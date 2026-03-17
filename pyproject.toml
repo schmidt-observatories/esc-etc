@@ -1,0 +1,63 @@
+# This part shouldn't change
+[build-system]
+requires = ["setuptools", "setuptools-scm", "wheel"]
+build-backend = "setuptools.build_meta" 
+
+[project]
+name = "esc_etc" # <- Edit this (repo name)
+authors = [
+  {name = "Aaron Goldtooth", email = "gold1992@arizona.edu"},
+  {name = "Justin Hom", email = "jrhom@arizona.edu"},
+  {name = "Jess Johnson", email = "jajohnson@arizona.edu"},
+  {name = "Sanchit Sabhlok", email = "ssabhlok@arizona.edu"},
+  {name = "Gudmundur Stefansson", email = "gstefansson@schmidtsciences.org"}
+]
+maintainers = [
+  {name = "Justin Hom", email = "jrhom@arizona.edu"}
+]
+description = "Exposure time calculator the ExtraSolar Camera" # Edit this
+readme = "README.md"
+license = { text = "GNU GENERAL PUBLIC LICENSE - Verison 3" }
+requires-python = ">=3.8"
+dependencies = [
+    "utils_config @ git+https://github.com/uasal/utils_config.git@develop",
+    "config_um @ git+https://github.com/uasal/config_um.git",
+    "synphot",
+    "numpy",
+    "astropy",
+    "matplotlib",
+    "pandas",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev= ["config_stp @ git+https://github.com/uasal/config_stp.git",  "config_stp_esc@ git+https://github.com/uasal/config_stp_esc.git", "pytest"]  
+
+# Edit this section with URLs for the README.md, CHANGELOG.md, and repository.
+[project.urls]
+Homepage = "https://github.com/uasal/stp_etc_esc/blob/main/README.md" 
+Changelog = "https://github.com/uasal/stp_etc_esc/blob/main/CHANGELOG.md" 
+Repository = "https://github.com/uasal/stp_etc_esc" 
+
+[tool.setuptools]
+packages = ["esc_etc"] # Edit this to package name (repo name)
+package-dir = { "" = "src" }
+include-package-data = true
+
+# Generated the _version.py automatically from GitHub tags
+[tool.setuptools_scm]
+write_to = "src/esc_etc/_version.py" # Modify the path where the _version.py lives
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+
+[tool.pytest.ini_options]
+testpaths = [
+	"tests",
+]
+
+# This should match the path for the write_to under tool.setuptools_scm
+[tool.coverage.run]
+omit=["src/esc_etc/_version.py"] # Modify the path where the _version.py lives
+
+[tool.setuptools.package-data]
+"esc_etc" = ["support_data/**/*", "configs/**/*.toml"] # Edit the config_project part
