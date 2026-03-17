@@ -25,7 +25,7 @@ import os
 from scipy.interpolate import interp1d
 import pandas as pd
 from math import ceil, floor, log10
-import config_stp
+#import config_stp
 import config_stp_esc
 import config_um
 from pathlib import Path
