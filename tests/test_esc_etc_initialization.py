@@ -23,7 +23,7 @@ except:
     print("Could not import utils_config. Cannot parse tomls. Exiting.")
     exit()
 
-from stp_etc_esc import ExposureTimeSNRCalculatorESC as etsc
+from esc_etc import ExposureTimeSNRCalculatorESC as etsc
 
 #@pytest.fixture
 #def UM():

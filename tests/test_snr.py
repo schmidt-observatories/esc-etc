@@ -1,5 +1,5 @@
-import stp_etc_esc
-import stp_etc_esc.ExposureTimeSNRCalculatorESC
+import esc_etc
+import esc_etc.ExposureTimeSNRCalculatorESC as stp_etc_esc
 import numpy as np
 
 def test_snr():
