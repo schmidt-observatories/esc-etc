@@ -154,7 +154,6 @@ class Observatory:
         self.rawDH_contrast = rawDH_contrast
     
     ### Add Spectral Elements
-    # Add Quantum Efficiancy properties
     def add_qe_curve(self, qe_fits_file, wave_unit='angstrom', num_curves=1, plot=False):
         """
         Add detector QE curve
@@ -480,16 +479,18 @@ class Observatory:
                 self.num_psf_pixels = 1 + 4 * sum(sequence) * (u.pix)
         return psf_diameter, self.num_psf_pixels
         
-    def make_STP(self,
+    def make_STP(self, 
                  subap = 'A',
                  plot=False,
                  telconfig='DEFAULT',
                  escconfig='DEFAULT',
                  telpath='DEFAULT',
                  escpath='DEFAULT',
-                 contrast='spec',
-                 verbose=True
-                ):
+                 separation=0.4,
+                 contrast=1e-8,
+                 ppgain=10,
+                 verbose=True,
+                 ):
         """
         Create a Preconfigured Observatory using submodule at 'uasal/stp_reference_data.git'
         NOTE: This function is "complete", meaning you would only need to add observational parameters
@@ -561,7 +562,8 @@ class Observatory:
         self.rms_surf           = u.Quantity(self.telescope_config['telescope']['optics']['m1']['surface_rms'])
         self.jitter_rms         = u.Quantity(self.telescope_config['observatory']['pointing']['jitter_rms'])
         self.resel              = np.pi*(((self.primary_filter)/2/self.diameter_primary*u.radian)**2).to(u.arcsec**2,equivalencies=u.dimensionless_angles())
-        self.ppgain             = 1./self.instrument_config['common_params']['ETC']['pp_gain']
+        #self.ppgain             = 1./self.instrument_config['common_params']['ETC']['pp_gain']
+        self.ppgain             = 1./ppgain
 
         # Add STP mirrors
         for key in self.telescope_config['telescope']['optics'].keys():
@@ -574,7 +576,7 @@ class Observatory:
         for key in self.instrument_config['common_params'][arm_key]['optics'].keys():
             if 'oap' in key or 'flat' in key or 'sphere' in key or 'dm' in key or 'fsm' in key:
                 coating = self.instrument_SP / Path(self.instrument_config['common_params'][arm_key]['optics'][key]['coating_refl'])
-                self.add_mirror(num_curves=1, coating_file=coating.as_posix(),plot=plot)
+                self.add_mirror(num_curves=1, coating_file=coating.as_posix(),plot=plot,verbose=verbose)
         t_after_escoptics = perf_counter()
         print(f"make_STP: esc optics {t_after_escoptics-t_after_mirrors:.3f}s")
 
@@ -596,7 +598,11 @@ class Observatory:
                     self.add_generic_optic(0.5,num_curves=1,plot=plot,coronOnly=False)
             elif 'fpm' in key:
                 throughput = self.instrument_SP / Path(self.instrument_config['common_params'][arm_key]['optics'][key]['throughput'])
-                self.add_lamD_optic(throughput.as_posix(),self.instrument_config['common_params']['sources']['companion']['separation'],num_curves=1,plot=plot,coronOnly=True)
+                if separation is None:
+                    self.add_lamD_optic(throughput.as_posix(),self.instrument_config['common_params']['sources']['companion']['separation'],num_curves=1,plot=plot,coronOnly=True)
+                else:
+                    self.add_lamD_optic(throughput.as_posix(),separation,num_curves=1,plot=plot,coronOnly=True)
+                print('Setting separation',separation)
         t_after_optics = perf_counter()
         print(f"make_STP: optics loop {t_after_optics-t_after_filter:.3f}s")
 
@@ -617,7 +623,8 @@ class Observatory:
         print(f"make_STP: add_sensor {t_after_sensor-t_after_optics:.3f}s")
 
         # Choose contrast and calc PSF
-        self.set_rawDH_contrast(self.instrument_config['common_params']['ETC']['rawDH_contrast_'+contrast])
+        #self.set_rawDH_contrast(self.instrument_config['common_params']['ETC']['rawDH_contrast_'+contrast])
+        self.set_rawDH_contrast(contrast)
         t_after_contrast = perf_counter()
         print(f"make_STP: set_rawDH_contrast {t_after_contrast-t_after_sensor:.3f}s")
 
@@ -805,9 +812,16 @@ class Observatory:
     
     
     # Create observation using source and return countrate. Normalizes the flux from the source to a specified vega or AB magnitude
-    def make_observation(self, hoststarflux=0, planetdeltamag=20, flux_units=units.VEGAMAG,
-                        bg_flux=23, bg_flux_units=units.VEGAMAG, exobg_flux=21,
-                        plot=False, left=4000, right=8000):
+    def make_observation(self,
+                         hoststarflux=0,
+                         planetdeltamag=20,
+                         flux_units=units.VEGAMAG,
+                         bg_flux=23,
+                         bg_flux_units=units.VEGAMAG, 
+                         exobg_flux=21,
+                         plot=False, 
+                         left=4000, 
+                         right=8000):
         """
         Create observations and return (source_counts, background_counts, speckle_counts).
 
@@ -1142,6 +1156,8 @@ def esc_calc_snr(exp_time,
                  bg_flux=22.5,
                  exobg_flux=21,
                  flux_units='vega',
+                 separation=0.2,
+                 ppgain=10,
                  verbose=True,
                  plot=False):
     """
@@ -1174,7 +1190,10 @@ def esc_calc_snr(exp_time,
                                  escconfig='DEFAULT',
                                  telpath='DEFAULT',
                                  escpath='DEFAULT',
-                                 contrast='spec')
+                                 separation=separation,
+                                 contrast=contrast,
+                                 ppgain=ppgain,
+                                 verbose=verbose)
     if verbose:
         print('######################################################')
         print(f"make_STP() took: {time.perf_counter() - pre_t:.3f} s")
@@ -1183,7 +1202,7 @@ def esc_calc_snr(exp_time,
     if verbose:
         print('#################################')
         print('Setting contrast to: ',contrast)
-    ESC.set_generic_source(contrast,0,plot=plot)
+    ESC.set_generic_source(contrast,hoststarmag,plot=plot)
 
     #zodi_model = stp_support_path / Path(stp_config['astrophysics']['zodi']['profile'])
 
