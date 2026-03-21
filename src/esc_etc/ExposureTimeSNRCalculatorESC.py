@@ -1122,6 +1122,101 @@ class Observatory:
 
         return int_time, noise_terms
 
+    def plot_compare_fluxes(self,return_html=False, auto_show=True):
+        """
+        Plot a Bokeh bar chart comparing major flux/count-rate contributors.
+
+        If return_html is False, returns a Bokeh Figure object (for notebooks).
+        If return_html is True, returns the Bokeh <div> string for embedding (not a full HTML file).
+        If auto_show is True, the figure is displayed automatically in notebooks.
+        """
+        try:
+            from bokeh.embed import file_html, components
+            from bokeh.io import output_notebook, show
+            from bokeh.models import ColumnDataSource, HoverTool
+            from bokeh.plotting import figure
+            from bokeh.resources import CDN
+        except Exception as exc:
+            raise ImportError(
+                "Bokeh is required for plot_compare_fluxes(). "
+                "Install with `pip install bokeh`."
+            ) from exc
+
+        missing = []
+        if self.source_counts is None:
+            missing.append('source_counts')
+        if self.sky_counts is None:
+            missing.append('sky_counts')
+        if self.exozodi_counts is None:
+            missing.append('exozodi_counts')
+        if self.speckle_counts is None:
+            missing.append('speckle_counts')
+        if self.dark_current is None:
+            missing.append('dark_current')
+        if self.num_psf_pixels is None:
+            missing.append('num_psf_pixels')
+
+        if missing:
+            raise ValueError(
+                "Missing required values: {}. Run setup/make_observation first."
+                .format(", ".join(missing))
+            )
+
+        # Dark current contributes as rate per pixel, so scale by PSF footprint.
+        dark_current_total = self.dark_current * self.num_psf_pixels
+
+        components = ['Source', 'Zodi', 'Dark Current', 'Speckles', 'Exozodi']
+        values = np.array([
+            self.source_counts.value,
+            self.sky_counts.value,
+            dark_current_total.value,
+            self.speckle_counts.value,
+            self.exozodi_counts.value
+        ], dtype=float)
+        values = np.clip(values, 1e-30, None)
+
+        source = ColumnDataSource(data=dict(
+            component=components,
+            value=values,
+        ))
+
+        p = figure(
+            x_range=components,
+            y_axis_type='log',
+            title='Flux/Count-Rate Comparison',
+            width=500,
+            height=450,
+            tools='pan,wheel_zoom,box_zoom,reset,save'
+        )
+        #p.vbar(x='component', top='value', width=0.7, source=source)
+        p.scatter(x='component', y='value', marker='square', size=16, source=source)
+        p.xgrid.grid_line_color = None
+        p.xaxis.axis_label = 'Component'
+        p.yaxis.axis_label = 'Rate [e-/s]'
+        p.add_tools(HoverTool(tooltips=[
+            ('Component', '@component'),
+            ('Value', '@value{0,0.000e}')
+        ]))
+
+        if return_html:
+            # Return only the div fragment for embedding (user requested div, not full HTML file)
+            script, div = components(p)
+            return div
+
+        if auto_show:
+            try:
+                from IPython import get_ipython
+                shell = get_ipython()
+                in_notebook = shell is not None and shell.__class__.__name__ == 'ZMQInteractiveShell'
+            except Exception:
+                in_notebook = False
+
+            if in_notebook:
+                output_notebook(hide_banner=True)
+                show(p)
+
+        return p
+
 def resample_SpectralElement(S,w,verbose=True,label=''):
     """
     INPUT:
