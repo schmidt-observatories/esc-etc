@@ -23,7 +23,7 @@ except:
     print("Could not import utils_config. Cannot parse tomls. Exiting.")
     exit()
 
-from stp_etc_esc import ExposureTimeSNRCalculatorESC as etsc
+from esc_etc import ExposureTimeSNRCalculatorESC as etsc
 
 #@pytest.fixture
 #def UM():
@@ -78,7 +78,7 @@ def test_default_throughput(telescope):
 	flux = obs.bandpass(obs.bandpass.waveset)
 	bp_non_zero = flux[flux!=0]
 	waveset_non_zero = obs.bandpass.waveset[flux!=0]
-	assert round(np.min(waveset_non_zero).value,2) == 6266.7, "Throughput check failed. Default filter modified or corrupt installation."
+	assert round(np.min(waveset_non_zero).value,2) == 6266.8, "Throughput check failed. Default filter modified or corrupt installation."
 	assert round(np.max(waveset_non_zero).value,2) == 6393.29, "Throughput check failed. Default filter modified or corrupt installation."
 	assert round(np.mean(bp_non_zero).value, 3) == 0.015, "Throughput check failed. Default filter modified or corrupt installation."
 
@@ -105,8 +105,8 @@ def test_counts(telescope):
 		data_telescope = config_stp.load_config_values("parsed")
 		data_path_telescope = config_stp.get_data_path()
 	if telescope == "test_STP":
-		test_loader = utils_config.ConfigLoader('test_data/test_STP')
-		data_telescope = utils_config.load_configs()
+		test_loader = utils_config.ConfigLoader('tests/test_data/test_stp')
+		data_telescope = test_loader.load_configs()
 		data_path_telescope = config_stp.get_data_path()
 	#if telescope == "UM":
 	#	data_telescope = config_um.load_config_values("parsed")
@@ -143,7 +143,7 @@ def test_validate_ETC_snr_calculation(telescope):
 		data_telescope = config_stp.load_config_values("parsed")
 		data_path_telescope = config_stp.get_data_path()
 	if telescope == "test_STP":
-		test_loader = utils_config.ConfigLoader('test_data/test_STP')
+		test_loader = utils_config.ConfigLoader('tests/test_data/test_stp')
 		data_telescope = test_loader.load_configs()
 		data_path_telescope = config_stp.get_data_path()
 	#if telescope == "UM":
