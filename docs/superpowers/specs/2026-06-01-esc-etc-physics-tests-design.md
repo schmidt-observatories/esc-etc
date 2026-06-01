@@ -85,9 +85,20 @@ and an isolated anchors file. All under `tests/`.
 - `source_counts` ratio for `Δplanetdeltamag = 2.5` ≈ 10 (and a 5-mag step
   ≈ ×100), within tolerance.
 - Monotonic: fainter planet (larger `planetdeltamag`) → lower SNR over a grid.
+- Host-magnitude flux law: at fixed `planetdeltamag`, `source_counts ∝
+  10^(-0.4·hoststarmag)` — a 2.5-mag brighter host → ×10 counts, within
+  tolerance. (Replaces the originally-planned collecting-area `D²` test — see
+  note below.)
 - Brighter host (smaller `hoststarmag`) → higher `source_counts` / SNR.
-- Collecting-area scaling via the low-level `Observatory` API: building with
-  diameter `D` vs `2D` gives `source_counts ∝ D²` (×4), within tolerance.
+
+> **Note (probe finding, 2026-06-01):** the `Observatory(name, diameter,
+> focal_len)` constructor arguments are **overridden by the telescope config in
+> `make_STP()`** — varying the constructor diameter/focal length changes neither
+> `source_counts`, `plate_scale`, nor `num_psf_pixels`. Collecting area is
+> therefore **not** a free knob through the public API, so the `counts ∝ D²`
+> test is not implementable as designed and is replaced by the host-magnitude
+> flux law above (same underlying `F0·10^(-0.4·mag)·area·throughput` physics,
+> exercised through a knob the API actually controls).
 
 ### `tests/test_physics_coronagraph.py` (new)
 - Deeper contrast → higher SNR; `speckle_counts` linear in contrast.
