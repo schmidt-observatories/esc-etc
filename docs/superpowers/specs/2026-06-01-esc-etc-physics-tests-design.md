@@ -1,7 +1,7 @@
 # ESC ETC Physics Test Suite — Design
 
 **Date:** 2026-06-01
-**Status:** Approved (pending spec review)
+**Status:** Implemented
 **Author:** Gummi + Claude
 
 ## Goal
