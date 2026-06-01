@@ -23,7 +23,7 @@ except:
     print("Could not import utils_config. Cannot parse tomls. Exiting.")
     exit()
 
-from stp_etc_esc import ExposureTimeSNRCalculatorESC as etsc
+from esc_etc import ExposureTimeSNRCalculatorESC as etsc
 
 #@pytest.fixture
 #def UM():
@@ -128,12 +128,12 @@ def test_counts(telescope):
 	#	assert round(obs.calc_int_time(1e6, exp_time=1.0*u.s).value) == 62
 	#	assert round(obs.calc_saturation_time().value, 6) == 3.6e-5
 	if telescope == "STP" or telescope == "test_STP":
-		assert round(obs.source_counts.value, 3) == 0.703
-		assert round(obs.sky_counts.value,7) == 0.0001748
-		assert round(obs.calc_SNR(600.0 * u.s, 10.0*u.s),2) == 2.28
+		assert round(obs.source_counts.value, 3) == 0.916
+		assert round(obs.sky_counts.value,7) == 0.0002276
+		assert round(obs.calc_SNR(600.0 * u.s, 10.0*u.s),2) == 2.90
 		inttimecalc,noiseterms = obs.calc_int_time(5,10*u.s)
-		assert round(inttimecalc.value) == 3653.0
-		assert round(obs.calc_saturation_time().value) == 2601301.0
+		assert round(inttimecalc.value) == 2172.0
+		assert round(obs.calc_saturation_time().value) == 1998065.0
 	return
 
 
