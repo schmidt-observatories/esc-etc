@@ -9,7 +9,6 @@ import warnings
 from astropy import units as u
 
 from .simulation import Simulation
-from .sensor import _resample_spectral_element  # re-export name kept below
 from synphot import SourceSpectrum, SpectralElement
 from synphot.models import Empirical1D
 
