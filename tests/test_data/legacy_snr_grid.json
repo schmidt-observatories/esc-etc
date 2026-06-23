@@ -1,0 +1,110 @@
+[
+  {
+    "params": {
+      "exp_time": 3600,
+      "int_time": 100,
+      "separation": 0.4,
+      "contrast": 1e-08,
+      "ppgain": 10
+    },
+    "snr": 8.92207891806657,
+    "source_counts": 0.9158243559681103,
+    "sky_counts": 0.0002276078119755961,
+    "speckle_counts": 0.9158243559681103,
+    "exozodi_counts": 0.0008266985557170741,
+    "num_psf_pixels": 225.0
+  },
+  {
+    "params": {
+      "exp_time": 600,
+      "int_time": 10,
+      "separation": 0.2,
+      "contrast": 1e-08,
+      "ppgain": 10
+    },
+    "snr": 1.9043539347453955,
+    "source_counts": 0.5818809405239519,
+    "sky_counts": 0.0001446135897564733,
+    "speckle_counts": 0.5818809405239519,
+    "exozodi_counts": 0.000525253701755879,
+    "num_psf_pixels": 225.0
+  },
+  {
+    "params": {
+      "exp_time": 3600,
+      "int_time": 100,
+      "separation": 0.4,
+      "contrast": 1e-09,
+      "ppgain": 10
+    },
+    "snr": 20.458134863264156,
+    "source_counts": 0.9158243559681065,
+    "sky_counts": 0.0002276078119755961,
+    "speckle_counts": 0.09158243559681066,
+    "exozodi_counts": 0.0008266985557170741,
+    "num_psf_pixels": 225.0
+  },
+  {
+    "params": {
+      "exp_time": 3600,
+      "int_time": 100,
+      "separation": 0.4,
+      "contrast": 1e-08,
+      "ppgain": 100
+    },
+    "snr": 19.380926159458834,
+    "source_counts": 0.9158243559681103,
+    "sky_counts": 0.0002276078119755961,
+    "speckle_counts": 0.9158243559681103,
+    "exozodi_counts": 0.0008266985557170741,
+    "num_psf_pixels": 225.0
+  },
+  {
+    "params": {
+      "exp_time": 1800,
+      "int_time": 60,
+      "separation": 0.3,
+      "contrast": 1e-08,
+      "ppgain": 10,
+      "planetdeltamag": 22
+    },
+    "snr": 1.1574115212699256,
+    "source_counts": 0.12827119119143435,
+    "sky_counts": 0.00020114261986776697,
+    "speckle_counts": 0.809336501674587,
+    "exozodi_counts": 0.0007305738405659831,
+    "num_psf_pixels": 225.0
+  },
+  {
+    "params": {
+      "exp_time": 3600,
+      "int_time": 100,
+      "separation": 0.4,
+      "contrast": 1e-08,
+      "ppgain": 10,
+      "hoststarmag": 2.0
+    },
+    "snr": 2.4659246195180566,
+    "source_counts": 0.1048605639900442,
+    "sky_counts": 0.0002276078119755961,
+    "speckle_counts": 0.1048605639900442,
+    "exozodi_counts": 9.465578878453193e-05,
+    "num_psf_pixels": 225.0
+  },
+  {
+    "params": {
+      "exp_time": 3600,
+      "int_time": 100,
+      "separation": 0.4,
+      "contrast": 1e-08,
+      "ppgain": 10,
+      "bg_flux": 21.0
+    },
+    "snr": 8.921999119504417,
+    "source_counts": 0.9158243559681103,
+    "sky_counts": 0.0009061230202147697,
+    "speckle_counts": 0.9158243559681103,
+    "exozodi_counts": 0.0008266985557170741,
+    "num_psf_pixels": 225.0
+  }
+]
