@@ -90,6 +90,9 @@ class Simulation(_MetaHolder_):
         exo_obs = Observation(exo_rn, bp, force=FORCE)
         exozodi = exo_obs.countrate(area=area) * u.electron / u.ct * resel / u.arcsec ** 2 * k
 
+        # host is the POST-FPM (k-scaled) host count rate, NOT the unattenuated
+        # stellar flux. Consumers (e.g. contrast estimation) must account for the
+        # applied FPM throughput k if they need the raw stellar rate.
         return CountRates(source=source, zodi=zodi, exozodi=exozodi,
                           speckle=speckle, host=host_countrate * k)
 
@@ -105,6 +108,9 @@ class Simulation(_MetaHolder_):
 
     def saturation_time(self):
         rates = self.count_rate_components()
+        # host is intentionally omitted from the per-pixel sum, matching legacy
+        # calc_saturation_time (ExposureTimeSNRCalculatorESC.py ~1017), which sums
+        # only source/sky(zodi)/speckle/exozodi.
         per_pix = (rates.source + rates.zodi + rates.speckle + rates.exozodi) \
             / self.sensor.num_psf_pixels
         return self.sensor.well_depth / per_pix
