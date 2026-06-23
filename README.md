@@ -64,5 +64,23 @@ stp_etc_esc.__version__
 
 Included in this repository is an [example notebook](https://github.com/uasal/stp_etc_esc/blob/develop/notebooks/ESC_ExposureTimeSNRCalculator_Demo.ipynb) of how to use the exposure time calculator assuming the default configurations. There is also an [executable python script](https://github.com/uasal/stp_etc_esc/blob/develop/notebooks/etc_esc_requirements.py) that will run the exposure time calculator assuming the default configurations and generate figures calculating SNR and noise sources for various individual frame exposure times.
 
+### New OO API
+
+The package now exposes a clean object-oriented API. The recommended entry point is `Simulation`:
+
+```python
+from esc_etc import Simulation
+import astropy.units as u
+
+sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20,
+                              contrast=1e-8, ppgain=10, separation=0.4)
+print(sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"])
+```
+
+The full set of top-level exports includes: `Telescope`, `Sensor`, `Scene`, `SceneElement`, `get_scene`, `Coronagraph`, `AnalyticCoronagraphNoiseModel`, `CountRates`, and `Simulation`.
+
+> [!Note]
+> `esc_calc_snr` / `Observatory` are deprecated compatibility wrappers; prefer `Simulation`.
+
 
 
