@@ -99,7 +99,7 @@ def plot_count_rates(sim=None, *, rates=None, sensor=None, ax=None, log=True):
         ax.set_ylabel(r"Count rate [e$^-$/s]")
         ax.set_xlabel("Component")
         _apply_axis_cosmetics(ax)
-        ax.grid(True, axis="y", alpha=0.3, linewidth=0.3)
+        ax.grid(False, axis="x")  # bar chart: keep horizontal (y) grid only
     return fig, ax
 
 
@@ -116,6 +116,8 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None, 
         total_times = np.logspace(1, 5, 40) * u.s
     if snrs is None:
         _require(sim, "snrs", "total_times")
+        # Intentionally bypasses sim.get_snr (which recomputes count rates each call):
+        # evaluate count rates ONCE, then vary only the time in the noise model.
         rates = sim.count_rate_components()
         snrs = np.array([
             sim.noise_model.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]

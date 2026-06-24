@@ -96,6 +96,7 @@ fig, ax = plot_snr_vs_time(sim)          # SNR vs integration time (lazuli style
 
 All helpers use the packaged `lazuli.mplstyle` automatically (no global state mutation).
 Call `use_lazuli_style()` to apply the style globally to your own plots.
+Each helper returns `(fig, ax)` and opens a matplotlib figure; close figures you don't keep (`plt.close(fig)`) when generating many in a loop.
 
 
 
