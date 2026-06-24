@@ -98,5 +98,17 @@ All helpers use the packaged `lazuli.mplstyle` automatically (no global state mu
 Call `use_lazuli_style()` to apply the style globally to your own plots.
 Each helper returns `(fig, ax)` and opens a matplotlib figure; close figures you don't keep (`plt.close(fig)`) when generating many in a loop.
 
+### Tutorials
+
+A numbered suite of runnable Jupyter tutorials in [`notebooks/`](notebooks/) walks through the new OO API and the plotting helpers (they require the `config_um` / `config_stp_esc` configs and an editable install):
+
+- [`01_getting_started.ipynb`](notebooks/01_getting_started.ipynb) — build a `Simulation`, compute SNR, and plot the noise breakdown.
+- [`02_components_and_parameters.ipynb`](notebooks/02_components_and_parameters.ipynb) — build `Telescope`/`Sensor`/`Scene`/`Coronagraph` individually, assemble with `from_components`, and vary parameters via `update()`/`reset()`.
+- [`03_coronagraph_and_contrast.ipynb`](notebooks/03_coronagraph_and_contrast.ipynb) — the coronagraph knobs (`raw_dh_contrast`, `ppgain`, `separation`) and the off-axis throughput curve.
+- [`04_integration_time_snr_saturation.ipynb`](notebooks/04_integration_time_snr_saturation.ipynb) — invert SNR for an integration time, the SNR-vs-time curve, and saturation.
+
+> [!Note]
+> The older `ESC_ExposureTimeSNRCalculator_Demo.ipynb` is legacy (deprecated API); prefer the numbered suite above.
+
 
 
