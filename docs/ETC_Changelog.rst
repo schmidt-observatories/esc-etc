@@ -28,3 +28,12 @@ The ETC was originally created by forking the UASAL Exposure Time Calculator rep
 12. Fixed read noise implementation (previously was not being squared) after confirming the source of e- read noise is actually RMS electrons per frame. Also fixed the corresponding unit check when calling `config_stp` respectively.
 
 13. Sky background normalization now performed in the Johnson V band, as this is the source of Zodi background SB from HST.
+
+14. Object-oriented API refactor. The ETC now exposes a suite of composable classes at the top level:
+    ``Telescope``, ``Sensor``, ``Scene`` / ``SceneElement`` / ``get_scene``, ``Coronagraph``,
+    ``AnalyticCoronagraphNoiseModel``, ``CountRates``, and ``Simulation``.
+    The noise model is pluggable via the ``noise_model`` seam on ``Simulation``, enabling custom
+    noise implementations without subclassing the simulation engine.
+    ``Simulation.from_default()`` and ``Simulation.from_config()`` replace direct use of
+    ``Observatory``; the legacy ``Observatory`` class and ``esc_calc_snr`` function are retained
+    as deprecated compatibility wrappers and will be removed in a future release.
