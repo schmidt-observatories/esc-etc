@@ -37,3 +37,14 @@ The ETC was originally created by forking the UASAL Exposure Time Calculator rep
     ``Simulation.from_default()`` and ``Simulation.from_config()`` replace direct use of
     ``Observatory``; the legacy ``Observatory`` class and ``esc_calc_snr`` function are retained
     as deprecated compatibility wrappers and will be removed in a future release.
+
+15. New ``esc_etc.plotting`` module with five lazuli-styled matplotlib helpers:
+    ``plot_count_rates`` (noise-contributor bar breakdown), ``plot_snr_vs_time``
+    (SNR vs integration time), ``plot_offaxis_throughput`` (coronagraph off-axis
+    throughput vs separation), ``plot_bandpass`` (sensor bandpass curve), and
+    ``plot_spectra`` (scene element spectra overlay). A packaged ``lazuli.mplstyle``
+    ships as package data and is applied automatically inside each helper via a
+    context manager (no global state mutation). Style utilities ``lazuli_style()``
+    and ``use_lazuli_style()`` plus color tokens ``TEAL``, ``RED``, ``AMBER``,
+    ``BLUE``, ``GREEN``, ``DARKBLUE``, and ``LAZULI_COLORS`` are exported from
+    the top-level ``esc_etc`` namespace.

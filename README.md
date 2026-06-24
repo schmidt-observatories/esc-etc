@@ -82,5 +82,20 @@ The full set of top-level exports includes: `Telescope`, `Sensor`, `Scene`, `Sce
 > [!Note]
 > `esc_calc_snr` / `Observatory` are deprecated compatibility wrappers; prefer `Simulation`.
 
+### Plotting
+
+The package ships a suite of lazuli-styled matplotlib helpers:
+
+```python
+from esc_etc import Simulation, plot_count_rates, plot_snr_vs_time
+
+sim = Simulation.from_default(separation=0.4, contrast=1e-8, ppgain=10)
+fig, ax = plot_count_rates(sim)          # noise-contributor breakdown
+fig, ax = plot_snr_vs_time(sim)          # SNR vs integration time (lazuli style)
+```
+
+All helpers use the packaged `lazuli.mplstyle` automatically (no global state mutation).
+Call `use_lazuli_style()` to apply the style globally to your own plots.
+
 
 
