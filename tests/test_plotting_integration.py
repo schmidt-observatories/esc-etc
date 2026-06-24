@@ -1,0 +1,28 @@
+# tests/test_plotting_integration.py
+"""One slow, config-backed test exercising the Simulation domain-object path."""
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import astropy.units as u
+import numpy as np
+import pytest
+
+pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um")
+
+from esc_etc.simulation import Simulation
+from esc_etc.plotting import plot_count_rates, plot_snr_vs_time
+
+
+def test_count_rates_and_snr_from_simulation():
+    sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20.0,
+                                  contrast=1e-8, ppgain=10, separation=0.4)
+    fig, ax = plot_count_rates(sim)
+    assert len(ax.patches) == 5
+    plt.close(fig)
+
+    # small sweep to keep it fast; count rates computed once internally
+    fig, ax = plot_snr_vs_time(sim, total_times=np.array([100.0, 1000.0, 3600.0]) * u.s,
+                               frame_time=100 * u.s)
+    assert len(ax.get_lines()[0].get_xdata()) == 3
+    plt.close(fig)

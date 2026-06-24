@@ -61,4 +61,4 @@ testpaths = [
 omit=["src/esc_etc/_version.py"] # Modify the path where the _version.py lives
 
 [tool.setuptools.package-data]
-"esc_etc" = ["support_data/**/*", "configs/**/*.toml"] # Edit the config_project part
+"esc_etc" = ["support_data/**/*", "configs/**/*.toml", "data/*.mplstyle"]
