@@ -11,6 +11,7 @@ import importlib.resources
 
 import numpy as np
 import matplotlib.pyplot as plt
+import astropy.units as u
 
 # Lazuli qualitative palette (hex), in prop_cycle order.
 TEAL = "#00798c"
@@ -67,3 +68,65 @@ def _require(value, name, alt):
             f"Provide either a domain object or {name!r} (and {alt}). Got neither."
         )
     return value
+
+
+def plot_count_rates(sim=None, *, rates=None, sensor=None, ax=None, log=True):
+    """Bar chart of count-rate contributors (e-/s): source, zodi, exozodi,
+    speckle, and dark-current total (dark_current * num_psf_pixels).
+
+    Pass a Simulation, or explicit `rates` (CountRates) + `sensor`. Returns (fig, ax).
+    """
+    if sim is not None:
+        rates = sim.count_rate_components()
+        sensor = sim.sensor
+    _require(rates, "rates", "sensor")
+    _require(sensor, "sensor", "rates")
+
+    dark_total = (sensor.dark_current * sensor.num_psf_pixels)
+    labels = ["Source", "Zodi", "Exozodi", "Speckle", "Dark"]
+    values = np.array([
+        rates.source.value, rates.zodi.value, rates.exozodi.value,
+        rates.speckle.value, dark_total.value,
+    ], dtype=float)
+    if log:
+        values = np.clip(values, 1e-30, None)
+
+    with lazuli_style():
+        fig, ax = _prepare_ax(ax)
+        ax.bar(labels, values, color=LAZULI_COLORS[:len(labels)])
+        if log:
+            ax.set_yscale("log")
+        ax.set_ylabel(r"Count rate [e$^-$/s]")
+        ax.set_xlabel("Component")
+        _apply_axis_cosmetics(ax)
+        ax.grid(True, axis="y", alpha=0.3, linewidth=0.3)
+    return fig, ax
+
+
+def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None, ax=None):
+    """SNR vs total integration time (log-log).
+
+    Pass a Simulation (sweeps `total_times`, default logspace 10..1e5 s, computing
+    SNR per point via the engine's noise_model with a single count-rate evaluation),
+    or explicit `(total_times, snrs)`. `frame_time` defaults to 100 s. Returns (fig, ax).
+    """
+    if frame_time is None:
+        frame_time = 100 * u.s
+    if total_times is None and sim is not None:
+        total_times = np.logspace(1, 5, 40) * u.s
+    if snrs is None:
+        _require(sim, "snrs", "total_times")
+        rates = sim.count_rate_components()
+        snrs = np.array([
+            sim.noise_model.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]
+            for t in total_times
+        ], dtype=float)
+
+    t_s = u.Quantity(total_times, u.s).value
+    with lazuli_style():
+        fig, ax = _prepare_ax(ax)
+        ax.loglog(t_s, np.asarray(snrs, dtype=float), color=TEAL)
+        ax.set_xlabel("Integration time [s]")
+        ax.set_ylabel("SNR")
+        _apply_axis_cosmetics(ax)
+    return fig, ax
