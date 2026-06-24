@@ -130,3 +130,90 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None, 
         ax.set_ylabel("SNR")
         _apply_axis_cosmetics(ax)
     return fig, ax
+
+
+def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=None,
+                            ax=None, mark_separation=True):
+    """Coronagraph off-axis (FPM) throughput vs planet separation (arcsec).
+
+    Pass a Coronagraph, a Simulation (uses .coronagraph), or explicit
+    (separations, throughputs). When `mark_separation`, draws a vertical marker at
+    the coronagraph's current separation. Returns (fig, ax).
+    """
+    if coronagraph is not None and hasattr(coronagraph, "coronagraph"):
+        coronagraph = coronagraph.coronagraph  # a Simulation was passed
+    if throughputs is None:
+        _require(coronagraph, "throughputs", "separations")
+        if separations is None:
+            separations = np.linspace(0.05, 0.6, 60)
+        throughputs = np.array([coronagraph.off_axis_throughput(float(s))
+                                for s in separations], dtype=float)
+
+    with lazuli_style():
+        fig, ax = _prepare_ax(ax)
+        ax.plot(np.asarray(separations, dtype=float),
+                np.asarray(throughputs, dtype=float), color=TEAL)
+        if mark_separation and coronagraph is not None:
+            ax.axvline(coronagraph.separation, color=RED, ls="--", lw=1.0,
+                       label=f"separation = {coronagraph.separation} arcsec")
+            ax.legend()
+        ax.set_xlabel("Separation [arcsec]")
+        ax.set_ylabel("Off-axis throughput")
+        _apply_axis_cosmetics(ax)
+    return fig, ax
+
+
+def plot_bandpass(sensor=None, *, wavelength=None, throughput=None, ax=None):
+    """Instrument bandpass throughput vs wavelength (nm).
+
+    Pass a Sensor, a Simulation (uses .sensor), or explicit (wavelength, throughput).
+    `wavelength` may be an astropy Quantity (converted to nm) or a plain array (nm).
+    Returns (fig, ax).
+    """
+    if sensor is not None and hasattr(sensor, "sensor"):
+        sensor = sensor.sensor  # a Simulation was passed
+    if throughput is None:
+        _require(sensor, "throughput", "wavelength")
+        bp = sensor.bandpass
+        wave_q = bp.waveset  # astropy Quantity (Angstrom)
+        wavelength = wave_q.to(u.nm).value
+        tput = bp(wave_q)
+        throughput = np.asarray(getattr(tput, "value", tput), dtype=float)
+    else:
+        wavelength = (u.Quantity(wavelength).to(u.nm).value
+                      if hasattr(wavelength, "unit") else np.asarray(wavelength, dtype=float))
+
+    with lazuli_style():
+        fig, ax = _prepare_ax(ax)
+        ax.plot(np.asarray(wavelength, dtype=float),
+                np.asarray(throughput, dtype=float), color=TEAL)
+        ax.set_xlabel("Wavelength [nm]")
+        ax.set_ylabel("Throughput")
+        _apply_axis_cosmetics(ax)
+    return fig, ax
+
+
+def plot_spectra(scene=None, *, which=("star", "planet", "zodi"), ax=None):
+    """Scene element spectra over 3000-9000 Angstrom.
+
+    Pass a Scene or a Simulation (uses .scene). `which` names the elements to draw.
+    Returns (fig, ax).
+    """
+    if scene is not None and hasattr(scene, "scene"):
+        scene = scene.scene  # a Simulation was passed
+    _require(scene, "scene", "which")
+
+    wave = np.arange(3000, 9000, 5) * u.AA
+    wave_nm = wave.to(u.nm).value
+    with lazuli_style():
+        fig, ax = _prepare_ax(ax)
+        for i, name in enumerate(which):
+            element = getattr(scene, name)
+            flux = element.spectrum(wave)
+            y = np.asarray(getattr(flux, "value", flux), dtype=float)
+            ax.plot(wave_nm, y, color=LAZULI_COLORS[i % len(LAZULI_COLORS)], label=name)
+        ax.set_xlabel("Wavelength [nm]")
+        ax.set_ylabel("Flux [PHOTLAM]")
+        ax.legend()
+        _apply_axis_cosmetics(ax)
+    return fig, ax
