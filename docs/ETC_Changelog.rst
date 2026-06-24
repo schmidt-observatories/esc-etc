@@ -48,3 +48,12 @@ The ETC was originally created by forking the UASAL Exposure Time Calculator rep
     and ``use_lazuli_style()`` plus color tokens ``TEAL``, ``RED``, ``AMBER``,
     ``BLUE``, ``GREEN``, ``DARKBLUE``, and ``LAZULI_COLORS`` are exported from
     the top-level ``esc_etc`` namespace.
+
+16. New numbered tutorial notebook suite in ``notebooks/`` teaching the object-oriented
+    API and the plotting helpers: ``01_getting_started`` (Simulation -> SNR -> noise
+    breakdown), ``02_components_and_parameters`` (build/inspect components, ``update()`` /
+    ``reset()``), ``03_coronagraph_and_contrast`` (contrast / ppgain / separation knobs and
+    off-axis throughput), and ``04_integration_time_snr_saturation`` (inverting SNR for an
+    integration time, the SNR-vs-time curve, and saturation). Each notebook executes
+    end-to-end and prints reference sanity values (baseline SNR ~ 8.92, ``num_psf_pixels``
+    225, off-axis throughput ~ 0.543 at 0.4 arcsec).
