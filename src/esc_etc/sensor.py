@@ -14,7 +14,7 @@ from astropy import units as u
 import astropy.io.fits
 import astropy.table
 from scipy.interpolate import interp1d
-from synphot import SourceSpectrum, SpectralElement
+from synphot import SpectralElement
 from synphot.models import Box1D, Empirical1D
 
 from .meta import _MetaHolder_

@@ -80,13 +80,23 @@ class Simulation(_MetaHolder_):
         source = host_countrate * planet_scale * k
         speckle = host_countrate * self.coronagraph.speckle_scale() * k
 
-        zodi_rn = self.scene.zodi.spectrum.normalize(
-            self.scene.zodi.mag * su.VEGAMAG, self._johnson_v, vegaspec=vega, force=FORCE)
+        zodi_norm_units = self._normalize_units(self.scene.zodi.mag_system)
+        if zodi_norm_units is su.VEGAMAG:
+            zodi_rn = self.scene.zodi.spectrum.normalize(
+                self.scene.zodi.mag * su.VEGAMAG, self._johnson_v, vegaspec=vega, force=FORCE)
+        else:
+            zodi_rn = self.scene.zodi.spectrum.normalize(
+                self.scene.zodi.mag * u.ABmag, self._johnson_v, force=FORCE)
         zodi_obs = Observation(zodi_rn, bp, force=FORCE)
         zodi = zodi_obs.countrate(area=area) * u.electron / u.ct * resel / u.arcsec ** 2 * k
 
-        exo_rn = self.scene.exozodi.spectrum.normalize(
-            self.scene.exozodi.mag * su.VEGAMAG, bp, vegaspec=vega, force=FORCE)
+        exo_norm_units = self._normalize_units(self.scene.exozodi.mag_system)
+        if exo_norm_units is su.VEGAMAG:
+            exo_rn = self.scene.exozodi.spectrum.normalize(
+                self.scene.exozodi.mag * su.VEGAMAG, bp, vegaspec=vega, force=FORCE)
+        else:
+            exo_rn = self.scene.exozodi.spectrum.normalize(
+                self.scene.exozodi.mag * u.ABmag, bp, force=FORCE)
         exo_obs = Observation(exo_rn, bp, force=FORCE)
         exozodi = exo_obs.countrate(area=area) * u.electron / u.ct * resel / u.arcsec ** 2 * k
 

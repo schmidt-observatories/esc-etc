@@ -56,8 +56,8 @@ $ pip install .
 
 The ETC should now be installed on your local machine. To confirm installation, the following import on python should work - 
 ```
-import stp_etc_esc
-stp_etc_esc.__version__
+import esc_etc
+esc_etc.__version__
 ```
 
 ## Usage

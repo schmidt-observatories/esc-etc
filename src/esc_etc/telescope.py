@@ -16,7 +16,7 @@ from .meta import _MetaHolder_
 class Telescope(_MetaHolder_):
     def __init__(self, diameter_primary, surface, f_num, focal_len, primary_filter,
                  resel, diameter_secondary, jitter_rms, zodi_profile_path):
-        self._mutable_parameters = ["separation_unused"]  # geometry is fixed post-config
+        self._mutable_parameters = []  # geometry is fixed post-config
         self.diameter_primary = diameter_primary
         self.surface = surface
         self.f_num = f_num
