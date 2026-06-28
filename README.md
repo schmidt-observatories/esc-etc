@@ -56,13 +56,59 @@ $ pip install .
 
 The ETC should now be installed on your local machine. To confirm installation, the following import on python should work - 
 ```
-import stp_etc_esc
-stp_etc_esc.__version__
+import esc_etc
+esc_etc.__version__
 ```
 
 ## Usage
 
 Included in this repository is an [example notebook](https://github.com/uasal/stp_etc_esc/blob/develop/notebooks/ESC_ExposureTimeSNRCalculator_Demo.ipynb) of how to use the exposure time calculator assuming the default configurations. There is also an [executable python script](https://github.com/uasal/stp_etc_esc/blob/develop/notebooks/etc_esc_requirements.py) that will run the exposure time calculator assuming the default configurations and generate figures calculating SNR and noise sources for various individual frame exposure times.
+
+### New OO API
+
+The package now exposes a clean object-oriented API. The recommended entry point is `Simulation`:
+
+```python
+from esc_etc import Simulation
+import astropy.units as u
+
+sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20,
+                              contrast=1e-8, ppgain=10, separation=0.4)
+print(sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"])
+```
+
+The full set of top-level exports includes: `Telescope`, `Sensor`, `Scene`, `SceneElement`, `get_scene`, `Coronagraph`, `AnalyticCoronagraphNoiseModel`, `CountRates`, and `Simulation`.
+
+> [!Note]
+> `esc_calc_snr` / `Observatory` are deprecated compatibility wrappers; prefer `Simulation`.
+
+### Plotting
+
+The package ships a suite of lazuli-styled matplotlib helpers:
+
+```python
+from esc_etc import Simulation, plot_count_rates, plot_snr_vs_time
+
+sim = Simulation.from_default(separation=0.4, contrast=1e-8, ppgain=10)
+fig, ax = plot_count_rates(sim)          # noise-contributor breakdown
+fig, ax = plot_snr_vs_time(sim)          # SNR vs integration time (lazuli style)
+```
+
+All helpers use the packaged `lazuli.mplstyle` automatically (no global state mutation).
+Call `use_lazuli_style()` to apply the style globally to your own plots.
+Each helper returns `(fig, ax)` and opens a matplotlib figure; close figures you don't keep (`plt.close(fig)`) when generating many in a loop.
+
+### Tutorials
+
+A numbered suite of runnable Jupyter tutorials in [`notebooks/`](notebooks/) walks through the new OO API and the plotting helpers (they require the `config_um` / `config_stp_esc` configs and an editable install):
+
+- [`01_getting_started.ipynb`](notebooks/01_getting_started.ipynb) — build a `Simulation`, compute SNR, and plot the noise breakdown.
+- [`02_components_and_parameters.ipynb`](notebooks/02_components_and_parameters.ipynb) — build `Telescope`/`Sensor`/`Scene`/`Coronagraph` individually, assemble with `from_components`, and vary parameters via `update()`/`reset()`.
+- [`03_coronagraph_and_contrast.ipynb`](notebooks/03_coronagraph_and_contrast.ipynb) — the coronagraph knobs (`raw_dh_contrast`, `ppgain`, `separation`) and the off-axis throughput curve.
+- [`04_integration_time_snr_saturation.ipynb`](notebooks/04_integration_time_snr_saturation.ipynb) — invert SNR for an integration time, the SNR-vs-time curve, and saturation.
+
+> [!Note]
+> The older `ESC_ExposureTimeSNRCalculator_Demo.ipynb` is legacy (deprecated API); prefer the numbered suite above.
 
 
 

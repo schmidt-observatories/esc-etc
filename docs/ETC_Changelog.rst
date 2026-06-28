@@ -28,3 +28,32 @@ The ETC was originally created by forking the UASAL Exposure Time Calculator rep
 12. Fixed read noise implementation (previously was not being squared) after confirming the source of e- read noise is actually RMS electrons per frame. Also fixed the corresponding unit check when calling `config_stp` respectively.
 
 13. Sky background normalization now performed in the Johnson V band, as this is the source of Zodi background SB from HST.
+
+14. Object-oriented API refactor. The ETC now exposes a suite of composable classes at the top level:
+    ``Telescope``, ``Sensor``, ``Scene`` / ``SceneElement`` / ``get_scene``, ``Coronagraph``,
+    ``AnalyticCoronagraphNoiseModel``, ``CountRates``, and ``Simulation``.
+    The noise model is pluggable via the ``noise_model`` seam on ``Simulation``, enabling custom
+    noise implementations without subclassing the simulation engine.
+    ``Simulation.from_default()`` and ``Simulation.from_config()`` replace direct use of
+    ``Observatory``; the legacy ``Observatory`` class and ``esc_calc_snr`` function are retained
+    as deprecated compatibility wrappers and will be removed in a future release.
+
+15. New ``esc_etc.plotting`` module with five lazuli-styled matplotlib helpers:
+    ``plot_count_rates`` (noise-contributor bar breakdown), ``plot_snr_vs_time``
+    (SNR vs integration time), ``plot_offaxis_throughput`` (coronagraph off-axis
+    throughput vs separation), ``plot_bandpass`` (sensor bandpass curve), and
+    ``plot_spectra`` (scene element spectra overlay). A packaged ``lazuli.mplstyle``
+    ships as package data and is applied automatically inside each helper via a
+    context manager (no global state mutation). Style utilities ``lazuli_style()``
+    and ``use_lazuli_style()`` plus color tokens ``TEAL``, ``RED``, ``AMBER``,
+    ``BLUE``, ``GREEN``, ``DARKBLUE``, and ``LAZULI_COLORS`` are exported from
+    the top-level ``esc_etc`` namespace.
+
+16. New numbered tutorial notebook suite in ``notebooks/`` teaching the object-oriented
+    API and the plotting helpers: ``01_getting_started`` (Simulation -> SNR -> noise
+    breakdown), ``02_components_and_parameters`` (build/inspect components, ``update()`` /
+    ``reset()``), ``03_coronagraph_and_contrast`` (contrast / ppgain / separation knobs and
+    off-axis throughput), and ``04_integration_time_snr_saturation`` (inverting SNR for an
+    integration time, the SNR-vs-time curve, and saturation). Each notebook executes
+    end-to-end and prints reference sanity values (baseline SNR ~ 8.92, ``num_psf_pixels``
+    225, off-axis throughput ~ 0.543 at 0.4 arcsec).
