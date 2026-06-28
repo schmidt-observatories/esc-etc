@@ -1,0 +1,24 @@
+# Documentation build requirements for the Sphinx site.
+# Build with:  pip install -r docs/sphinx/requirements.txt && pip install -e . --no-deps
+#
+# Sphinx toolchain
+sphinx>=7
+sphinx-rtd-theme>=2.0
+nbsphinx>=0.9
+ipykernel
+# Optional: enables authoring pages in Markdown in addition to reStructuredText
+myst-parser
+# nbsphinx also needs a `pandoc` binary on the build machine
+# (conda install pandoc  /  apt-get install pandoc  /  brew install pandoc)
+#
+# esc_etc's third-party runtime deps, needed so autodoc can import the package.
+# This mirrors pyproject.toml's `dependencies` *minus* the UASAL config packages
+# (config_um / config_stp_esc / utils_config), which are imported lazily inside
+# the `from_default` / `from_config` constructors and mocked for the docs build
+# (see conf.py: autodoc_mock_imports). Keep in sync with pyproject.toml.
+numpy
+astropy
+synphot
+matplotlib
+pandas
+scipy
