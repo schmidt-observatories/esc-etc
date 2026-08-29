@@ -112,3 +112,35 @@ A numbered suite of runnable Jupyter tutorials in [`notebooks/`](notebooks/) wal
 
 
 
+
+## Documentation
+
+The full documentation site — installation, a user guide, the rendered tutorial
+notebooks, and an auto-generated API reference — is built with **Sphinx** and the
+*Read the Docs* theme. It lives under [`docs/sphinx/`](docs/sphinx/).
+
+To build it locally:
+
+```bash
+pip install -e ".[docs]"   # Sphinx + theme + nbsphinx (+ the package itself)
+brew install pandoc        # or: conda install pandoc / apt-get install pandoc
+cd docs/sphinx
+make html                  # output in _build/html/index.html
+```
+
+> [!Note]
+> `pip install -e ".[docs]"` also installs the UASAL config git dependencies. If
+> you only want to build the docs and don't have access to those repos, use the
+> dependency-free path that CI and Read the Docs use instead:
+> ```bash
+> pip install -r docs/sphinx/requirements.txt
+> pip install -e . --no-deps
+> ```
+> The config packages are imported lazily inside `from_default` / `from_config`
+> and are mocked for the docs build, and the tutorial notebooks render from their
+> saved outputs, so nothing is executed at build time.
+
+The site is built and published by the
+[`Docs` workflow](.github/workflows/deploy-docs.yml) on every push to `main`
+(GitHub Pages), and a [`.readthedocs.yaml`](.readthedocs.yaml) is included so it
+also builds on Read the Docs once the repository is connected there.

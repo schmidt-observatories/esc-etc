@@ -66,11 +66,10 @@ the integration time needed to reach a target SNR at a given ``frame_time``:
 Saturation
 ----------
 
-:meth:`~esc_etc.Simulation.saturation_time` returns the frame time at which the
-per-pixel accumulation (source + zodi + speckle + exozodi, spread over
-``num_psf_pixels``; the host is intentionally excluded, matching the legacy
-behavior) fills the detector well. :meth:`~esc_etc.Simulation.is_saturated`
-compares a candidate ``frame_time`` against it:
+``frame_time`` is bounded from above by detector saturation and from below by
+read noise, which grows with the number of reads. See :doc:`saturation` for how
+:meth:`~esc_etc.Simulation.saturation_time` and
+:meth:`~esc_etc.Simulation.is_saturated` bracket that choice:
 
 .. code-block:: python
 

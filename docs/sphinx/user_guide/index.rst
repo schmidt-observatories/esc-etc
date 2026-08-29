@@ -11,6 +11,7 @@ the exact signatures and docstrings.
    concepts
    scene
    snr
+   saturation
    coronagraph
    plotting
 

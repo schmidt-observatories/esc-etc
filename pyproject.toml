@@ -32,7 +32,20 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev= ["config_stp @ git+https://github.com/uasal/config_stp.git",   "pytest"]  
+dev= ["config_stp @ git+https://github.com/uasal/config_stp.git",   "pytest"]
+# Sphinx toolchain for the docs site under docs/sphinx/. Note this extra pulls
+# in esc_etc's base dependencies too, including the UASAL config git installs —
+# convenient locally, but CI and Read the Docs instead use
+# `pip install -r docs/sphinx/requirements.txt && pip install -e . --no-deps`
+# so the git dependencies are never needed. nbsphinx also requires a `pandoc`
+# binary on the build machine.
+docs = [
+  "sphinx>=7",
+  "sphinx-rtd-theme>=2.0",
+  "nbsphinx>=0.9",
+  "ipykernel",
+  "myst-parser",
+]
 
 # Edit this section with URLs for the README.md, CHANGELOG.md, and repository.
 [project.urls]
