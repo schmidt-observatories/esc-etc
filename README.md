@@ -1,4 +1,4 @@
-# STP ETC ESC
+# ESC ETC
 
 This is intended to be the active directory for the public release of the exposure time calculator for the ExtraSolar Camera.
 
@@ -38,21 +38,24 @@ Additional package dependencies required for the ETC - astropy, numpy, matplotli
 
 ## Installation
 
-The Exposure Time Calculator is a python package that can be installed via a download from GitHub and then installing on your system locally. You can directly clone the [STP ETC ESC GitHub Repo](https://github.com/uasal/stp_etc_esc) or fork the repo and clone the fork. 
+The Exposure Time Calculator is a python package that can be installed via a download from GitHub and then installing on your system locally. You can directly clone the [ESC ETC GitHub Repo](https://github.com/schmidt-observatories/esc-etc) or fork the repo and clone the fork. 
 
 ```
-$ git clone https://github.com/uasal/stp_etc_esc.git
-$ cd stp_etc_esc
-$ pip install .
+$ git clone https://github.com/schmidt-observatories/esc-etc.git
+$ cd esc-etc
+$ pip install -e .
 ```
+> [!Important]
+> Use an **editable** install (`pip install -e .`). A plain `pip install .` copies the package into `site-packages` and can shadow the repository's `src/` tree, reintroducing import/version surprises. For development always prefer `-e`.
+
 > [!Note]
 > To install package with optional dependencies *(ex. config_stp, config_um, pytest, etc...)*, run the following pip command instead:<br>
 > 
-> `pip install '.[dev]'`<br>
+> `pip install -e '.[dev]'`<br>
 > **OR**<br>
-> `pip install ".[dev]"`
+> `pip install -e ".[dev]"`
 >
-> Pytests will be able to be used when installing `stp_etc_esc` with the `.[dev]` command.
+> Pytests will be able to be used when installing `esc_etc` with the `.[dev]` command.
 
 The ETC should now be installed on your local machine. To confirm installation, the following import on python should work - 
 ```
@@ -62,7 +65,10 @@ esc_etc.__version__
 
 ## Usage
 
-Included in this repository is an [example notebook](https://github.com/uasal/stp_etc_esc/blob/develop/notebooks/ESC_ExposureTimeSNRCalculator_Demo.ipynb) of how to use the exposure time calculator assuming the default configurations. There is also an [executable python script](https://github.com/uasal/stp_etc_esc/blob/develop/notebooks/etc_esc_requirements.py) that will run the exposure time calculator assuming the default configurations and generate figures calculating SNR and noise sources for various individual frame exposure times.
+Included in this repository is an [example notebook](https://github.com/schmidt-observatories/esc-etc/blob/main/notebooks/ESC_ExposureTimeSNRCalculator_Demo.ipynb) of how to use the exposure time calculator assuming the default configurations. There is also an [executable python script](https://github.com/schmidt-observatories/esc-etc/blob/main/notebooks/etc_esc_requirements.py) that will run the exposure time calculator assuming the default configurations and generate figures calculating SNR and noise sources for various individual frame exposure times.
+
+> [!Note]
+> Both of the above predate the OO refactor and import from the old `stp_etc_esc` package name, so they will not run as-is against a current install. See the [New OO API](#new-oo-api) section and the numbered [tutorials](#tutorials) below for working examples.
 
 ### New OO API
 

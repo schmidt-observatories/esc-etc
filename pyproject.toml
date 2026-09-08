@@ -47,11 +47,10 @@ docs = [
   "myst-parser",
 ]
 
-# Edit this section with URLs for the README.md, CHANGELOG.md, and repository.
 [project.urls]
-Homepage = "https://github.com/uasal/stp_etc_esc/blob/main/README.md" 
-Changelog = "https://github.com/uasal/stp_etc_esc/blob/main/CHANGELOG.md" 
-Repository = "https://github.com/uasal/stp_etc_esc" 
+Homepage = "https://github.com/schmidt-observatories/esc-etc/blob/main/README.md"
+Changelog = "https://github.com/schmidt-observatories/esc-etc/blob/main/docs/sphinx/changelog.rst"
+Repository = "https://github.com/schmidt-observatories/esc-etc"
 
 [tool.setuptools]
 packages = ["esc_etc"] # Edit this to package name (repo name)

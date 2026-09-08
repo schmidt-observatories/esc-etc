@@ -20,8 +20,8 @@ local changes to ``src/`` are picked up immediately:
 
 .. code-block:: bash
 
-   git clone https://github.com/uasal/stp_etc_esc.git
-   cd stp_etc_esc
+   git clone https://github.com/schmidt-observatories/esc-etc.git
+   cd esc-etc
    pip install -e .
 
 .. important::
