@@ -42,8 +42,8 @@ bundled UASAL configuration (UA Ultramarine 3 m + ESC instrument):
    import astropy.units as u
 
    sim = Simulation.from_default(
-       hoststarmag=-0.353,    # host-star magnitude
-       planetdeltamag=20.0,   # planet is 20 mag fainter than the host
+       hoststarmag=-0.353,    # host-star Vega magnitude in the ESC band
+       planetdeltamag=20.0,   # planet is 20 mag fainter than the host (ESC band)
        contrast=1e-8,         # raw dark-hole contrast
        ppgain=10,             # post-processing gain
        separation=0.4,        # planet separation (arcsec)

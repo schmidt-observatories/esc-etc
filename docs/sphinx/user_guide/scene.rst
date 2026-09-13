@@ -27,15 +27,18 @@ Building a scene
    telescope = Telescope.from_default(arm="arm_a")
    scene = get_scene(
        telescope,
-       hoststarmag=-0.353,    # host-star magnitude
-       planetdeltamag=20.0,   # planet is 20 mag fainter than the host
-       bg_flux=22.5,          # zodi surface brightness (mag / arcsec^2)
-       exobg_flux=21.0,       # exozodi surface brightness (mag / arcsec^2)
-       mag_system="vega",     # "vega" (default) or "AB"
+       hoststarmag=-0.353,    # host-star magnitude in hoststar_band
+       hoststar_band=None,    # None = ESC band; "johnson_v" for a catalog V mag
+       planetdeltamag=20.0,   # planet is 20 mag fainter than the host, ESC band
+       bg_flux=22.5,          # zodi surface brightness, mag / arcsec^2 in Johnson V
+       exobg_flux=21.0,       # exozodi DELTA mag: host + 21 mag / arcsec^2, ESC band
+       mag_system="vega",     # "vega" (default) or "AB", for every magnitude above
    )
 
 The resulting ``scene`` exposes its elements as ``scene.star``,
 ``scene.planet``, ``scene.zodi``, and ``scene.exozodi``.
+
+.. _planet-spectra:
 
 Planet spectra
 --------------
@@ -65,16 +68,28 @@ The normalization is always in the host's ``mag_system`` (Vega or AB).
 Magnitude systems
 -----------------
 
-Magnitudes are interpreted in the Vega system by default; pass
-``mag_system="AB"`` to use AB magnitudes instead. The same choice is honored per
-element when the count rates are normalized in
-:meth:`~esc_etc.Simulation.count_rate_components`.
+Every magnitude carries two labels: a **system** and a **band**.
+
+- ``mag_system`` is ``"vega"`` (default) or ``"AB"``. Anything else raises
+  ``ValueError`` at construction or ``update``. The deprecated
+  ``esc_calc_snr(..., flux_units=...)`` forwards to it.
+- ``band`` is where the magnitude is quoted: ``None`` for the ESC sensor
+  bandpass, a synphot filter name such as ``"johnson_v"``, or a
+  ``SpectralElement``. The spectrum is normalized in that band and then
+  integrated through the ESC bandpass, so a catalog *V* magnitude of a red star
+  gives a different ESC count rate than the same number read as an ESC-band
+  magnitude.
+
+Defaults: the host and exozodi are ESC-band magnitudes, the zodi surface
+brightness is in Johnson *V*, and ``planetdeltamag`` is an ESC-band delta
+magnitude (see :ref:`planet-spectra`).
 
 Updating scene elements
 -----------------------
 
 Each :class:`~esc_etc.SceneElement` is a meta holder with mutable parameters
-``spectrum``, ``mag``, ``mag_system``, ``deltamag``, and ``deltamag_band``, so
+``spectrum``, ``mag``, ``mag_system``, ``band``, ``deltamag``, and
+``deltamag_band``, so
 you can change magnitudes or spectral shapes in place
 and recompute. Through a :class:`~esc_etc.Simulation`, route updates with the
 ``scene__`` prefix (the scene element name is the next segment):

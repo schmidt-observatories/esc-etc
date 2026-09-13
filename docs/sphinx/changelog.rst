@@ -38,6 +38,15 @@ Physics
   or a filter name such as ``"johnson_v"``) and observed through the ESC
   bandpass, so planet colour matters when the contrast is quoted elsewhere.
   ``spectrum`` and ``deltamag_band`` are mutable; ``planet.mag`` is unused.
+- **Explicit reference bands** (issue #14). Every :class:`~esc_etc.SceneElement`
+  carries a mutable ``band`` (``None`` = ESC bandpass, a synphot filter name, or
+  a ``SpectralElement``); spectra are normalized there, then integrated through
+  the ESC bandpass. :func:`~esc_etc.get_scene` and
+  :meth:`Simulation.from_default <esc_etc.Simulation.from_default>` take
+  ``hoststar_band`` (``"johnson_v"`` for catalog photometry) and ``mag_system``.
+  Zodi is explicitly Johnson *V*; ``exobg_flux`` is documented as a delta
+  magnitude. Invalid magnitude systems raise ``ValueError`` immediately, and the
+  deprecated ``flux_units`` argument is now honored instead of ignored.
 
 Object-oriented API
 -------------------

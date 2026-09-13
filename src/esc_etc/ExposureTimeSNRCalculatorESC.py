@@ -66,6 +66,7 @@ def esc_calc_snr(exp_time, int_time, hoststarmag=-0.353, contrast=1e-8,
     sim = Simulation.from_default(
         hoststarmag=hoststarmag, planetdeltamag=planetdeltamag, contrast=contrast,
         ppgain=ppgain, separation=separation, bg_flux=bg_flux, exobg_flux=exobg_flux,
+        mag_system=flux_units,
     )
     out = sim.get_snr(total_time=exp_time * u.s, frame_time=int_time * u.s)
     return out["snr"], Observatory(sim)
