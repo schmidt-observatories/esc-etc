@@ -7,12 +7,12 @@
       "contrast": 1e-08,
       "ppgain": 10
     },
-    "snr": 8.92207891806657,
-    "source_counts": 0.9158243559681103,
-    "sky_counts": 0.0002276078119755961,
-    "speckle_counts": 0.9158243559681103,
+    "snr": 9.59251384586086,
+    "source_counts": 0.9158243559681066,
+    "sky_counts": 0.00022760781197559609,
+    "speckle_counts": 0.9158243559681066,
     "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   },
   {
     "params": {
@@ -22,12 +22,12 @@
       "contrast": 1e-08,
       "ppgain": 10
     },
-    "snr": 1.9043539347453955,
-    "source_counts": 0.5818809405239519,
+    "snr": 4.4545656651737255,
+    "source_counts": 0.5818809405239497,
     "sky_counts": 0.0001446135897564733,
-    "speckle_counts": 0.5818809405239519,
+    "speckle_counts": 0.5818809405239497,
     "exozodi_counts": 0.000525253701755879,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   },
   {
     "params": {
@@ -37,12 +37,12 @@
       "contrast": 1e-09,
       "ppgain": 10
     },
-    "snr": 20.458134863264156,
-    "source_counts": 0.9158243559681065,
-    "sky_counts": 0.0002276078119755961,
+    "snr": 37.941469467436825,
+    "source_counts": 0.9158243559681066,
+    "sky_counts": 0.00022760781197559609,
     "speckle_counts": 0.09158243559681066,
     "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   },
   {
     "params": {
@@ -52,12 +52,12 @@
       "contrast": 1e-08,
       "ppgain": 100
     },
-    "snr": 19.380926159458834,
-    "source_counts": 0.9158243559681103,
-    "sky_counts": 0.0002276078119755961,
-    "speckle_counts": 0.9158243559681103,
+    "snr": 32.14724266614204,
+    "source_counts": 0.9158243559681066,
+    "sky_counts": 0.00022760781197559609,
+    "speckle_counts": 0.9158243559681066,
     "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   },
   {
     "params": {
@@ -68,12 +68,12 @@
       "ppgain": 10,
       "planetdeltamag": 22
     },
-    "snr": 1.1574115212699256,
-    "source_counts": 0.12827119119143435,
+    "snr": 1.455529919803171,
+    "source_counts": 0.12827119119143382,
     "sky_counts": 0.00020114261986776697,
-    "speckle_counts": 0.809336501674587,
+    "speckle_counts": 0.8093365016745838,
     "exozodi_counts": 0.0007305738405659831,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   },
   {
     "params": {
@@ -84,12 +84,12 @@
       "ppgain": 10,
       "hoststarmag": 2.0
     },
-    "snr": 2.4659246195180566,
-    "source_counts": 0.1048605639900442,
-    "sky_counts": 0.0002276078119755961,
-    "speckle_counts": 0.1048605639900442,
+    "snr": 5.3308055528954625,
+    "source_counts": 0.10486056399004409,
+    "sky_counts": 0.00022760781197559609,
+    "speckle_counts": 0.10486056399004409,
     "exozodi_counts": 9.465578878453193e-05,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   },
   {
     "params": {
@@ -100,11 +100,11 @@
       "ppgain": 10,
       "bg_flux": 21.0
     },
-    "snr": 8.921999119504417,
-    "source_counts": 0.9158243559681103,
-    "sky_counts": 0.0009061230202147697,
-    "speckle_counts": 0.9158243559681103,
+    "snr": 9.592414672899736,
+    "source_counts": 0.9158243559681066,
+    "sky_counts": 0.0009061230202147696,
+    "speckle_counts": 0.9158243559681066,
     "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 225.0
+    "num_psf_pixels": 29.99584367548284
   }
 ]

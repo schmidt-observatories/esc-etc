@@ -3,6 +3,17 @@
 Owns raw dark-hole contrast, post-processing gain, planet separation, and the
 off-axis (FPM) lambda/D throughput curve. The FPM throughput is a flat scalar
 applied by Simulation to every count rate (plan physics-fact #1).
+
+Definitions (issue #10):
+
+* ``off_axis_throughput`` k: fraction of an off-axis point source's photons that
+  land in the extraction aperture (Telescope.resel), relative to the same source
+  with no coronagraph. Encircled energy is folded into k; no separate factor is
+  applied. The FPM FITS table does not record whether it is core, peak, or total
+  throughput; core throughput is the assumption used here.
+* ``raw_dh_contrast`` C: residual stellar intensity in the dark hole divided by
+  the off-axis PSF at the same separation, both in the extraction aperture, so
+  stellar leakage in the aperture is ``R_host * C * k``.
 """
 from pathlib import Path
 
@@ -63,8 +74,8 @@ class Coronagraph(_MetaHolder_):
         return float(self._throughput[idx])
 
     def speckle_scale(self):
-        delta_mag = -2.5 * np.log10(self.raw_dh_contrast)
-        return 10 ** (-0.4 * delta_mag)
+        """Stellar-leakage rate in the extraction aperture per unit host rate."""
+        return self.raw_dh_contrast
 
     def noise_floor_factor(self):
         return 1.0 / self.ppgain

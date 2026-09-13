@@ -5,6 +5,18 @@ This page summarizes notable changes. The authoritative history is the git log
 and the design specs under ``docs/superpowers/``. A detailed list of the changes
 made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 
+Physics
+-------
+
+- **One photometric aperture** (issue #10). ``Sensor.num_psf_pixels`` is now
+  :attr:`Telescope.resel <esc_etc.Telescope.resel>` :math:`= \pi(\lambda/2D)^2`
+  in detector pixels (about 30 at the default configuration) instead of a
+  separate :math:`15 \times 15` PSF box, so dark current, read noise, zodi and
+  exozodi all use the same extraction aperture. ``Sensor.calc_psf`` is removed.
+  The FPM off-axis throughput is documented as the planet's throughput into that
+  aperture and raw contrast as leakage relative to the off-axis PSF in it.
+  Default-configuration SNR anchors moved accordingly.
+
 Object-oriented API
 -------------------
 
@@ -59,8 +71,8 @@ Documentation site
 - **New** :doc:`user_guide/saturation` **page** covering
   :meth:`~esc_etc.Simulation.saturation_time` and
   :meth:`~esc_etc.Simulation.is_saturated`, what sets the per-pixel rate
-  (:attr:`~esc_etc.Sensor.well_depth`, :meth:`Sensor.calc_psf
-  <esc_etc.Sensor.calc_psf>`), and the frame-time trade-off against read noise.
+  (:attr:`~esc_etc.Sensor.well_depth`, ``num_psf_pixels``), and the frame-time
+  trade-off against read noise.
 - A ``docs`` extra in ``pyproject.toml`` for a one-line local docs build
   (``pip install -e ".[docs]"``).
 

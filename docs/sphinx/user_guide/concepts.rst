@@ -15,7 +15,8 @@ The four building blocks
    * - :class:`~esc_etc.Telescope`
      - The optics: primary diameter, throughput surface / collecting area, focal
        ratio and length, the primary-filter wavelength, and the resolution
-       element (``resel``) used to scale the background terms.
+       element (``resel``, :math:`\pi(\lambda/2D)^2`), which is the single
+       photometric extraction aperture used by every noise term.
    * - :class:`~esc_etc.Sensor`
      - The detector + optical path: read noise, dark current, gain, well depth,
        number of PSF pixels, and the optical **bandpass** (the product of mirror

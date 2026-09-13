@@ -9,7 +9,7 @@ import types
 
 import esc_etc.ExposureTimeSNRCalculatorESC as esc_mod
 
-# Canonical baseline observation. SNR for these settings is ~8.9221 (see
+# Canonical baseline observation. SNR for these settings is ~9.5925 (see
 # test_anchors.py). `verbose`/`plot` are off so the suite stays quiet/headless.
 _BASELINE = dict(
     exp_time=3600.0,

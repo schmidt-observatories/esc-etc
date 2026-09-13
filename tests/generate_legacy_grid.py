@@ -1,6 +1,7 @@
 # tests/generate_legacy_grid.py
 """One-off: capture current esc_calc_snr outputs over a grid for equivalence testing.
-Run once with the pre-refactor engine; the committed JSON is the cross-check baseline."""
+Run once with the pre-refactor engine; the committed JSON is the cross-check baseline.
+Regenerated 2026-09-12 after the single-aperture change (issue #10)."""
 import json
 import os
 import esc_etc.ExposureTimeSNRCalculatorESC as esc_mod

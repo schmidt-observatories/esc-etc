@@ -59,18 +59,12 @@ parameter, so a different gain setting can be explored in place:
    sim.saturation_time()
    sim.reset()
 
-**PSF pixel count.** :meth:`Sensor.calc_psf <esc_etc.Sensor.calc_psf>` runs at
-construction and sets ``num_psf_pixels`` from the diffraction-limited spot
-diameter :math:`2 \times 1.22\,\lambda\,F_\#` at the bandpass peak, divided by
-the pixel size. The default ``approx_type="sq"`` counts the enclosing
-:math:`n \times n` square; passing a circular approximation counts the inscribed
-disk instead, which is roughly 20 % fewer pixels and therefore a *shorter*
-saturation time for the same total rate:
-
-.. code-block:: python
-
-   sim.sensor.calc_psf("circle")   # recompute with a circular aperture
-   sim.saturation_time()
+**Aperture pixel count.** ``num_psf_pixels`` is the photometric extraction
+aperture :attr:`Telescope.resel <esc_etc.Telescope.resel>`,
+:math:`\Omega = \pi(\lambda/2D)^2`, divided by the pixel solid angle. The same
+:math:`\Omega` scales the zodi and exozodi rates, so background, detector, and
+saturation terms all refer to one aperture (about 30 pixels at the default
+configuration).
 
 Choosing a frame time
 ---------------------
