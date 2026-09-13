@@ -18,7 +18,8 @@ A calculation is built from four pieces, combined into a
    Coronagraph (contrast, ppgain, separation)  ─┘
 
 - A :class:`~esc_etc.Telescope` carries the collecting area, focal geometry,
-  primary filter wavelength, and the resolution element (``resel``).
+  primary filter wavelength, and the resolution element (``resel``), the
+  photometric extraction aperture shared by every noise term.
 - A :class:`~esc_etc.Sensor` couples the detector characteristics (read noise,
   dark current, gain, well depth, number of PSF pixels) with the optical
   **bandpass**.

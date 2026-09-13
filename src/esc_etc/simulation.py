@@ -4,6 +4,18 @@ count_rate_components extracts Observatory.make_observation: it normalizes the
 host on the FPM-free Sensor.bandpass, derives planet/speckle by scaling, computes
 zodi/exozodi with the resel factor, then multiplies EVERY rate by the flat FPM
 throughput k = coronagraph.off_axis_throughput (plan physics-fact #1).
+
+Every SNR term is evaluated in ONE extraction aperture, Omega = telescope.resel
+= pi (lambda/2D)^2 (issue #10):
+
+    R_planet  = R_host * 10^(-0.4 dmag) * k     k = planet throughput into Omega
+    R_speckle = R_host * C * k                  C = raw contrast, see Coronagraph
+    R_zodi    = SB_zodi * Omega * k             (exozodi likewise)
+    N_pix     = Omega / plate_scale^2           (dark current, read noise)
+
+k on the diffuse terms stands in for the diffuse-background transmission.
+ponytail: assumed equal to the point-source core throughput; split it out when
+the FPM data records total transmission separately.
 """
 from astropy import units as u
 from synphot import Observation, SourceSpectrum, SpectralElement, units as su

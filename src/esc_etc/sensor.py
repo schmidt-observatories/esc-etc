@@ -4,8 +4,11 @@
 The cumulative bandpass is assembled exactly as Observatory.make_STP did, EXCEPT
 the FPM (focal-plane-mask) lambda/D throughput, which is a flat scalar and now
 lives in Coronagraph.off_axis_throughput (see plan physics-fact #1).
+
+``num_psf_pixels`` is the photometric extraction aperture (Telescope.resel,
+Omega = pi (lambda/2D)^2) expressed in detector pixels, so the dark-current and
+read-noise pixel count and the zodi/exozodi solid angle describe one aperture.
 """
-from math import ceil, floor, sqrt
 from pathlib import Path
 
 import numpy as np
@@ -48,10 +51,11 @@ class Sensor(_MetaHolder_):
         self.sensor_temp = sensor_temp
         self.plate_scale = plate_scale
         self._telescope = telescope
-        self.num_psf_pixels = None
+        # One aperture for every SNR term: Omega = telescope.resel in pixels.
+        self.num_psf_pixels = (telescope.resel.to_value(u.arcsec ** 2)
+                               / plate_scale ** 2) * u.pix
         self._init_meta(gain=gain, dark_current=dark_current,
                         read_noise=read_noise, well_depth=well_depth)
-        self.calc_psf()
 
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope_config,
@@ -129,20 +133,3 @@ class Sensor(_MetaHolder_):
             telescope_support_path=config_um.get_data_path(),
             telescope=telescope, arm=arm,
         )
-
-    def calc_psf(self, approx_type="sq"):
-        wavelength = self.bandpass.wpeak()
-        psf_diameter = (2 * 1.22 * wavelength * self._telescope.f_num).to("um")
-        n = ceil((psf_diameter / self.pixel_size).value)
-        if approx_type.lower() in ("s", "sq", "square"):
-            self.num_psf_pixels = n ** 2 * u.pix
-        else:
-            if n % 2 == 0:
-                L = int(n / 2)
-                seq = [floor(0.5 + 0.5 * sqrt(n ** 2 - (2 * y - 1) ** 2)) for y in range(1, L + 1)]
-                self.num_psf_pixels = 4 * sum(seq) * u.pix
-            else:
-                L = int((n - 1) / 2)
-                seq = [floor(1 + 0.5 * sqrt(n ** 2 - 4 * (y ** 2))) for y in range(1, L + 1)]
-                self.num_psf_pixels = (1 + 4 * sum(seq)) * u.pix
-        return psf_diameter, self.num_psf_pixels

@@ -42,6 +42,8 @@ class Telescope(_MetaHolder_):
         focal_len = f_num * diameter_primary
         jitter_rms = u.Quantity(
             telescope_config["observatory"]["pointing"]["jitter_rms"])
+        # Photometric extraction aperture: a disk of diameter lambda/D. Shared by
+        # the background solid angle (Simulation) and detector pixel count (Sensor).
         resel = np.pi * (((primary_filter) / 2 / diameter_primary * u.radian) ** 2).to(
             u.arcsec ** 2, equivalencies=u.dimensionless_angles())
         zodi_profile_path = (
