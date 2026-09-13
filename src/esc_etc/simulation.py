@@ -26,7 +26,7 @@ from synphot import Observation, SourceSpectrum, SpectralElement, units as su
 from .meta import _MetaHolder_
 from .telescope import Telescope
 from .sensor import Sensor
-from .scene import Scene, get_scene
+from .scene import Scene, get_scene, mag_units
 from .coronagraph import Coronagraph
 from .noise import CountRates, AnalyticCoronagraphNoiseModel
 
@@ -42,7 +42,7 @@ class Simulation(_MetaHolder_):
         self.coronagraph = coronagraph
         self.noise_model = noise_model or AnalyticCoronagraphNoiseModel()
         self._vega = None
-        self._johnson_v = None
+        self._bands = {}
         self._init_meta()
 
     @classmethod
@@ -52,42 +52,39 @@ class Simulation(_MetaHolder_):
     @classmethod
     def from_default(cls, hoststarmag=-0.353, planetdeltamag=20.0, contrast=1e-8,
                      ppgain=10, separation=0.4, bg_flux=22.5, exobg_flux=21.0,
-                     arm="arm_a"):
+                     arm="arm_a", mag_system="vega", hoststar_band=None):
+        """See ``get_scene`` for what band each magnitude is quoted in."""
         telescope = Telescope.from_default(arm=arm)
         sensor = Sensor.from_default(telescope, arm=arm)
         scene = get_scene(telescope, hoststarmag=hoststarmag,
                           planetdeltamag=planetdeltamag, bg_flux=bg_flux,
-                          exobg_flux=exobg_flux)
+                          exobg_flux=exobg_flux, mag_system=mag_system,
+                          hoststar_band=hoststar_band)
         coronagraph = Coronagraph.from_default(
             telescope, raw_dh_contrast=contrast, ppgain=ppgain, separation=separation,
             arm=arm)
         return cls(telescope, sensor, scene, coronagraph)
 
-    def _normalize_units(self, mag_system):
-        if mag_system in ("vega", su.VEGAMAG):
-            return su.VEGAMAG
-        if mag_system in ("AB", "ABmag", u.ABmag):
-            return u.ABmag
-        raise NotImplementedError(f"flux units {mag_system!r} not implemented")
-
-    def _normalize(self, spectrum, mag, mag_system, band):
-        """Scale ``spectrum`` to ``mag`` in ``band`` (Vega or AB per mag_system)."""
-        units = self._normalize_units(mag_system)
+    def _normalize(self, element, mag, band):
+        """Scale ``element.spectrum`` to ``mag`` in ``band`` (Vega/AB per element)."""
+        units = mag_units(element.mag_system)
         vegaspec = self._vega if units is su.VEGAMAG else None
-        return spectrum.normalize(mag * units, band, vegaspec=vegaspec, force=FORCE)
+        return element.spectrum.normalize(mag * units, self._band(band),
+                                          vegaspec=vegaspec, force=FORCE)
 
     def _band(self, band):
+        """None -> ESC bandpass; str -> synphot filter (cached); else as given."""
         if band is None:
             return self.sensor.bandpass
         if isinstance(band, str):
-            return SpectralElement.from_filter(band)
+            if band not in self._bands:
+                self._bands[band] = SpectralElement.from_filter(band)
+            return self._bands[band]
         return band
 
     def count_rate_components(self):
         if self._vega is None:
             self._vega = SourceSpectrum.from_vega()
-        if self._johnson_v is None:
-            self._johnson_v = SpectralElement.from_filter("johnson_v")
         vega = self._vega
         bp = self.sensor.bandpass
         area = self.telescope.surface
@@ -98,28 +95,25 @@ class Simulation(_MetaHolder_):
             return Observation(sp, bp, force=FORCE).countrate(area=area) * u.electron / u.ct
 
         star = self.scene.star
-        host_sp = self._normalize(star.spectrum, star.mag, star.mag_system, bp)
+        host_sp = self._normalize(star, star.mag, star.band)
         host_countrate = countrate(host_sp)
 
         # Planet: its own spectral shape, deltamag fainter than the host in the
         # reference band (default: the ESC band itself), observed through bp.
         planet = self.scene.planet
-        ref_band = self._band(planet.deltamag_band)
-        host_ref_mag = Observation(host_sp, ref_band, force=FORCE).effstim(
-            self._normalize_units(star.mag_system), vegaspec=vega).value
-        planet_sp = self._normalize(planet.spectrum, host_ref_mag + planet.deltamag,
-                                    star.mag_system, ref_band)
+        host_ref_mag = Observation(host_sp, self._band(planet.deltamag_band), force=FORCE
+                                   ).effstim(mag_units(star.mag_system), vegaspec=vega).value
+        planet_sp = self._normalize(planet, host_ref_mag + planet.deltamag, planet.deltamag_band)
         source = countrate(planet_sp) * k
         speckle = host_countrate * self.coronagraph.speckle_scale() * k
 
         zodi_el = self.scene.zodi
-        zodi_rn = self._normalize(zodi_el.spectrum, zodi_el.mag, zodi_el.mag_system,
-                                  self._johnson_v)
-        zodi = countrate(zodi_rn) * resel / u.arcsec ** 2 * k
+        zodi = countrate(self._normalize(zodi_el, zodi_el.mag, zodi_el.band)) \
+            * resel / u.arcsec ** 2 * k
 
         exo_el = self.scene.exozodi
-        exo_rn = self._normalize(exo_el.spectrum, exo_el.mag, exo_el.mag_system, bp)
-        exozodi = countrate(exo_rn) * resel / u.arcsec ** 2 * k
+        exozodi = countrate(self._normalize(exo_el, exo_el.mag, exo_el.band)) \
+            * resel / u.arcsec ** 2 * k
 
         # host is the POST-FPM (k-scaled) host count rate, NOT the unattenuated
         # stellar flux. Consumers (e.g. contrast estimation) must account for the
