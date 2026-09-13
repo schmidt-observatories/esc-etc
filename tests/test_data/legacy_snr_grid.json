@@ -7,12 +7,12 @@
       "contrast": 1e-08,
       "ppgain": 10
     },
-    "snr": 9.59251384586086,
-    "source_counts": 0.9158243559681066,
-    "sky_counts": 0.00022760781197559609,
-    "speckle_counts": 0.9158243559681066,
-    "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 9.946005564751525,
+    "source_counts": 5.437826011416425,
+    "sky_counts": 0.0008646151233760717,
+    "speckle_counts": 5.437826011416433,
+    "exozodi_counts": 0.0031900982709167037,
+    "num_psf_pixels": 19.59514440298425
   },
   {
     "params": {
@@ -22,12 +22,12 @@
       "contrast": 1e-08,
       "ppgain": 10
     },
-    "snr": 4.4545656651737255,
-    "source_counts": 0.5818809405239497,
-    "sky_counts": 0.0001446135897564733,
-    "speckle_counts": 0.5818809405239497,
-    "exozodi_counts": 0.000525253701755879,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 9.311330639402856,
+    "source_counts": 3.9825210673893383,
+    "sky_counts": 0.0006332214265038109,
+    "speckle_counts": 3.982521067389344,
+    "exozodi_counts": 0.002336344256748078,
+    "num_psf_pixels": 19.59514440298425
   },
   {
     "params": {
@@ -37,12 +37,12 @@
       "contrast": 1e-09,
       "ppgain": 10
     },
-    "snr": 37.941469467436825,
-    "source_counts": 0.9158243559681066,
-    "sky_counts": 0.00022760781197559609,
-    "speckle_counts": 0.09158243559681066,
-    "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 78.35114673310633,
+    "source_counts": 5.437826011416425,
+    "sky_counts": 0.0008646151233760717,
+    "speckle_counts": 0.5437826011416435,
+    "exozodi_counts": 0.0031900982709167037,
+    "num_psf_pixels": 19.59514440298425
   },
   {
     "params": {
@@ -52,12 +52,12 @@
       "contrast": 1e-08,
       "ppgain": 100
     },
-    "snr": 32.14724266614204,
-    "source_counts": 0.9158243559681066,
-    "sky_counts": 0.00022760781197559609,
-    "speckle_counts": 0.9158243559681066,
-    "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 69.1929973035213,
+    "source_counts": 5.437826011416425,
+    "sky_counts": 0.0008646151233760717,
+    "speckle_counts": 5.437826011416433,
+    "exozodi_counts": 0.0031900982709167037,
+    "num_psf_pixels": 19.59514440298425
   },
   {
     "params": {
@@ -68,12 +68,12 @@
       "ppgain": 10,
       "planetdeltamag": 22
     },
-    "snr": 1.455529919803171,
-    "source_counts": 0.12827119119143382,
-    "sky_counts": 0.00020114261986776697,
-    "speckle_counts": 0.8093365016745838,
-    "exozodi_counts": 0.0007305738405659831,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 1.572593897492387,
+    "source_counts": 0.7806914116098331,
+    "sky_counts": 0.0007832076514936537,
+    "speckle_counts": 4.9258297992783335,
+    "exozodi_counts": 0.0028897359151464773,
+    "num_psf_pixels": 19.59514440298425
   },
   {
     "params": {
@@ -84,12 +84,12 @@
       "ppgain": 10,
       "hoststarmag": 2.0
     },
-    "snr": 5.3308055528954625,
-    "source_counts": 0.10486056399004409,
-    "sky_counts": 0.00022760781197559609,
-    "speckle_counts": 0.10486056399004409,
-    "exozodi_counts": 9.465578878453193e-05,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 9.365164405899867,
+    "source_counts": 0.6226232123233855,
+    "sky_counts": 0.0008646151233760717,
+    "speckle_counts": 0.6226232123233864,
+    "exozodi_counts": 0.00036526163744398033,
+    "num_psf_pixels": 19.59514440298425
   },
   {
     "params": {
@@ -100,11 +100,11 @@
       "ppgain": 10,
       "bg_flux": 21.0
     },
-    "snr": 9.592414672899736,
-    "source_counts": 0.9158243559681066,
-    "sky_counts": 0.0009061230202147696,
-    "speckle_counts": 0.9158243559681066,
-    "exozodi_counts": 0.0008266985557170741,
-    "num_psf_pixels": 29.99584367548284
+    "snr": 9.94599365349846,
+    "source_counts": 5.437826011416425,
+    "sky_counts": 0.003442094803850108,
+    "speckle_counts": 5.437826011416433,
+    "exozodi_counts": 0.0031900982709167037,
+    "num_psf_pixels": 19.59514440298425
   }
 ]

@@ -4,7 +4,7 @@ Tutorials
 These tutorials are runnable Jupyter notebooks from the ``notebooks/``
 directory of the repository, rendered here with their saved outputs. Each one
 is self-contained — download it and run it interactively to experiment. They
-require the ``config_um`` / ``config_stp_esc`` configs and an editable install
+require the ``config_um`` / ``config_um_esc`` configs and an editable install
 (see :doc:`installation`).
 
 .. list-table::

@@ -4,7 +4,7 @@ import pytest
 from synphot import SourceSpectrum
 from synphot.models import BlackBody1D
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 from esc_etc import Simulation

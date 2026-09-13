@@ -2,7 +2,7 @@
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 from esc_etc import Simulation
@@ -10,9 +10,9 @@ from esc_etc import Simulation
 
 def test_default_peak_fraction_matches_hand_airy_value():
     s = Simulation.from_default().sensor
-    # 6.18 pix per lambda/D -> pixel area 0.0262 (lambda/D)^2; Airy peak pi/4
-    # -> 0.0206 of the total; encircled energy inside r = 0.5 lambda/D is 0.456.
-    assert s.peak_pixel_fraction == pytest.approx(0.0206 / 0.456, rel=0.02)
+    # 5.00 pix per lambda/D -> pixel area 0.0401 (lambda/D)^2; Airy peak pi/4
+    # -> 0.0315 of the total; encircled energy inside r = 0.5 lambda/D is 0.456.
+    assert s.peak_pixel_fraction == pytest.approx(0.0315 / 0.456, rel=0.02)
     # the peak pixel is brighter than the aperture mean
     assert s.peak_pixel_fraction * s.num_psf_pixels.value > 1
 

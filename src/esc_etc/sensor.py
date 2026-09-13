@@ -16,7 +16,6 @@ import pandas as pd
 from astropy import units as u
 import astropy.io.fits
 import astropy.table
-from scipy.interpolate import interp1d
 from scipy.special import j0, j1
 from synphot import SpectralElement
 from synphot.models import Box1D, Empirical1D
@@ -102,6 +101,10 @@ class Sensor(_MetaHolder_):
         fbw = cp["optics"]["filter"]["bandwidth"]
         bandpass = bandpass * SpectralElement(
             Box1D, amplitude=0.98, x_0=primary_filter, width=fbw * primary_filter)
+        # Dichroic (flat), when the config has one
+        if "dichroic" in cp["optics"]:
+            bandpass = bandpass * SpectralElement(
+                Box1D, amplitude=cp["optics"]["dichroic"]["dichroic_throughput"], x_0=6000, width=7000)
         # Polarizers / wave plates (NOT the FPM)
         for key in cp["optics"].keys():
             if "lp" in key or "qwp" in key:
@@ -124,7 +127,10 @@ class Sensor(_MetaHolder_):
         def _interp(csv_key, names, x):
             f = isp / Path(cp["sensor"][csv_key])
             df = pd.read_csv(f.as_posix(), skiprows=1, names=names)
-            return interp1d(df[names[0]], df[names[1]])(x)
+            # ponytail: clamps to the table ends (config_um_esc's -20 C nominal
+            # sits just below the first dark-current row); extrapolate if the
+            # detector tables are ever extended.
+            return np.interp(x, df[names[0]], df[names[1]])
 
         gain = _interp("gain_curve", ["gain_setting", "gain"], gain_setting) * (u.electron / u.ct)
         dark_current = _interp("dark_current", ["sensor_temperature", "dark_current"],
@@ -147,11 +153,11 @@ class Sensor(_MetaHolder_):
 
     @classmethod
     def from_default(cls, telescope, arm="arm_a"):
-        import config_stp_esc
+        import config_um_esc
         import config_um
         return cls.from_config(
-            instrument_config=config_stp_esc.load_config_values(),
-            instrument_support_path=config_stp_esc.get_data_path(),
+            instrument_config=config_um_esc.load_config_values(),
+            instrument_support_path=config_um_esc.get_data_path(),
             telescope_config=config_um.load_config_values(),
             telescope_support_path=config_um.get_data_path(),
             telescope=telescope, arm=arm,

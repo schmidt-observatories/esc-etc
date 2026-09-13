@@ -7,7 +7,7 @@ import os
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 import esc_etc.ExposureTimeSNRCalculatorESC as esc_mod
