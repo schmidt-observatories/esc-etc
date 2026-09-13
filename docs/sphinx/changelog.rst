@@ -47,6 +47,15 @@ Physics
   Zodi is explicitly Johnson *V*; ``exobg_flux`` is documented as a delta
   magnitude. Invalid magnitude systems raise ``ValueError`` immediately, and the
   deprecated ``flux_units`` argument is now honored instead of ignored.
+- **Reference-subtraction noise and time** (issue #12).
+  :class:`~esc_etc.Coronagraph` gains ``subtraction`` (``"none"`` default, or
+  ``"rdi"``), ``ref_brightness_ratio`` and ``ref_time_ratio``. Under RDI the
+  scaled random variance of the reference image is added to the science
+  variance (Nemati et al. 2023) and the inversion accounts for it.
+  ``total_time`` is on-target science time; results carry ``science_time``,
+  ``charged_time`` and ``reference_noise_e``, and ``noise_terms`` gains a
+  sixth, reference entry. ``ppgain`` is documented as an assumed residual-
+  speckle factor.
 
 Object-oriented API
 -------------------

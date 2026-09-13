@@ -13,6 +13,8 @@ class _Sensor:
 
 
 class _Coronagraph:
+    subtraction = "none"
+
     def noise_floor_factor(self):
         return 0.1
 
