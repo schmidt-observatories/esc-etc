@@ -4,7 +4,7 @@ import pytest
 from synphot import Observation, SourceSpectrum, SpectralElement, units as su
 from synphot.models import BlackBody1D
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 import esc_etc.ExposureTimeSNRCalculatorESC as shim

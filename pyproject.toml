@@ -22,7 +22,7 @@ requires-python = ">=3.8"
 dependencies = [
     "utils_config @ git+https://github.com/uasal/utils_config.git@develop",
     "config_um @ git+https://github.com/uasal/config_um.git",
-    "config_stp_esc@ git+https://github.com/uasal/config_stp_esc.git",
+    "config_um_esc @ git+https://github.com/uasal/config_um_esc.git",
     "synphot",
     "numpy",
     "astropy",
@@ -32,7 +32,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev= ["config_stp @ git+https://github.com/uasal/config_stp.git",   "pytest"]
+dev= ["config_stp @ git+https://github.com/uasal/config_stp.git",
+      "config_stp_esc @ git+https://github.com/uasal/config_stp_esc.git",   "pytest"]
 # Sphinx toolchain for the docs site under docs/sphinx/. Note this extra pulls
 # in esc_etc's base dependencies too, including the UASAL config git installs —
 # convenient locally, but CI and Read the Docs instead use

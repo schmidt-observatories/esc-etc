@@ -18,7 +18,7 @@ The configuration packages
    * - `config_um <https://github.com/uasal/config_um>`_
      - The UA Ultramarine 3 m telescope concept — primary diameter, surface /
        collecting area, focal geometry, and the detector calibration curves.
-   * - `config_stp_esc <https://github.com/uasal/config_stp_esc>`_
+   * - `config_um_esc <https://github.com/uasal/config_um_esc>`_
      - The ESC instrument — optical throughputs, the focal-plane-mask (FPM)
        off-axis throughput curve, and filter definitions.
    * - `config_stp <https://github.com/uasal/config_stp>`_
@@ -36,7 +36,7 @@ The default instrument
 ----------------------
 
 :meth:`Simulation.from_default <esc_etc.Simulation.from_default>` assembles the
-telescope, sensor, scene, and coronagraph from ``config_um`` + ``config_stp_esc``
+telescope, sensor, scene, and coronagraph from ``config_um`` + ``config_um_esc``
 for a given optical **arm** (default ``"arm_a"``):
 
 .. code-block:: python
@@ -68,11 +68,11 @@ config repositories:
 
 .. code-block:: python
 
-   import config_stp_esc
+   import config_um_esc
 
    coronagraph = Coronagraph.from_config(
-       instrument_config=config_stp_esc.load_config_values(),
-       instrument_support_path=config_stp_esc.get_data_path(),
+       instrument_config=config_um_esc.load_config_values(),
+       instrument_support_path=config_um_esc.get_data_path(),
        telescope=telescope,
        raw_dh_contrast=1e-8, ppgain=10, separation=0.4, arm="arm_a",
    )

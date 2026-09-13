@@ -55,7 +55,20 @@ Physics
   <esc_etc.Simulation.from_default>`, ``Telescope.from_default`` and
   ``Sensor.from_default`` uses the curve as the whole sensor bandpass and the
   design wavelength as the telescope's central wavelength (resel, lambda/D).
-  Default (``None``) keeps the generic config box filter.
+  Default (``None``) keeps the generic config box filter. The curves were
+  generated from the ``config_stp_esc`` chain (Al+MgF2 optics, ASI6200MM QE)
+  and peak about 3.5x below the ``config_um_esc`` default chain; see
+  ``report/`` for the audit.
+- **3 m Ultramarine default** (``config_um_esc``). ``from_default`` on every
+  component now reads the ESC instrument from ``config_um_esc`` (3.0 m clear
+  aperture, ASI294MM, silver ESC optics, 0.9 dichroic) instead of
+  ``config_stp_esc`` (2.43 m, ASI6200MM, Al+MgF2), matching the telescope in
+  ``config_um``. ``config_um_esc`` is a required dependency; ``config_stp_esc``
+  moves to the ``dev`` extra. The bandpass chain applies
+  ``dichroic_throughput`` when the config has one, and the detector tables are
+  clamped at their ends so the -20 C nominal temperature no longer raises.
+  Default source rates rise 5.9x (area 1.56 x throughput 3.52 x FPM 1.07) and
+  every golden anchor was re-pinned accordingly.
 - **Reference-subtraction noise and time** (issue #12).
   :class:`~esc_etc.Coronagraph` gains ``subtraction`` (``"none"`` default, or
   ``"rdi"``), ``ref_brightness_ratio`` and ``ref_time_ratio``. Under RDI the

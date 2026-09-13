@@ -11,7 +11,7 @@ F0*10^(-0.4*mag)*area*throughput physics via a knob the API controls.
 """
 import pytest
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 from physics_helpers import esc_snr
