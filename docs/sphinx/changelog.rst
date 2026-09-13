@@ -56,6 +56,15 @@ Physics
   ``Sensor.from_default`` uses the curve as the whole sensor bandpass and the
   design wavelength as the telescope's central wavelength (resel, lambda/D).
   Default (``None``) keeps the generic config box filter.
+- **Reference-subtraction noise and time** (issue #12).
+  :class:`~esc_etc.Coronagraph` gains ``subtraction`` (``"none"`` default, or
+  ``"rdi"``), ``ref_brightness_ratio`` and ``ref_time_ratio``. Under RDI the
+  scaled random variance of the reference image is added to the science
+  variance (Nemati et al. 2023) and the inversion accounts for it.
+  ``total_time`` is on-target science time; results carry ``science_time``,
+  ``charged_time`` and ``reference_noise_e``, and ``noise_terms`` gains a
+  sixth, reference entry. ``ppgain`` is documented as an assumed residual-
+  speckle factor.
 
 Object-oriented API
 -------------------
