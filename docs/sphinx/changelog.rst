@@ -16,6 +16,13 @@ Physics
   The FPM off-axis throughput is documented as the planet's throughput into that
   aperture and raw contrast as leakage relative to the off-axis PSF in it.
   Default-configuration SNR anchors moved accordingly.
+- **Peak-pixel saturation model** (issue #11).
+  :meth:`~esc_etc.Simulation.saturation_time` now fills the brightest dark-hole
+  pixel: point sources contribute ``Sensor.peak_pixel_fraction`` of their
+  in-aperture rate (default from the Airy pattern at the plate scale), diffuse
+  backgrounds spread over the aperture, dark current is included, and the limit
+  is ``Sensor.headroom`` (default 0.8) times the well depth. Both new sensor
+  parameters are mutable. The occulted host remains out of scope.
 
 Object-oriented API
 -------------------
