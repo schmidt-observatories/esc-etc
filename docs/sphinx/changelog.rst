@@ -47,6 +47,15 @@ Physics
   Zodi is explicitly Johnson *V*; ``exobg_flux`` is documented as a delta
   magnitude. Invalid magnitude systems raise ``ValueError`` immediately, and the
   deprecated ``flux_units`` argument is now honored instead of ignored.
+- **End-of-life ESC filter curves**. Twelve telescope + ESC throughput curves
+  (EOL, 5% telescope and 10% ESC reserve, detector QE included, FPM excluded)
+  ship in ``esc_etc/data/esc_filters_eol`` and are listed in
+  :data:`esc_etc.FILTERS` by wheel slot (``"R1"``) and designation
+  (``"F620N"``). ``filter=`` on :meth:`Simulation.from_default
+  <esc_etc.Simulation.from_default>`, ``Telescope.from_default`` and
+  ``Sensor.from_default`` uses the curve as the whole sensor bandpass and the
+  design wavelength as the telescope's central wavelength (resel, lambda/D).
+  Default (``None``) keeps the generic config box filter.
 
 Object-oriented API
 -------------------

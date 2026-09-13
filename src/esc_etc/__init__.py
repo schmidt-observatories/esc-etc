@@ -13,7 +13,7 @@ def get_data_path():
 
 
 from .telescope import Telescope
-from .sensor import Sensor
+from .sensor import Sensor, FILTERS
 from .scene import Scene, SceneElement, get_scene
 from .coronagraph import Coronagraph
 from .noise import AnalyticCoronagraphNoiseModel, CountRates
@@ -27,7 +27,7 @@ from .plotting import (
 
 __all__ = [
     "get_data_path", "__version__",
-    "Simulation", "Telescope", "Sensor", "Scene", "SceneElement", "Coronagraph",
+    "Simulation", "Telescope", "Sensor", "FILTERS", "Scene", "SceneElement", "Coronagraph",
     "get_scene", "AnalyticCoronagraphNoiseModel", "CountRates",
     "Observatory", "esc_calc_snr",
     "plot_count_rates", "plot_snr_vs_time", "plot_offaxis_throughput",

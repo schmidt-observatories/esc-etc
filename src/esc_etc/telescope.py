@@ -11,6 +11,7 @@ import numpy as np
 from astropy import units as u
 
 from .meta import _MetaHolder_
+from .sensor import filter_central_wavelength
 
 
 class Telescope(_MetaHolder_):
@@ -30,14 +31,15 @@ class Telescope(_MetaHolder_):
 
     @classmethod
     def from_config(cls, telescope_config, instrument_config, telescope_support_path,
-                    arm="arm_a"):
+                    arm="arm_a", filter=None):
         cp = instrument_config["common_params"][arm]
         diameter_primary = u.Quantity(cp["pupil"]["aper_clear_OD"])
         lyot = cp["optics"]["lyot_stop"]["lyot_ratio"]
         surface = np.pi * (0.5 * lyot * diameter_primary) ** 2
         diameter_secondary = u.Quantity(
             telescope_config["telescope"]["optics"]["m2"]["aper_clear_OD"])
-        primary_filter = u.Quantity(cp["optics"]["filter"]["lam_central"]).to("AA")
+        primary_filter = (filter_central_wavelength(filter) if filter else
+                          u.Quantity(cp["optics"]["filter"]["lam_central"])).to("AA")
         f_num = cp["general"]["f_number_sci_cam"]
         focal_len = f_num * diameter_primary
         jitter_rms = u.Quantity(
@@ -54,12 +56,12 @@ class Telescope(_MetaHolder_):
                    resel, diameter_secondary, jitter_rms, zodi_profile_path)
 
     @classmethod
-    def from_default(cls, arm="arm_a"):
+    def from_default(cls, arm="arm_a", filter=None):
         import config_stp_esc
         import config_um
         return cls.from_config(
             telescope_config=config_um.load_config_values(),
             instrument_config=config_stp_esc.load_config_values(),
             telescope_support_path=config_um.get_data_path(),
-            arm=arm,
+            arm=arm, filter=filter,
         )

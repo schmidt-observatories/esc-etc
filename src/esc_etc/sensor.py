@@ -9,6 +9,7 @@ lives in Coronagraph.off_axis_throughput (see plan physics-fact #1).
 Omega = pi (lambda/2D)^2) expressed in detector pixels, so the dark-current and
 read-noise pixel count and the zodi/exozodi solid angle describe one aperture.
 """
+import re
 from pathlib import Path
 
 import numpy as np
@@ -24,6 +25,33 @@ from synphot.models import Box1D, Empirical1D
 from .meta import _MetaHolder_
 
 WAVELENGTHS = np.arange(2000, 10000, 0.2) * u.AA
+
+# End-of-life telescope + ESC throughput curves (QE included, FPM excluded),
+# keyed by wheel slot ("R1") and by designation ("F620N").
+_FILTER_DIR = Path(__file__).parent / "data" / "esc_filters_eol"
+FILTERS = {}
+for _f in sorted(_FILTER_DIR.glob("ESC_*_EOL.csv")):
+    _slot, _name = _f.stem.split("_")[2:4]
+    FILTERS[_slot] = FILTERS[_name.replace("p", ".")] = _f
+
+
+def _filter_path(name):
+    try:
+        return FILTERS[name]
+    except KeyError:
+        raise ValueError(f"Unknown ESC filter {name!r}; choose from {sorted(FILTERS)}") from None
+
+
+def filter_central_wavelength(name):
+    """Design central wavelength from the designation, e.g. F725.9N -> 725.9 nm."""
+    designation = _filter_path(name).stem.split("_")[3].replace("p", ".")
+    return float(re.search(r"F([\d.]+)[NW]", designation)[1]) * u.nm
+
+
+def filter_bandpass(name):
+    df = pd.read_csv(_filter_path(name), skiprows=1)
+    return SpectralElement(Empirical1D, points=df.iloc[:, 0].values * u.nm,
+                           lookup_table=df.iloc[:, 1].values)
 
 
 def _resample_spectral_element(S, w):
@@ -82,12 +110,43 @@ class Sensor(_MetaHolder_):
 
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope_config,
-                    telescope_support_path, telescope, arm="arm_a"):
+                    telescope_support_path, telescope, arm="arm_a", filter=None):
         isp = Path(instrument_support_path)
         tsp = Path(telescope_support_path)
         cp = instrument_config["common_params"][arm]
-        bandpass = SpectralElement(Box1D, amplitude=1, x_0=6000, width=7000)
+        bandpass = filter_bandpass(filter) if filter else cls._config_bandpass(
+            cp, isp, telescope_config, tsp)
 
+        # Detector
+        pixel_size = (u.Quantity(cp["sensor"]["pixel_size"])).to(u.um) * (1.0 / u.pix)
+        sensor_area = 962.56 * u.um * 962.56 * u.um
+        gain_setting = cp["sensor"]["gain"]
+        sensor_temp = cp["sensor"]["temp_nominal"] * u.Celsius
+
+        def _interp(csv_key, names, x):
+            f = isp / Path(cp["sensor"][csv_key])
+            df = pd.read_csv(f.as_posix(), skiprows=1, names=names)
+            return interp1d(df[names[0]], df[names[1]])(x)
+
+        gain = _interp("gain_curve", ["gain_setting", "gain"], gain_setting) * (u.electron / u.ct)
+        dark_current = _interp("dark_current", ["sensor_temperature", "dark_current"],
+                               sensor_temp.value) * (u.electron / (u.s * u.pix))
+        read_noise = _interp("read_noise", ["gain_setting", "read_noise"], gain_setting) \
+            * np.sqrt(1.0 * u.electron / u.pix)
+        well_depth = _interp("well_depth", ["gain_setting", "well_depth"], gain_setting) \
+            * (u.electron / u.pix)
+
+        num_pixels = (sensor_area / (pixel_size ** 2)).to("pix2").value * u.pix
+        plate_scale = (pixel_size.value * 1e-6 / telescope.diameter_primary.value
+                       / telescope.f_num * 206265)
+
+        return cls(bandpass, gain, dark_current, read_noise, well_depth, pixel_size,
+                   num_pixels, sensor_area, sensor_temp, plate_scale, telescope)
+
+    @staticmethod
+    def _config_bandpass(cp, isp, telescope_config, tsp):
+        """Mirrors x generic box filter x polarizers x QE from the config files."""
+        bandpass = SpectralElement(Box1D, amplitude=1, x_0=6000, width=7000)
         # Telescope mirrors
         for key in telescope_config["telescope"]["optics"].keys():
             coating = tsp / Path(telescope_config["telescope"]["optics"][key]["coating_refl"])
@@ -115,38 +174,12 @@ class Sensor(_MetaHolder_):
                 if "lp1" in key:
                     bandpass = bandpass * SpectralElement(Box1D, amplitude=0.5, x_0=6000, width=7000)
 
-        # Detector
-        pixel_size = (u.Quantity(cp["sensor"]["pixel_size"])).to(u.um) * (1.0 / u.pix)
-        sensor_area = 962.56 * u.um * 962.56 * u.um
-        gain_setting = cp["sensor"]["gain"]
-        sensor_temp = cp["sensor"]["temp_nominal"] * u.Celsius
-
-        def _interp(csv_key, names, x):
-            f = isp / Path(cp["sensor"][csv_key])
-            df = pd.read_csv(f.as_posix(), skiprows=1, names=names)
-            return interp1d(df[names[0]], df[names[1]])(x)
-
-        gain = _interp("gain_curve", ["gain_setting", "gain"], gain_setting) * (u.electron / u.ct)
-        dark_current = _interp("dark_current", ["sensor_temperature", "dark_current"],
-                               sensor_temp.value) * (u.electron / (u.s * u.pix))
-        read_noise = _interp("read_noise", ["gain_setting", "read_noise"], gain_setting) \
-            * np.sqrt(1.0 * u.electron / u.pix)
-        well_depth = _interp("well_depth", ["gain_setting", "well_depth"], gain_setting) \
-            * (u.electron / u.pix)
-
-        num_pixels = (sensor_area / (pixel_size ** 2)).to("pix2").value * u.pix
-        plate_scale = (pixel_size.value * 1e-6 / telescope.diameter_primary.value
-                       / telescope.f_num * 206265)
-
         qe_path = isp / Path(cp["sensor"]["qe"])
         bandpass = bandpass * SpectralElement.from_file(qe_path.as_posix(), wave_unit="nm")
-        bandpass = _resample_spectral_element(bandpass, WAVELENGTHS)
-
-        return cls(bandpass, gain, dark_current, read_noise, well_depth, pixel_size,
-                   num_pixels, sensor_area, sensor_temp, plate_scale, telescope)
+        return _resample_spectral_element(bandpass, WAVELENGTHS)
 
     @classmethod
-    def from_default(cls, telescope, arm="arm_a"):
+    def from_default(cls, telescope, arm="arm_a", filter=None):
         import config_stp_esc
         import config_um
         return cls.from_config(
@@ -154,5 +187,5 @@ class Sensor(_MetaHolder_):
             instrument_support_path=config_stp_esc.get_data_path(),
             telescope_config=config_um.load_config_values(),
             telescope_support_path=config_um.get_data_path(),
-            telescope=telescope, arm=arm,
+            telescope=telescope, arm=arm, filter=filter,
         )
