@@ -2,24 +2,29 @@ Saturation
 ==========
 
 ``esc-etc`` reports saturation as a *frame time*: the longest single frame you
-can read out before the detector well fills. Because the ESC noise model reads
-an integration out in frames of duration ``frame_time`` (see :doc:`snr`),
-saturation is a constraint on that frame time, not on the total integration.
+can read out before the brightest dark-hole pixel fills. Because the ESC noise
+model reads an integration out in frames of duration ``frame_time`` (see
+:doc:`snr`), saturation is a constraint on that frame time, not on the total
+integration.
 
 The saturation time
 -------------------
 
-:meth:`~esc_etc.Simulation.saturation_time` divides the sensor well depth by the
-per-pixel electron rate:
+:meth:`~esc_etc.Simulation.saturation_time` divides the usable well by the
+peak-pixel electron rate:
 
 .. math::
 
-   t_\mathrm{sat} = \frac{W}{\left(R_\mathrm{source} + R_\mathrm{zodi} +
-   R_\mathrm{speckle} + R_\mathrm{exozodi}\right) / N_\mathrm{pix}}
+   t_\mathrm{sat} = \frac{h\,W}{f_\mathrm{peak}\left(R_\mathrm{source} +
+   R_\mathrm{speckle}\right) + \left(R_\mathrm{zodi} + R_\mathrm{exozodi}\right)
+   / N_\mathrm{pix} + R_\mathrm{dark}}
 
-where :math:`W` is :attr:`Sensor.well_depth <esc_etc.Sensor.well_depth>` and
-:math:`N_\mathrm{pix}` is :attr:`Sensor.num_psf_pixels
-<esc_etc.Sensor.num_psf_pixels>`. The rates come from
+where :math:`W` is :attr:`Sensor.well_depth <esc_etc.Sensor.well_depth>`,
+:math:`h` is ``Sensor.headroom`` (the usable fraction of full well, default
+0.8), :math:`f_\mathrm{peak}` is ``Sensor.peak_pixel_fraction`` (the share of a
+point source's in-aperture rate that lands on its brightest pixel),
+:math:`N_\mathrm{pix}` is ``Sensor.num_psf_pixels``, and :math:`R_\mathrm{dark}`
+is the dark current per pixel. The rates come from
 :meth:`~esc_etc.Simulation.count_rate_components`:
 
 .. code-block:: python
@@ -30,41 +35,41 @@ where :math:`W` is :attr:`Sensor.well_depth <esc_etc.Sensor.well_depth>` and
    sim.is_saturated(100 * u.s)   # True / False for a 100 s frame
 
 :meth:`~esc_etc.Simulation.is_saturated` is the direct comparison
-``frame_time > saturation_time()``.
+``frame_time > saturation_time()``, so both use the same definition.
 
 .. note::
 
-   The host star is deliberately **excluded** from the per-pixel sum. Only the
-   planet, zodi, speckle, and exozodi rates contribute. This matches the legacy
-   ``calc_saturation_time`` in
-   :class:`~esc_etc.ExposureTimeSNRCalculatorESC.ExposureTimeSNRCalculatorESC`,
-   and reflects the fact that the quantity of interest is the accumulation in
-   the dark hole, not at the (occulted) star's position.
+   The occulted host star is **out of scope**. The quantity of interest is the
+   brightest pixel in the dark-hole science region, not the stellar core behind
+   the focal-plane mask. All rates are already scaled by the FPM throughput
+   ``coronagraph.off_axis_throughput``.
 
-   All rates are already scaled by the flat FPM throughput
-   ``coronagraph.off_axis_throughput``, so the saturation time refers to the
-   post-coronagraph focal plane.
+What sets the peak-pixel rate
+-----------------------------
 
-What sets the per-pixel rate
-----------------------------
+Three sensor knobs move :math:`t_\mathrm{sat}` for a fixed scene, all mutable
+through :meth:`Simulation.update <esc_etc.Simulation.update>`:
 
-Two knobs move :math:`t_\mathrm{sat}` for a fixed scene:
-
-**Well depth.** :attr:`~esc_etc.Sensor.well_depth` is a mutable sensor
-parameter, so a different gain setting can be explored in place:
+**Well depth and headroom.** ``well_depth`` follows the gain setting;
+``headroom`` is a safety margin on it, not a measured linearity limit:
 
 .. code-block:: python
 
-   sim.update(sensor__well_depth=60000 * u.electron)
+   sim.update(sensor__well_depth=60000 * u.electron / u.pix, sensor__headroom=0.9)
    sim.saturation_time()
    sim.reset()
 
-**Aperture pixel count.** ``num_psf_pixels`` is the photometric extraction
-aperture :attr:`Telescope.resel <esc_etc.Telescope.resel>`,
-:math:`\Omega = \pi(\lambda/2D)^2`, divided by the pixel solid angle. The same
-:math:`\Omega` scales the zodi and exozodi rates, so background, detector, and
-saturation terms all refer to one aperture (about 30 pixels at the default
-configuration).
+**Peak-pixel fraction.** The default is computed for an unobscured Airy pattern
+at the sensor plate scale: peak intensity :math:`\pi/4` per
+:math:`(\lambda/D)^2`, divided by the encircled energy inside the extraction
+aperture. At the default configuration this is about 0.045 of the in-aperture
+rate, versus 0.033 for the aperture mean. It ignores Lyot-stop broadening and
+finite-pixel integration; when a real PSF image is available, set the fraction
+from it:
+
+.. code-block:: python
+
+   sim.update(sensor__peak_pixel_fraction=psf_image.max() / psf_image.sum())
 
 Choosing a frame time
 ---------------------
@@ -75,11 +80,12 @@ term in the noise budget is
 t_\mathrm{frame})` — it grows with the *number of reads*, so splitting a long
 integration into many short frames to dodge saturation costs SNR.
 
-A workable frame time therefore sits just under :math:`t_\mathrm{sat}`:
+Because ``headroom`` already holds back part of the well, a frame time at or
+just under :math:`t_\mathrm{sat}` is the natural choice:
 
 .. code-block:: python
 
-   frame_time = 0.8 * sim.saturation_time()
+   frame_time = sim.saturation_time()
    result = sim.get_snr(total_time=3600 * u.s, frame_time=frame_time)
 
 .. tip::

@@ -129,13 +129,20 @@ class Simulation(_MetaHolder_):
                                                  self.coronagraph, frame_time)
 
     def saturation_time(self):
-        rates = self.count_rate_components()
-        # host is intentionally omitted from the per-pixel sum, matching legacy
-        # calc_saturation_time (ExposureTimeSNRCalculatorESC.py ~1017), which sums
-        # only source/sky(zodi)/speckle/exozodi.
-        per_pix = (rates.source + rates.zodi + rates.speckle + rates.exozodi) \
-            / self.sensor.num_psf_pixels
-        return self.sensor.well_depth / per_pix
+        """Frame time at which the brightest dark-hole pixel reaches
+        ``sensor.headroom * sensor.well_depth``.
+
+        Planet and speckle put ``sensor.peak_pixel_fraction`` of their
+        in-aperture rate on the peak pixel; zodi and exozodi spread uniformly
+        over ``num_psf_pixels``; dark current adds per pixel. The occulted host
+        is out of scope: this is the dark-hole science ROI, not the stellar
+        core behind the FPM.
+        """
+        r = self.count_rate_components()
+        s = self.sensor
+        peak = ((r.source + r.speckle) * s.peak_pixel_fraction
+                + (r.zodi + r.exozodi) / s.num_psf_pixels.value) / u.pix + s.dark_current
+        return (s.headroom * s.well_depth / peak).to(u.s)
 
     def is_saturated(self, frame_time):
         return frame_time > self.saturation_time()

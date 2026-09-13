@@ -17,6 +17,7 @@ from astropy import units as u
 import astropy.io.fits
 import astropy.table
 from scipy.interpolate import interp1d
+from scipy.special import j0, j1
 from synphot import SpectralElement
 from synphot.models import Box1D, Empirical1D
 
@@ -39,11 +40,28 @@ def _mirror_bandpass(coating_file):
     return SpectralElement.from_file(coating_file, wave_unit="nm")
 
 
+def _airy_peak_pixel_fraction(telescope, plate_scale):
+    """Brightest-pixel share of a point source's in-aperture rate for an
+    unobscured Airy PSF sampled at ``plate_scale`` arcsec/pix.
+
+    Peak intensity is pi/4 of the total per (lambda/D)^2; encircled energy inside
+    radius r (lambda/D units) is 1 - J0(pi r)^2 - J1(pi r)^2.
+    ponytail: ignores Lyot-stop broadening and finite-pixel integration; set
+    ``Sensor.peak_pixel_fraction`` from a real PSF image when one exists.
+    """
+    lam_d = (telescope.primary_filter / telescope.diameter_primary).to_value(
+        u.arcsec, equivalencies=u.dimensionless_angles())
+    r_ap = np.sqrt(telescope.resel.to_value(u.arcsec ** 2) / np.pi) / lam_d
+    ee = 1 - j0(np.pi * r_ap) ** 2 - j1(np.pi * r_ap) ** 2
+    return float((np.pi / 4) * (plate_scale / lam_d) ** 2 / ee)
+
+
 class Sensor(_MetaHolder_):
     def __init__(self, bandpass, gain, dark_current, read_noise, well_depth,
                  pixel_size, num_pixels, sensor_area, sensor_temp, plate_scale,
-                 telescope):
-        self._mutable_parameters = ["read_noise", "dark_current", "gain", "well_depth"]
+                 telescope, peak_pixel_fraction=None, headroom=0.8):
+        self._mutable_parameters = ["read_noise", "dark_current", "gain", "well_depth",
+                                    "peak_pixel_fraction", "headroom"]
         self.bandpass = bandpass
         self.pixel_size = pixel_size
         self.num_pixels = num_pixels
@@ -54,8 +72,13 @@ class Sensor(_MetaHolder_):
         # One aperture for every SNR term: Omega = telescope.resel in pixels.
         self.num_psf_pixels = (telescope.resel.to_value(u.arcsec ** 2)
                                / plate_scale ** 2) * u.pix
+        if peak_pixel_fraction is None:
+            peak_pixel_fraction = _airy_peak_pixel_fraction(telescope, plate_scale)
+        # headroom: usable fraction of full well before saturation/nonlinearity.
+        # 0.8 is a safety margin, not a measured linearity limit.
         self._init_meta(gain=gain, dark_current=dark_current,
-                        read_noise=read_noise, well_depth=well_depth)
+                        read_noise=read_noise, well_depth=well_depth,
+                        peak_pixel_fraction=peak_pixel_fraction, headroom=headroom)
 
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope_config,
