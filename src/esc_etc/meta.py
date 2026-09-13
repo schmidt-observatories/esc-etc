@@ -16,7 +16,7 @@ class _MetaHolder_:
             setattr(self, key, value)
 
     def update(self, **kwargs):
-        updated = []
+        updated, previous = [], {}
         for key, value in kwargs.items():
             if "__" in key:
                 child_name, sub_key = key.split("__", 1)
@@ -28,10 +28,17 @@ class _MetaHolder_:
                     f"{key!r} is not a mutable parameter of {type(self).__name__}; "
                     f"allowed: {self._mutable_parameters}"
                 )
+            previous[key] = getattr(self, key)
             setattr(self, key, value)
             self.meta[key] = value
             updated.append(key)
-        self._on_update(updated)
+        try:
+            self._on_update(updated)
+        except Exception:
+            for k, v in previous.items():  # rejected update leaves no trace
+                setattr(self, k, v)
+                self.meta[k] = v
+            raise
         return updated
 
     def reset(self):

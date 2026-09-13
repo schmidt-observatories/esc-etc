@@ -23,6 +23,15 @@ Physics
   backgrounds spread over the aperture, dark current is included, and the limit
   is ``Sensor.headroom`` (default 0.8) times the well depth. Both new sensor
   parameters are mutable. The occulted host remains out of scope.
+- **Integer frame accounting and input validation** (issue #15). Read noise
+  scales with ``ceil(total_time / frame_time)`` reads (whole frames plus a
+  shorter final one, at least one).
+  :meth:`~esc_etc.Simulation.get_int_time_for_snr` returns ``int_time`` rounded
+  up to whole frames plus ``int_time_continuous``, both in seconds. Non-positive
+  times, target SNR, ``ppgain`` or separation and negative contrast raise
+  ``ValueError``; separations outside the FPM table raise instead of clamping; a
+  saturating ``frame_time`` warns. A rejected ``update`` leaves no trace. The
+  default :func:`~esc_etc.plot_snr_vs_time` grid starts at one frame.
 
 Object-oriented API
 -------------------

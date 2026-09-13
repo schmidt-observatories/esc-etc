@@ -21,7 +21,9 @@ the total noise (in electrons) combines:
 - **Dark current** — :math:`R_\mathrm{dark}\,t \times N_\mathrm{pix}`, summed
   over the PSF pixels.
 - **Read noise** — :math:`\sigma_\mathrm{read}^2 \, N_\mathrm{pix} \,
-  (t / t_\mathrm{frame})`, i.e. it grows with the number of reads.
+  N_\mathrm{reads}`, with :math:`N_\mathrm{reads} = \lceil t / t_\mathrm{frame}
+  \rceil`: whole frames plus one shorter final frame, and never fewer than one
+  read. An integration shorter than a frame is still one read.
 - **Post-processed speckle floor** — a systematic term
   :math:`(M\,t)^2`, where :math:`M = R_\mathrm{speckle} \times` the
   coronagraph's :meth:`noise floor factor <esc_etc.Coronagraph.noise_floor_factor>`
@@ -52,8 +54,15 @@ the integration time needed to reach a target SNR at a given ``frame_time``:
 .. code-block:: python
 
    inv = sim.get_int_time_for_snr(snr=10, frame_time=100 * u.s)
-   inv["int_time"]      # integration time(s) (numpy array)
-   inv["noise_terms"]   # [dark, read, zodi, exozodi, speckle] contributions
+   inv["int_time"]             # whole frames: shortest realizable schedule
+   inv["int_time_continuous"]  # closed-form inversion with fractional reads
+   inv["noise_terms"]          # [dark, read, zodi, exozodi, speckle] contributions
+
+``int_time`` rounds the closed-form solution up to a whole number of frames, so
+it is always achievable and meets the target SNR; ``int_time_continuous`` is the
+unrounded value. Non-positive times, target SNRs, ``ppgain`` or negative
+contrast raise ``ValueError``; a ``frame_time`` above
+:meth:`~esc_etc.Simulation.saturation_time` emits a warning.
 
 .. important::
 
