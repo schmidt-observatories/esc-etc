@@ -38,6 +38,8 @@ Building a scene
 The resulting ``scene`` exposes its elements as ``scene.star``,
 ``scene.planet``, ``scene.zodi``, and ``scene.exozodi``.
 
+.. _planet-spectra:
+
 Planet spectra
 --------------
 
@@ -80,7 +82,7 @@ Every magnitude carries two labels: a **system** and a **band**.
 
 Defaults: the host and exozodi are ESC-band magnitudes, the zodi surface
 brightness is in Johnson *V*, and ``planetdeltamag`` is an ESC-band delta
-magnitude (see :ref:`planet spectra <scene:Planet spectra>`).
+magnitude (see :ref:`planet-spectra`).
 
 Updating scene elements
 -----------------------

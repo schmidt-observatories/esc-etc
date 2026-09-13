@@ -63,14 +63,14 @@ def get_scene(telescope, hoststarmag=-0.353, planetdeltamag=20.0, bg_flux=22.5,
               hoststar_band=None):
     """Build a Scene from magnitudes.
 
-    hoststarmag     host magnitude in ``hoststar_band`` (None = ESC band;
-                    ``"johnson_v"`` for a catalog V magnitude).
-    planetdeltamag  planet fainter than host by this much in the ESC band
-                    (change via ``planet.deltamag_band``).
-    bg_flux         zodi surface brightness, mag/arcsec^2 in Johnson V.
-    exobg_flux      exozodi DELTA magnitude: surface brightness is
-                    ``hoststarmag + exobg_flux`` mag/arcsec^2 in the ESC band.
-    mag_system      "vega" or "AB", applied to every magnitude above.
+    - ``hoststarmag``: host magnitude in ``hoststar_band`` (None = ESC band;
+      ``"johnson_v"`` for a catalog V magnitude).
+    - ``planetdeltamag``: planet fainter than the host by this much in the ESC
+      band (change via ``planet.deltamag_band``).
+    - ``bg_flux``: zodi surface brightness, mag/arcsec^2 in Johnson V.
+    - ``exobg_flux``: exozodi DELTA magnitude; surface brightness is
+      ``hoststarmag + exobg_flux`` mag/arcsec^2 in the ESC band.
+    - ``mag_system``: ``"vega"`` or ``"AB"``, applied to every magnitude above.
     """
     flat = SourceSpectrum(ConstFlux1D, amplitude=hoststarmag * u.ABmag)
     star = SceneElement("star", flat, mag=hoststarmag, mag_system=mag_system,
