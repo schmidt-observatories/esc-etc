@@ -2,7 +2,7 @@
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 from esc_etc.telescope import Telescope
@@ -16,6 +16,6 @@ def test_from_default_detector_and_psf():
     assert s.dark_current.unit.is_equivalent(u.electron / (u.s * u.pix))
     assert s.well_depth.unit.is_equivalent(u.electron / u.pix)
     # Square-approx PSF footprint pinned by the baseline config.
-    assert s.num_psf_pixels.value == pytest.approx(29.9958, rel=1e-4)
+    assert s.num_psf_pixels.value == pytest.approx(19.5951, rel=1e-4)
     # Bandpass is a synphot SpectralElement evaluable on the detector grid.
     assert float(s.bandpass.tpeak()) > 0

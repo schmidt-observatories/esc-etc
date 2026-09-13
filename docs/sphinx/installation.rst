@@ -9,7 +9,7 @@ Requirements
   ``astropy``, ``synphot``, ``matplotlib``, ``pandas``, and ``scipy``.
 - The UASAL configuration packages, also installed automatically as
   dependencies: ``utils_config``, ``config_um`` (UA Ultramarine 3 m telescope
-  concept), and ``config_stp_esc`` (the ESC instrument). See
+  concept), and ``config_um_esc`` (the ESC instrument). See
   :doc:`configuration`.
 
 Install from source (recommended)

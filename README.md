@@ -22,7 +22,7 @@ The installation instructions for these packages can be found on their correspon
 2. [config_stp](https://github.com/uasal/config_stp) - The configuration repo for the Space Telescope Project 6.5m (https://arxiv.org/abs/2309.04934).
 
 ### Instrument
-1. [config_stp_esc](https://github.com/uasal/config_stp_esc) - Configuration repo for the ESC instrument.
+1. [config_um_esc](https://github.com/uasal/config_um_esc) - Configuration repo for the ESC instrument.
 
 ### UASAL Archive
 
@@ -106,7 +106,7 @@ Each helper returns `(fig, ax)` and opens a matplotlib figure; close figures you
 
 ### Tutorials
 
-A numbered suite of runnable Jupyter tutorials in [`notebooks/`](notebooks/) walks through the new OO API and the plotting helpers (they require the `config_um` / `config_stp_esc` configs and an editable install):
+A numbered suite of runnable Jupyter tutorials in [`notebooks/`](notebooks/) walks through the new OO API and the plotting helpers (they require the `config_um` / `config_um_esc` configs and an editable install):
 
 - [`01_getting_started.ipynb`](notebooks/01_getting_started.ipynb) — build a `Simulation`, compute SNR, and plot the noise breakdown.
 - [`02_components_and_parameters.ipynb`](notebooks/02_components_and_parameters.ipynb) — build `Telescope`/`Sensor`/`Scene`/`Coronagraph` individually, assemble with `from_components`, and vary parameters via `update()`/`reset()`.

@@ -13,6 +13,7 @@ import astropy.units as u
 try:
     import config_stp
     import config_stp_esc
+    import config_um_esc
     import config_um
 except:
     print("Could not import configuration repos.")
@@ -63,7 +64,7 @@ def test_configs_telescope(telescope):
 	return
 
 def test_configs_instrument():
-	data_instrument = config_stp_esc.load_config_values("parsed")
+	data_instrument = config_um_esc.load_config_values("parsed")
 
     #assert "value" in data_instrument['common_params']['arm_a']['sensor']['temp_nominal'], "Value type mismatch. Potentially corrupted or modified data."
 	assert isinstance(data_instrument['common_params']['arm_a']['sensor']['gain'], int), "Value type mismatch. Potentially corrupted or modified data."

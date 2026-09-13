@@ -44,7 +44,7 @@ A configurable instrument
 
 Instrument and telescope properties (mirrors, optics, coatings, filters,
 detectors) live in the UASAL configuration repositories — ``config_um`` (the UA
-Ultramarine 3 m telescope concept) and ``config_stp_esc`` (the ESC instrument).
+Ultramarine 3 m telescope concept) and ``config_um_esc`` (the ESC instrument).
 :meth:`Simulation.from_default <esc_etc.Simulation.from_default>` pulls these in
 for you; see :doc:`configuration` for the details and for how to supply your
 own.

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-pytest.importorskip("config_stp_esc")
+pytest.importorskip("config_um_esc")
 pytest.importorskip("config_um")
 
 import esc_etc
@@ -14,5 +14,5 @@ def test_snr():
     snr, _esc = esc_etc.ExposureTimeSNRCalculatorESC.esc_calc_snr(
         600, 10, verbose=False, plot=False
     )
-    val = 4.4545656651737255
+    val = 9.311330639402856
     assert np.abs(float(snr) - val) < 1e-4, f"Expected {val}, but got {snr}"

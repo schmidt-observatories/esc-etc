@@ -2,7 +2,7 @@
 """Telescope geometry for the ESC ETC.
 
 Holds aperture/collecting-area geometry. Throughput lives in Sensor (mirroring
-wcc-etc). Values are extracted from config_um (telescope) + config_stp_esc
+wcc-etc). Values are extracted from config_um (telescope) + config_um_esc
 (per-arm aperture), matching the original Observatory.make_STP logic.
 """
 from pathlib import Path
@@ -55,11 +55,11 @@ class Telescope(_MetaHolder_):
 
     @classmethod
     def from_default(cls, arm="arm_a"):
-        import config_stp_esc
+        import config_um_esc
         import config_um
         return cls.from_config(
             telescope_config=config_um.load_config_values(),
-            instrument_config=config_stp_esc.load_config_values(),
+            instrument_config=config_um_esc.load_config_values(),
             telescope_support_path=config_um.get_data_path(),
             arm=arm,
         )

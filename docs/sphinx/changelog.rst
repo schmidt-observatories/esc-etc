@@ -47,6 +47,16 @@ Physics
   Zodi is explicitly Johnson *V*; ``exobg_flux`` is documented as a delta
   magnitude. Invalid magnitude systems raise ``ValueError`` immediately, and the
   deprecated ``flux_units`` argument is now honored instead of ignored.
+- **3 m Ultramarine default** (``config_um_esc``). ``from_default`` on every
+  component now reads the ESC instrument from ``config_um_esc`` (3.0 m clear
+  aperture, ASI294MM, silver ESC optics, 0.9 dichroic) instead of
+  ``config_stp_esc`` (2.43 m, ASI6200MM, Al+MgF2), matching the telescope in
+  ``config_um``. ``config_um_esc`` is a required dependency; ``config_stp_esc``
+  moves to the ``dev`` extra. The bandpass chain applies
+  ``dichroic_throughput`` when the config has one, and the detector tables are
+  clamped at their ends so the -20 C nominal temperature no longer raises.
+  Default source rates rise 5.9x (area 1.56 x throughput 3.52 x FPM 1.07) and
+  every golden anchor was re-pinned accordingly.
 - **Reference-subtraction noise and time** (issue #12).
   :class:`~esc_etc.Coronagraph` gains ``subtraction`` (``"none"`` default, or
   ``"rdi"``), ``ref_brightness_ratio`` and ``ref_time_ratio``. Under RDI the
