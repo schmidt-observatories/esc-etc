@@ -34,6 +34,15 @@ class Coronagraph(_MetaHolder_):
         self._throughput = throughput
         self._init_meta(raw_dh_contrast=raw_dh_contrast, ppgain=ppgain,
                         separation=separation)
+        self._on_update([])
+
+    def _on_update(self, updated_keys):
+        if self.raw_dh_contrast < 0:
+            raise ValueError(f"raw_dh_contrast must be >= 0, got {self.raw_dh_contrast}")
+        if self.ppgain <= 0:
+            raise ValueError(f"ppgain must be > 0, got {self.ppgain}")
+        if self.separation <= 0:
+            raise ValueError(f"separation must be > 0 arcsec, got {self.separation}")
 
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope,
@@ -70,6 +79,10 @@ class Coronagraph(_MetaHolder_):
         lamD_single = (self.primary_filter / self.diameter_primary).to(
             u.arcsec, equivalencies=u.dimensionless_angles())
         lamD_separation = separation / lamD_single.value
+        if not (self._lamD.min() <= lamD_separation <= self._lamD.max()):
+            raise ValueError(
+                f"separation {separation} arcsec = {lamD_separation:.2f} lambda/D is outside "
+                f"the FPM throughput table [{self._lamD.min():.2f}, {self._lamD.max():.2f}] lambda/D")
         idx = np.absolute(self._lamD - lamD_separation).argmin()
         return float(self._throughput[idx])
 

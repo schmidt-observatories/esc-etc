@@ -67,8 +67,9 @@ signal-to-noise itself is under the ``"snr"`` key:
    result["M"]          # post-processed speckle noise-floor rate
 
 ``total_time`` is the integrated exposure; ``frame_time`` is the per-frame
-read-out cadence (it sets how many reads — and hence how much read noise —
-accumulate). See :doc:`user_guide/snr` for the full noise budget.
+read-out cadence. The number of reads is ``ceil(total_time / frame_time)``,
+never fewer than one, and sets how much read noise accumulates. See
+:doc:`user_guide/snr` for the full noise budget.
 
 3. Invert: integration time for a target SNR
 --------------------------------------------
@@ -76,8 +77,9 @@ accumulate). See :doc:`user_guide/snr` for the full noise budget.
 .. code-block:: python
 
    inv = sim.get_int_time_for_snr(snr=10, frame_time=100 * u.s)
-   inv["int_time"]      # integration time(s) to reach SNR = 10
-   inv["noise_terms"]   # per-source noise contributions
+   inv["int_time"]             # whole-frame integration time to reach SNR = 10
+   inv["int_time_continuous"]  # unrounded closed-form value
+   inv["noise_terms"]          # per-source noise contributions
 
 Because residual speckle imposes a noise floor, some target SNRs are
 unreachable at a given contrast/ppgain; those entries come back as ``nan``.

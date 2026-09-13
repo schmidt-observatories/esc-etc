@@ -106,14 +106,16 @@ def plot_count_rates(sim=None, *, rates=None, sensor=None, ax=None, log=True):
 def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None, ax=None):
     """SNR vs total integration time (log-log).
 
-    Pass a Simulation (sweeps `total_times`, default logspace 10..1e5 s, computing
-    SNR per point via the engine's noise_model with a single count-rate evaluation),
-    or explicit `(total_times, snrs)`. `frame_time` defaults to 100 s. Returns (fig, ax).
+    Pass a Simulation (sweeps `total_times`, default logspace from one frame to
+    1e5 s, computing SNR per point via the engine's noise_model with a single
+    count-rate evaluation), or explicit `(total_times, snrs)`. `frame_time`
+    defaults to 100 s. Returns (fig, ax).
     """
     if frame_time is None:
         frame_time = 100 * u.s
     if total_times is None and sim is not None:
-        total_times = np.logspace(1, 5, 40) * u.s
+        t0 = np.log10(u.Quantity(frame_time, u.s).value)
+        total_times = np.logspace(t0, max(5, t0 + 1), 40) * u.s
     if snrs is None:
         _require(sim, "snrs", "total_times")
         # Intentionally bypasses sim.get_snr (which recomputes count rates each call):

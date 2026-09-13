@@ -17,6 +17,9 @@ k on the diffuse terms stands in for the diffuse-background transmission.
 ponytail: assumed equal to the point-source core throughput; split it out when
 the FPM data records total transmission separately.
 """
+import warnings
+
+import numpy as np
 from astropy import units as u
 from synphot import Observation, SourceSpectrum, SpectralElement, units as su
 
@@ -118,13 +121,21 @@ class Simulation(_MetaHolder_):
         return CountRates(source=source, zodi=zodi, exozodi=exozodi,
                           speckle=speckle, host=host_countrate * k)
 
+    def _warn_if_saturated(self, frame_time, rates):
+        t_sat = self._saturation_time(rates)
+        if np.any(u.Quantity(frame_time, u.s) > t_sat):
+            warnings.warn(f"frame_time {frame_time} exceeds saturation_time {t_sat:.3g}; "
+                          "the brightest dark-hole pixel saturates", stacklevel=3)
+
     def get_snr(self, total_time, frame_time):
         rates = self.count_rate_components()
+        self._warn_if_saturated(frame_time, rates)
         return self.noise_model.snr(rates, self.sensor, self.coronagraph,
                                     total_time, frame_time)
 
     def get_int_time_for_snr(self, snr, frame_time):
         rates = self.count_rate_components()
+        self._warn_if_saturated(frame_time, rates)
         return self.noise_model.int_time_for_snr(snr, rates, self.sensor,
                                                  self.coronagraph, frame_time)
 
@@ -138,7 +149,9 @@ class Simulation(_MetaHolder_):
         is out of scope: this is the dark-hole science ROI, not the stellar
         core behind the FPM.
         """
-        r = self.count_rate_components()
+        return self._saturation_time(self.count_rate_components())
+
+    def _saturation_time(self, r):
         s = self.sensor
         peak = ((r.source + r.speckle) * s.peak_pixel_fraction
                 + (r.zodi + r.exozodi) / s.num_psf_pixels.value) / u.pix + s.dark_current
