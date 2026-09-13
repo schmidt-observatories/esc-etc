@@ -79,7 +79,7 @@ never fewer than one, and sets how much read noise accumulates. See
    inv = sim.get_int_time_for_snr(snr=10, frame_time=100 * u.s)
    inv["int_time"]             # whole-frame integration time to reach SNR = 10
    inv["int_time_continuous"]  # unrounded closed-form value
-   inv["noise_terms"]          # per-source noise contributions
+   inv["noise_terms"]          # [dark, read, zodi, exozodi, speckle, reference] rates
 
 Because residual speckle imposes a noise floor, some target SNRs are
 unreachable at a given contrast/ppgain; those entries come back as ``nan``.

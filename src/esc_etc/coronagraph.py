@@ -14,6 +14,18 @@ Definitions (issue #10):
 * ``raw_dh_contrast`` C: residual stellar intensity in the dark hole divided by
   the off-axis PSF at the same separation, both in the extraction aperture, so
   stellar leakage in the aperture is ``R_host * C * k``.
+* ``ppgain``: an ASSUMED/calibrated residual-speckle suppression factor. The
+  systematic floor is ``R_speckle / ppgain``. It is not a prediction of what a
+  post-processing algorithm will achieve, and it carries no random-noise cost;
+  that cost is modeled by the subtraction strategy below (issue #12).
+* ``subtraction``: ``"none"`` (one science image, the default) or ``"rdi"``
+  (reference-differential imaging). For RDI a reference star
+  ``ref_brightness_ratio`` times brighter than the host is observed for
+  ``ref_time_ratio`` times the science time, scaled to the target, and
+  subtracted; its scaled random variance is added to the science variance
+  (Nemati et al. 2023, JATIS 9, 034007). Roll/ADI self-subtraction is not
+  modeled. ``total_time`` is always on-target science time; the noise model
+  reports the charged time ``total_time * (1 + ref_time_ratio)`` for RDI.
 """
 from pathlib import Path
 
@@ -26,14 +38,18 @@ from .meta import _MetaHolder_
 
 class Coronagraph(_MetaHolder_):
     def __init__(self, raw_dh_contrast, ppgain, separation, primary_filter,
-                 diameter_primary, lamD, throughput):
-        self._mutable_parameters = ["raw_dh_contrast", "ppgain", "separation"]
+                 diameter_primary, lamD, throughput, subtraction="none",
+                 ref_brightness_ratio=1.0, ref_time_ratio=1.0):
+        self._mutable_parameters = ["raw_dh_contrast", "ppgain", "separation",
+                                    "subtraction", "ref_brightness_ratio", "ref_time_ratio"]
         self.primary_filter = primary_filter
         self.diameter_primary = diameter_primary
         self._lamD = lamD
         self._throughput = throughput
         self._init_meta(raw_dh_contrast=raw_dh_contrast, ppgain=ppgain,
-                        separation=separation)
+                        separation=separation, subtraction=subtraction,
+                        ref_brightness_ratio=ref_brightness_ratio,
+                        ref_time_ratio=ref_time_ratio)
         self._on_update([])
 
     def _on_update(self, updated_keys):
@@ -43,6 +59,10 @@ class Coronagraph(_MetaHolder_):
             raise ValueError(f"ppgain must be > 0, got {self.ppgain}")
         if self.separation <= 0:
             raise ValueError(f"separation must be > 0 arcsec, got {self.separation}")
+        if self.subtraction not in ("none", "rdi"):
+            raise ValueError(f"subtraction must be 'none' or 'rdi', got {self.subtraction!r}")
+        if self.ref_brightness_ratio <= 0 or self.ref_time_ratio <= 0:
+            raise ValueError("ref_brightness_ratio and ref_time_ratio must be > 0")
 
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope,

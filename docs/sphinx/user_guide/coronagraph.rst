@@ -14,14 +14,22 @@ The three knobs
    * - Parameter
      - Meaning
    * - ``raw_dh_contrast``
-     - The raw dark-hole contrast (e.g. ``1e-8``). It sets the residual speckle
-       level: the speckle count rate is the host rate scaled by
-       :meth:`~esc_etc.Coronagraph.speckle_scale`, i.e.
-       :math:`10^{-0.4\,\Delta m}` with
-       :math:`\Delta m = -2.5\log_{10}(\text{raw\_dh\_contrast})`.
+     - The raw dark-hole contrast (e.g. ``1e-8``): residual stellar intensity in
+       the extraction aperture relative to the off-axis PSF at the same
+       separation. The speckle count rate is the host rate times this value
+       (:meth:`~esc_etc.Coronagraph.speckle_scale`).
    * - ``ppgain``
-     - The post-processing gain. It suppresses the systematic speckle floor by a
-       factor :meth:`~esc_etc.Coronagraph.noise_floor_factor` :math:`= 1/\text{ppgain}`.
+     - An **assumed** residual-speckle suppression factor after post-processing.
+       It divides the systematic speckle floor
+       (:meth:`~esc_etc.Coronagraph.noise_floor_factor` :math:`= 1/\text{ppgain}`)
+       and carries no random-noise cost of its own; that cost comes from the
+       subtraction strategy.
+   * - ``subtraction``
+     - ``"none"`` (default) or ``"rdi"``. See :doc:`snr` for the reference
+       noise and time accounting.
+   * - ``ref_brightness_ratio``, ``ref_time_ratio``
+     - RDI only: reference star brightness relative to the host, and reference
+       exposure time relative to the science time.
    * - ``separation``
      - The planet's angular separation (arcsec). It selects the off-axis
        throughput from the FPM curve and is the separation at which the planet is
