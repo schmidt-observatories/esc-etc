@@ -32,6 +32,12 @@ Physics
   ``ValueError``; separations outside the FPM table raise instead of clamping; a
   saturating ``frame_time`` warns. A rejected ``update`` leaves no trace. The
   default :func:`~esc_etc.plot_snr_vs_time` grid starts at one frame.
+- **Planet spectrum is used** (issue #13). The planet's ``spectrum`` is
+  normalized ``deltamag`` fainter than the host in ``deltamag_band`` (default:
+  the ESC band, which reproduces the old :math:`10^{-0.4\,\Delta m}` scaling;
+  or a filter name such as ``"johnson_v"``) and observed through the ESC
+  bandpass, so planet colour matters when the contrast is quoted elsewhere.
+  ``spectrum`` and ``deltamag_band`` are mutable; ``planet.mag`` is unused.
 
 Object-oriented API
 -------------------

@@ -1,7 +1,13 @@
 """Observable scene for the ESC ETC: host star, planet, zodi, exozodi.
 
-The star/planet share a flat ConstFlux1D spectral shape (as in the original
-set_generic_source); the planet is defined relative to the star by deltamag.
+Planet flux model (issue #13): ``planet.spectrum`` is a spectral *shape*,
+normalized ``planet.deltamag`` magnitudes fainter than the host in
+``planet.deltamag_band`` (None = the ESC sensor bandpass; a synphot filter name
+such as ``"johnson_v"``; or a SpectralElement), in the host's magnitude system,
+then observed through the ESC bandpass. With the default flat shape and ESC-band
+reference this reduces to ``R_host * 10**(-0.4 * deltamag)``. ``planet.mag`` is
+unused -- the planet's brightness is always host + deltamag.
+
 Backgrounds use the zodi profile file from the telescope config.
 """
 from synphot import SourceSpectrum
@@ -12,11 +18,13 @@ from .meta import _MetaHolder_
 
 
 class SceneElement(_MetaHolder_):
-    def __init__(self, name, spectrum, mag, mag_system="vega", deltamag=None):
-        self._mutable_parameters = ["mag", "mag_system", "deltamag"]
+    def __init__(self, name, spectrum, mag, mag_system="vega", deltamag=None,
+                 deltamag_band=None):
+        self._mutable_parameters = ["spectrum", "mag", "mag_system", "deltamag",
+                                    "deltamag_band"]
         self.name = name
-        self.spectrum = spectrum
-        self._init_meta(mag=mag, mag_system=mag_system, deltamag=deltamag)
+        self._init_meta(spectrum=spectrum, mag=mag, mag_system=mag_system,
+                        deltamag=deltamag, deltamag_band=deltamag_band)
 
 
 class Scene(_MetaHolder_):
@@ -34,7 +42,8 @@ def get_scene(telescope, hoststarmag=-0.353, planetdeltamag=20.0, bg_flux=22.5,
     """Build a Scene from host magnitude + planet delta-mag + background mags."""
     flat = SourceSpectrum(ConstFlux1D, amplitude=hoststarmag * u.ABmag)
     star = SceneElement("star", flat, mag=hoststarmag, mag_system=mag_system)
-    planet = SceneElement("planet", flat, mag=hoststarmag, mag_system=mag_system,
+    # planet.mag is ignored: brightness is host + deltamag in the ESC band.
+    planet = SceneElement("planet", flat, mag=None, mag_system=mag_system,
                           deltamag=planetdeltamag)
     bg_path = background_file if background_file is not None else telescope.zodi_profile_path
     zodi_spectrum = SourceSpectrum.from_file(bg_path)

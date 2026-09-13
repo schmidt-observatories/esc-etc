@@ -70,6 +70,19 @@ class Simulation(_MetaHolder_):
             return u.ABmag
         raise NotImplementedError(f"flux units {mag_system!r} not implemented")
 
+    def _normalize(self, spectrum, mag, mag_system, band):
+        """Scale ``spectrum`` to ``mag`` in ``band`` (Vega or AB per mag_system)."""
+        units = self._normalize_units(mag_system)
+        vegaspec = self._vega if units is su.VEGAMAG else None
+        return spectrum.normalize(mag * units, band, vegaspec=vegaspec, force=FORCE)
+
+    def _band(self, band):
+        if band is None:
+            return self.sensor.bandpass
+        if isinstance(band, str):
+            return SpectralElement.from_filter(band)
+        return band
+
     def count_rate_components(self):
         if self._vega is None:
             self._vega = SourceSpectrum.from_vega()
@@ -81,39 +94,32 @@ class Simulation(_MetaHolder_):
         resel = self.telescope.resel
         k = self.coronagraph.off_axis_throughput(self.coronagraph.separation)
 
-        star = self.scene.star
-        norm_units = self._normalize_units(star.mag_system)
-        if norm_units is su.VEGAMAG:
-            host_sp = star.spectrum.normalize(star.mag * su.VEGAMAG, bp,
-                                              vegaspec=vega, force=FORCE)
-        else:
-            host_sp = star.spectrum.normalize(star.mag * u.ABmag, bp, force=FORCE)
-        host_obs = Observation(host_sp, bp, force=FORCE)
-        host_countrate = host_obs.countrate(area=area) * u.electron / u.ct
+        def countrate(sp):
+            return Observation(sp, bp, force=FORCE).countrate(area=area) * u.electron / u.ct
 
-        planet_scale = 10 ** (-0.4 * self.scene.planet.deltamag)
-        source = host_countrate * planet_scale * k
+        star = self.scene.star
+        host_sp = self._normalize(star.spectrum, star.mag, star.mag_system, bp)
+        host_countrate = countrate(host_sp)
+
+        # Planet: its own spectral shape, deltamag fainter than the host in the
+        # reference band (default: the ESC band itself), observed through bp.
+        planet = self.scene.planet
+        ref_band = self._band(planet.deltamag_band)
+        host_ref_mag = Observation(host_sp, ref_band, force=FORCE).effstim(
+            self._normalize_units(star.mag_system), vegaspec=vega).value
+        planet_sp = self._normalize(planet.spectrum, host_ref_mag + planet.deltamag,
+                                    star.mag_system, ref_band)
+        source = countrate(planet_sp) * k
         speckle = host_countrate * self.coronagraph.speckle_scale() * k
 
-        zodi_norm_units = self._normalize_units(self.scene.zodi.mag_system)
-        if zodi_norm_units is su.VEGAMAG:
-            zodi_rn = self.scene.zodi.spectrum.normalize(
-                self.scene.zodi.mag * su.VEGAMAG, self._johnson_v, vegaspec=vega, force=FORCE)
-        else:
-            zodi_rn = self.scene.zodi.spectrum.normalize(
-                self.scene.zodi.mag * u.ABmag, self._johnson_v, force=FORCE)
-        zodi_obs = Observation(zodi_rn, bp, force=FORCE)
-        zodi = zodi_obs.countrate(area=area) * u.electron / u.ct * resel / u.arcsec ** 2 * k
+        zodi_el = self.scene.zodi
+        zodi_rn = self._normalize(zodi_el.spectrum, zodi_el.mag, zodi_el.mag_system,
+                                  self._johnson_v)
+        zodi = countrate(zodi_rn) * resel / u.arcsec ** 2 * k
 
-        exo_norm_units = self._normalize_units(self.scene.exozodi.mag_system)
-        if exo_norm_units is su.VEGAMAG:
-            exo_rn = self.scene.exozodi.spectrum.normalize(
-                self.scene.exozodi.mag * su.VEGAMAG, bp, vegaspec=vega, force=FORCE)
-        else:
-            exo_rn = self.scene.exozodi.spectrum.normalize(
-                self.scene.exozodi.mag * u.ABmag, bp, force=FORCE)
-        exo_obs = Observation(exo_rn, bp, force=FORCE)
-        exozodi = exo_obs.countrate(area=area) * u.electron / u.ct * resel / u.arcsec ** 2 * k
+        exo_el = self.scene.exozodi
+        exo_rn = self._normalize(exo_el.spectrum, exo_el.mag, exo_el.mag_system, bp)
+        exozodi = countrate(exo_rn) * resel / u.arcsec ** 2 * k
 
         # host is the POST-FPM (k-scaled) host count rate, NOT the unattenuated
         # stellar flux. Consumers (e.g. contrast estimation) must account for the
