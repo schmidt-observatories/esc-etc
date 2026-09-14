@@ -52,10 +52,16 @@ class Simulation(_MetaHolder_):
     @classmethod
     def from_default(cls, hoststarmag=-0.353, planetdeltamag=20.0, contrast=1e-8,
                      ppgain=10, separation=0.4, bg_flux=22.5, exobg_flux=21.0,
-                     arm="arm_a", mag_system="vega", hoststar_band=None):
-        """See ``get_scene`` for what band each magnitude is quoted in."""
-        telescope = Telescope.from_default(arm=arm)
-        sensor = Sensor.from_default(telescope, arm=arm)
+                     arm="arm_a", mag_system="vega", hoststar_band=None, filter=None):
+        """See ``get_scene`` for what band each magnitude is quoted in.
+
+        ``filter`` (None = the generic config box filter, or a key of
+        :data:`esc_etc.FILTERS` such as ``"R1"`` / ``"F620N"``) selects an
+        end-of-life ESC filter curve as the full sensor bandpass and its design
+        wavelength as the telescope's central wavelength.
+        """
+        telescope = Telescope.from_default(arm=arm, filter=filter)
+        sensor = Sensor.from_default(telescope, arm=arm, filter=filter)
         scene = get_scene(telescope, hoststarmag=hoststarmag,
                           planetdeltamag=planetdeltamag, bg_flux=bg_flux,
                           exobg_flux=exobg_flux, mag_system=mag_system,

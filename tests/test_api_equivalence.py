@@ -36,3 +36,12 @@ def test_fluent_api_matches_shim():
     shim, _ = esc_mod.esc_calc_snr(3600, 100, separation=0.4, contrast=1e-8,
                                    ppgain=10, verbose=False, plot=False)
     assert fluent == pytest.approx(float(shim), rel=1e-9)
+
+
+def test_shim_passes_filter_through():
+    shim, esc = esc_mod.esc_calc_snr(3600, 100, separation=0.4, verbose=False,
+                                     plot=False, filter="R1")
+    fluent = Simulation.from_default(separation=0.4, filter="R1").get_snr(
+        total_time=3600 * u.s, frame_time=100 * u.s)["snr"]
+    assert float(shim) == pytest.approx(float(fluent))
+    assert esc._sim.telescope.primary_filter.to_value(u.nm) == pytest.approx(620)
