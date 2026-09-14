@@ -55,10 +55,13 @@ Physics
   <esc_etc.Simulation.from_default>`, ``Telescope.from_default`` and
   ``Sensor.from_default`` uses the curve as the whole sensor bandpass and the
   design wavelength as the telescope's central wavelength (resel, lambda/D).
-  Default (``None``) keeps the generic config box filter. The curves were
-  generated from the ``config_stp_esc`` chain (Al+MgF2 optics, ASI6200MM QE)
-  and peak about 3.5x below the ``config_um_esc`` default chain; see
-  ``report/`` for the audit.
+  Default (``None``) keeps the generic config box filter. The curves come
+  from the Pearl PLSE throughput budget v0.4 (Zandbergen, frozen for MPDR) and
+  are totals: besides the ``config_um_esc`` optics chain, QE, EOL contamination
+  and the 5%/10% reserves they already contain the vortex off-axis factor at
+  5 lambda/D (0.446) and the Lyot area (0.81), which ``Coronagraph`` and
+  ``Telescope.surface`` apply again. Until the curves are regenerated without
+  those two factors, ``filter=`` results are low by about 0.36 in rate.
 - **3 m Ultramarine default** (``config_um_esc``). ``from_default`` on every
   component now reads the ESC instrument from ``config_um_esc`` (3.0 m clear
   aperture, ASI294MM, silver ESC optics, 0.9 dichroic) instead of
