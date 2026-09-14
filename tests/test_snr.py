@@ -14,5 +14,5 @@ def test_snr():
     snr, _esc = esc_etc.ExposureTimeSNRCalculatorESC.esc_calc_snr(
         600, 10, verbose=False, plot=False
     )
-    val = 9.311330639402856
+    val = 8.11414044996051
     assert np.abs(float(snr) - val) < 1e-4, f"Expected {val}, but got {snr}"

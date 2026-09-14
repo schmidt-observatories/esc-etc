@@ -2,7 +2,8 @@
 """One-off: capture current esc_calc_snr outputs over a grid for equivalence testing.
 Run once with the pre-refactor engine; the committed JSON is the cross-check baseline.
 Regenerated 2026-09-12 after the single-aperture change (issue #10) and
-2026-09-13 for the config_um_esc 3 m default."""
+2026-09-13 for the config_um_esc 3 m default, and again for the encircled-energy
+aperture default (point-source rates x0.456)."""
 import json
 import os
 import esc_etc.ExposureTimeSNRCalculatorESC as esc_mod
