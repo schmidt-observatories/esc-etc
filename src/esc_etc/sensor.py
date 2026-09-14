@@ -25,8 +25,10 @@ from .meta import _MetaHolder_
 
 WAVELENGTHS = np.arange(2000, 10000, 0.2) * u.AA
 
-# End-of-life telescope + ESC throughput curves (QE included, FPM excluded),
-# keyed by wheel slot ("R1") and by designation ("F620N").
+# End-of-life telescope + ESC throughput curves from the Pearl PLSE budget v0.4:
+# optics, QE, polarization 0.5, EOL contamination and reserves included; vortex
+# off-axis factor and Lyot area EXCLUDED (Coronagraph and Telescope.surface apply
+# them). Keyed by wheel slot ("R1") and by designation ("F620N").
 _FILTER_DIR = Path(__file__).parent / "data" / "esc_filters_eol"
 FILTERS = {}
 for _f in sorted(_FILTER_DIR.glob("ESC_*_EOL.csv")):

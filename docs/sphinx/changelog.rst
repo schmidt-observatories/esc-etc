@@ -48,20 +48,20 @@ Physics
   magnitude. Invalid magnitude systems raise ``ValueError`` immediately, and the
   deprecated ``flux_units`` argument is now honored instead of ignored.
 - **End-of-life ESC filter curves**. Twelve telescope + ESC throughput curves
-  (EOL, 5% telescope and 10% ESC reserve, detector QE included, FPM excluded)
-  ship in ``esc_etc/data/esc_filters_eol`` and are listed in
+  (EOL, 5% telescope and 10% ESC reserve, detector QE and EOL contamination
+  included, vortex and Lyot factors excluded) ship in ``esc_etc/data/esc_filters_eol`` and are listed in
   :data:`esc_etc.FILTERS` by wheel slot (``"R1"``) and designation
   (``"F620N"``). ``filter=`` on :meth:`Simulation.from_default
   <esc_etc.Simulation.from_default>`, ``Telescope.from_default`` and
   ``Sensor.from_default`` uses the curve as the whole sensor bandpass and the
   design wavelength as the telescope's central wavelength (resel, lambda/D).
   Default (``None``) keeps the generic config box filter. The curves come
-  from the Pearl PLSE throughput budget v0.4 (Zandbergen, frozen for MPDR) and
-  are totals: besides the ``config_um_esc`` optics chain, QE, EOL contamination
-  and the 5%/10% reserves they already contain the vortex off-axis factor at
-  5 lambda/D (0.446) and the Lyot area (0.81), which ``Coronagraph`` and
-  ``Telescope.surface`` apply again. Until the curves are regenerated without
-  those two factors, ``filter=`` results are low by about 0.36 in rate.
+  from the Pearl PLSE throughput budget v0.4 (Zandbergen, frozen for MPDR),
+  whose optics chain matches ``config_um_esc``, on a 0.1 nm grid; the vortex
+  off-axis factor and the Lyot area are deliberately left out because
+  ``Coronagraph.off_axis_throughput`` and ``Telescope.surface`` apply them per
+  target. Blue-arm curves are provisional (placeholder gold-DM and polarizer
+  curves in the budget).
 - **3 m Ultramarine default** (``config_um_esc``). ``from_default`` on every
   component now reads the ESC instrument from ``config_um_esc`` (3.0 m clear
   aperture, ASI294MM, silver ESC optics, 0.9 dichroic) instead of
