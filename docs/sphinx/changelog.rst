@@ -81,6 +81,22 @@ Physics
   ``charged_time`` and ``reference_noise_e``, and ``noise_terms`` gains a
   sixth, reference entry. ``ppgain`` is documented as an assumed residual-
   speckle factor.
+- **Switchable noise aperture with encircled energy, and EOL/BOL throughput
+  sets.** ``Sensor`` gains two mutable parameters. ``aperture`` selects the
+  extraction aperture every SNR term uses: ``"resel"`` (disk of diameter
+  lambda/D, default), ``"optimal"`` (radius 0.7 lambda/D, the read-noise-limited
+  optimum), ``"box"`` (the UA ``stp_etc_esc`` n x n box, n = ceil(2.44 lambda F#
+  / pixel)) or ``"matched"`` (N_eff = 1/sum p_i^2, EE = 1). ``encircled_energy``
+  (``None`` = Airy value for that aperture, exposed as ``ee_fraction``) is the
+  fraction of a point source's light credited inside it; planet and speckle
+  rates are multiplied by it, zodi and exozodi use ``aperture_solid_angle`` and
+  detector terms ``num_psf_pixels``. The default therefore now charges the 46%
+  encircled energy of the resel: default point-source rates fall x0.456 and the
+  golden anchors are re-pinned. ``encircled_energy=1.0`` recovers the previous
+  numbers; ``aperture="box"`` with ``encircled_energy=1.0`` reproduces the UA
+  convention. ``filter=`` gains ``lifetime="eol"`` (default: EOL contamination
+  and reserves) or ``"bol"`` (instrument delivery, no reserves); both curve sets
+  come from the Pearl PLSE budget v0.4 without the vortex and Lyot factors.
 
 Object-oriented API
 -------------------

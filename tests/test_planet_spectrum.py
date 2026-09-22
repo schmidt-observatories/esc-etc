@@ -13,8 +13,11 @@ RED = SourceSpectrum(BlackBody1D, temperature=1000 * u.K)
 
 
 def test_default_is_host_scaled_by_deltamag():
-    r = Simulation.from_default(planetdeltamag=20.0).count_rate_components()
-    assert r.source.value == pytest.approx((r.host * 10 ** (-0.4 * 20.0)).value, rel=1e-6)
+    sim = Simulation.from_default(planetdeltamag=20.0)
+    r = sim.count_rate_components()
+    # host is the k-scaled full-PSF rate; the planet is also credited only the
+    # encircled energy inside the noise aperture
+    assert r.source.value == pytest.approx((r.host * 10 ** (-0.4 * 20.0) * sim.sensor.ee_fraction).value, rel=1e-6)
 
 
 def test_esc_band_reference_is_shape_independent():

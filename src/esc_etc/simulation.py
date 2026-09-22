@@ -52,7 +52,8 @@ class Simulation(_MetaHolder_):
     @classmethod
     def from_default(cls, hoststarmag=-0.353, planetdeltamag=20.0, contrast=1e-8,
                      ppgain=10, separation=0.4, bg_flux=22.5, exobg_flux=21.0,
-                     arm="arm_a", mag_system="vega", hoststar_band=None, filter=None):
+                     arm="arm_a", mag_system="vega", hoststar_band=None, filter=None,
+                     lifetime="eol"):
         """See ``get_scene`` for what band each magnitude is quoted in.
 
         ``filter`` (None = the generic config box filter, or a key of
@@ -61,7 +62,7 @@ class Simulation(_MetaHolder_):
         wavelength as the telescope's central wavelength.
         """
         telescope = Telescope.from_default(arm=arm, filter=filter)
-        sensor = Sensor.from_default(telescope, arm=arm, filter=filter)
+        sensor = Sensor.from_default(telescope, arm=arm, filter=filter, lifetime=lifetime)
         scene = get_scene(telescope, hoststarmag=hoststarmag,
                           planetdeltamag=planetdeltamag, bg_flux=bg_flux,
                           exobg_flux=exobg_flux, mag_system=mag_system,
@@ -94,7 +95,8 @@ class Simulation(_MetaHolder_):
         vega = self._vega
         bp = self.sensor.bandpass
         area = self.telescope.surface
-        resel = self.telescope.resel
+        omega = self.sensor.aperture_solid_angle      # noise aperture on the sky
+        ee = self.sensor.ee_fraction                  # point-source light inside it
         k = self.coronagraph.off_axis_throughput(self.coronagraph.separation)
 
         def countrate(sp):
@@ -110,16 +112,16 @@ class Simulation(_MetaHolder_):
         host_ref_mag = Observation(host_sp, self._band(planet.deltamag_band), force=FORCE
                                    ).effstim(mag_units(star.mag_system), vegaspec=vega).value
         planet_sp = self._normalize(planet, host_ref_mag + planet.deltamag, planet.deltamag_band)
-        source = countrate(planet_sp) * k
-        speckle = host_countrate * self.coronagraph.speckle_scale() * k
+        source = countrate(planet_sp) * k * ee
+        speckle = host_countrate * self.coronagraph.speckle_scale() * k * ee
 
         zodi_el = self.scene.zodi
         zodi = countrate(self._normalize(zodi_el, zodi_el.mag, zodi_el.band)) \
-            * resel / u.arcsec ** 2 * k
+            * omega / u.arcsec ** 2 * k
 
         exo_el = self.scene.exozodi
         exozodi = countrate(self._normalize(exo_el, exo_el.mag, exo_el.band)) \
-            * resel / u.arcsec ** 2 * k
+            * omega / u.arcsec ** 2 * k
 
         # host is the POST-FPM (k-scaled) host count rate, NOT the unattenuated
         # stellar flux. Consumers (e.g. contrast estimation) must account for the
