@@ -5,10 +5,8 @@ import copy
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_um")
-config_um_esc = pytest.importorskip("config_um_esc")
 
-from esc_etc import Sensor, Simulation, Telescope
+from esc_etc import Sensor, Simulation, Telescope, uasal_config
 
 
 def test_default_telescope_is_3m():
@@ -24,12 +22,12 @@ def test_default_sensor_builds_at_nominal_temperature():
 
 
 def test_dichroic_throughput_is_applied():
-    import config_um
     t = Telescope.from_default()
-    cfg = copy.deepcopy(config_um_esc.load_config_values())
+    cfg = copy.deepcopy(uasal_config.load_config_values("config_um_esc"))
     cfg["common_params"]["arm_a"]["optics"]["dichroic"]["dichroic_throughput"] = 0.5
-    half = Sensor.from_config(cfg, config_um_esc.get_data_path(), config_um.load_config_values(),
-                              config_um.get_data_path(), t)
+    half = Sensor.from_config(cfg, uasal_config.get_data_path("config_um_esc"),
+                              uasal_config.load_config_values("config_um"),
+                              uasal_config.get_data_path("config_um"), t)
     full = Sensor.from_default(t)
     assert float(half.bandpass(630 * u.nm)) == pytest.approx(0.5 / 0.9 * float(full.bandpass(630 * u.nm)), rel=1e-6)
 

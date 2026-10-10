@@ -1,0 +1,156 @@
+[spectrum] #---------------------------------------------------------------------
+# PLACEHOLDER: This will be replaced with a filter specification
+wvl_reference = '633e-9m' # central wavelength
+bandwidth = 0.24 # fraction of wvl_reference
+
+[sources] #---------------------------------------------------------------------
+
+[sources.host]
+magnitude = -0.0 #Filter magnitude
+spectral_profile = "pickles_uk_23.fits" # host star spectral template (default is Pickles G0)
+
+[sources.companion]
+delta_magnitude = 20 #delta filter magnitude
+separation = 0.2 # arcsec
+spectral_profile = "placeholder.fits" # TBD planet spectral template
+
+[sources.exozodi]
+delta_magnitude = 22 #delta filter magnitude,  Stark et al 2016 Table 1 value
+spectral_profile = "zodiacal_001.fits"
+
+[ETC]
+pp_gain = 10.0 # Post-processing gain
+rawDH_contrast_CBE = 9.7e-9 # "Total raw contrast" from the contrast budget CBE column 2025-04-17
+rawDH_contrast_spec = 1.0e-8 # "Total raw contrast" from L2-0198 which is the top line in the contrast budget 2025-04-17
+
+[arm_a] #---------------------------------------------------------------------
+
+[arm_a.general] 
+f_number_fpm = 49.655877851383266
+f_number_sci_cam = 36.70879621305138
+f_eff_fpm = '0.46433211378828493m'
+f_eff_sci_cam = '0.14657943442905533m'
+version = ''
+design_wavelength = '635e-9m' # m - Flows from contrast budget dh["wavelen"] 
+
+[arm_a.pupil] 
+aper_clear_OD = '3.0m'
+aper_clear_ID = '0.0m'
+
+[arm_a.optics]
+
+[arm_a.optics.wcc_focal_plane]
+
+[arm_a.optics.oap1]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+
+[arm_a.optics.pupil_mask]
+
+
+[arm_a.optics.oap2]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+coating_refl_rms = 0.005
+
+[arm_a.optics.int_focal_plane1]
+
+[arm_a.optics.oap3]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+
+[arm_a.optics.dichroic]
+dichroic_throughput = 0.9
+
+[arm_a.optics.fsm]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+[arm_a.optics.oap4]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+
+[arm_a.optics.int_focal_plane2]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+[arm_a.optics.dm]
+coating_refl = "coatings/bmc_dm_au.csv"
+
+[arm_a.optics.lp1]
+pol_throughput = "transmissive_optics/meadowlark_VIS_pol_transmit.csv"
+
+[arm_a.optics.qwp1]
+pol_throughput = 'none'
+
+[arm_a.optics.oap6]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+[arm_a.optics.fpm]
+charge = 6
+diam_dot = 0.6 # lamD
+throughput = "transmissive_optics/vvc_throughput_vs_lamD.fits"
+
+[arm_a.optics.oap7]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+[arm_a.optics.lyot_stop]
+lyot_ratio = 0.9
+
+[arm_a.optics.oap9]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+[arm_a.optics.field_stop]
+prop_dist = '0.140786700680841m'
+
+
+[arm_a.optics.filter]
+lam_central = '630.0nm' #central wavelength of filter THIS IS TEMPORARY UNTIL AN ACTUAL FILTER CURVE IS AVAILABLE
+bandwidth = 0.02 # fraction of central wavelength bandwidth THIS IS TEMPORARY UNTIL AN ACTUAL FILTER CURVE IS AVAILABLE
+
+[arm_a.optics.qwp2]
+pol_throughput = 'none'
+
+[arm_a.optics.lp2]
+pol_throughput = "transmissive_optics/meadowlark_VIS_pol_transmit.csv"
+
+[arm_a.sensor]
+exposure_time = 1                   # seconds
+black_level = 100
+gain = 120
+pixel_size = '4.63e-6m'                # meters
+qe = "sensors/ZWO_ASI294MM_Pro_QE_curve.csv" 
+dark_current = "sensors/ZWO_ASI294MM_Pro_Dark_Current_vs_Sensor_Temperature.csv"
+gain_curve = "sensors/ZWO_ASI294MM_Pro_Gain_vs_Gain_Setting.csv"
+read_noise = "sensors/ZWO_ASI294MM_Pro_Read_Noise_vs_Gain_Setting.csv"
+well_depth = "sensors/ZWO_ASI294MM_Pro_Well_Depth_vs_Gain_Setting.csv"
+temp_nominal = -20                    # Celsius
+temp_nominal_range = 1              # Kelvin
+temp_stability = 0.1                # Kelvin/hr
+
+[llowfs] #---------------------------------------------------------------------
+
+[llowfs.general]
+f_eff = '0.2m'
+f_number = 48.15795810257646
+defocus = '5e-3m'
+
+[llowfs.pupil]
+aper_clear_OD = '4.153e-3m'
+aper_clear_ID = '3.7e-3m'
+
+[llowfs.optics]
+
+[llowfs.optics.oap8]
+coating_refl = "coatings/qe_ag_fss99_profile_mirror.csv"
+
+[llowfs.sensor]
+exposure_time = 1                   # seconds
+black_level = 100
+gain = 50
+pixel_size = 4.63e-6                # meters
+qe = "sensors/ZWO_ASI294MM_Pro_QE_curve.fits" 
+dark_current = "sensors/support_data/sensors/ZWO_ASI294MM_Pro_Dark_Current_vs_Sensor_Temperature.csv"
+gain_curve = "sensors/ZWO_ASI294MM_Pro_Gain_vs_Gain_Setting.csv"
+read_noise = "sensors/ZWO_ASI294MM_Pro_Read_Noise_vs_Gain_Setting.csv"
+well_depth = "sensors/ZWO_ASI294MM_Pro_Well_Depth_vs_Gain_Setting.csv"
+temp_nominal = 5                    # Celsius
+temp_nominal_range = 1              # Kelvin
+temp_stability = 0.1                # Kelvin/hr

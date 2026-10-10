@@ -2,8 +2,6 @@
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from esc_etc.telescope import Telescope
 from esc_etc.scene import Scene, SceneElement, get_scene

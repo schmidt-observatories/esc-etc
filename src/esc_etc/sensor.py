@@ -251,12 +251,11 @@ class Sensor(_MetaHolder_):
 
     @classmethod
     def from_default(cls, telescope, arm="arm_a", filter=None, lifetime="eol"):
-        import config_um_esc
-        import config_um
+        from . import uasal_config
         return cls.from_config(
-            instrument_config=config_um_esc.load_config_values(),
-            instrument_support_path=config_um_esc.get_data_path(),
-            telescope_config=config_um.load_config_values(),
-            telescope_support_path=config_um.get_data_path(),
+            instrument_config=uasal_config.load_config_values("config_um_esc"),
+            instrument_support_path=uasal_config.get_data_path("config_um_esc"),
+            telescope_config=uasal_config.load_config_values("config_um"),
+            telescope_support_path=uasal_config.get_data_path("config_um"),
             telescope=telescope, arm=arm, filter=filter, lifetime=lifetime,
         )

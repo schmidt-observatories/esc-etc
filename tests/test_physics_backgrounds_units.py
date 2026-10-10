@@ -6,8 +6,6 @@ exobg_flux number is *brighter* and yields more sky/exozodi counts.
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from physics_helpers import esc_snr
 

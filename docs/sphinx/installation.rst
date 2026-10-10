@@ -4,12 +4,13 @@ Installation
 Requirements
 ------------
 
-- **Python 3.8 or newer.**
+- **Python 3.11 or newer.**
 - The scientific stack pulled in automatically as dependencies: ``numpy``,
   ``astropy``, ``synphot``, ``matplotlib``, ``pandas``, and ``scipy``.
-- The UASAL configuration packages, also installed automatically as
-  dependencies: ``utils_config``, ``config_um`` (UA Ultramarine 3 m telescope
-  concept), and ``config_um_esc`` (the ESC instrument). See
+- The UASAL configuration files for ``config_um`` (UA Ultramarine 3 m telescope
+  concept) and ``config_um_esc`` (the ESC instrument) ship inside the package
+  under ``esc_etc/data/uasal/``, so no git packages are needed. Maintainers
+  refresh that snapshot with ``scripts/sync_uasal_configs.py``. See
   :doc:`configuration`.
 
 Install from source (recommended)
@@ -31,8 +32,8 @@ local changes to ``src/`` are picked up immediately:
    ``src/`` tree, reintroducing import/version surprises. For development always
    prefer ``-e``.
 
-To additionally pull the optional development dependencies (``config_stp`` for
-the legacy 6.5 m configuration and ``pytest``):
+To additionally pull the optional development dependencies (``pytest``,
+``build``, ``twine``):
 
 .. code-block:: bash
 

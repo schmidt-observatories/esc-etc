@@ -6,8 +6,6 @@ esc.ppgain == 1/ppgain_input (input 10 -> 0.1).
 """
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from physics_helpers import esc_snr
 

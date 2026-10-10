@@ -1,6 +1,6 @@
 # This part shouldn't change
 [build-system]
-requires = ["setuptools", "setuptools-scm", "wheel"]
+requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta" 
 
 [project]
@@ -15,15 +15,17 @@ authors = [
 maintainers = [
   {name = "Justin Hom", email = "jrhom@arizona.edu"}
 ]
-description = "Exposure time calculator the ExtraSolar Camera" # Edit this
+description = "Exposure time calculator for the ExtraSolar Camera (ESC) on the UA Ultramarine 3 m"
 readme = "README.md"
-license = { text = "GNU GENERAL PUBLIC LICENSE - Verison 3" }
-requires-python = ">=3.8"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "COPYRIGHT"]
+requires-python = ">=3.11"
+# The UASAL config_um / config_um_esc files are vendored under
+# src/esc_etc/data/uasal (see scripts/sync_uasal_configs.py), so no git
+# dependencies: PyPI rejects direct URL requirements.
 dependencies = [
-    "utils_config @ git+https://github.com/uasal/utils_config.git@develop",
-    "config_um @ git+https://github.com/uasal/config_um.git",
-    "config_um_esc @ git+https://github.com/uasal/config_um_esc.git",
     "synphot",
+    "scipy",
     "numpy",
     "astropy",
     "matplotlib",
@@ -32,14 +34,10 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev= ["config_stp @ git+https://github.com/uasal/config_stp.git",
-      "config_stp_esc @ git+https://github.com/uasal/config_stp_esc.git",   "pytest"]
-# Sphinx toolchain for the docs site under docs/sphinx/. Note this extra pulls
-# in esc_etc's base dependencies too, including the UASAL config git installs —
-# convenient locally, but CI and Read the Docs instead use
-# `pip install -r docs/sphinx/requirements.txt && pip install -e . --no-deps`
-# so the git dependencies are never needed. nbsphinx also requires a `pandoc`
-# binary on the build machine.
+dev = ["pytest", "build", "twine"]
+# Sphinx toolchain for the docs site under docs/sphinx/. CI and Read the Docs use
+# `pip install -r docs/sphinx/requirements.txt && pip install -e . --no-deps`.
+# nbsphinx also requires a `pandoc` binary on the build machine.
 docs = [
   "sphinx>=7",
   "sphinx-rtd-theme>=2.0",
@@ -74,4 +72,4 @@ testpaths = [
 omit=["src/esc_etc/_version.py"] # Modify the path where the _version.py lives
 
 [tool.setuptools.package-data]
-"esc_etc" = ["support_data/**/*", "configs/**/*.toml", "data/*.mplstyle", "data/esc_filters_eol/*.csv", "data/esc_filters_bol/*.csv"]
+"esc_etc" = ["data/*.mplstyle", "data/esc_filters_eol/*.csv", "data/esc_filters_bol/*.csv", "data/uasal/**/*"]

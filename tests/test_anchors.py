@@ -8,8 +8,6 @@ encircled-energy default (point-source rates x0.456, Airy EE in the resel). If o
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 import esc_etc.ExposureTimeSNRCalculatorESC as esc_mod
 from physics_helpers import esc_snr

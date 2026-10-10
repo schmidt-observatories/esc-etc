@@ -1,0 +1,6 @@
+# Only needed to run scripts/sync_uasal_configs.py (refresh the vendored
+# config snapshot) and the drift test in tests/test_uasal_snapshot.py.
+# Not part of the package's PyPI dependencies: PyPI rejects direct git URLs.
+utils_config @ git+https://github.com/uasal/utils_config.git@develop
+config_um @ git+https://github.com/uasal/config_um.git
+config_um_esc @ git+https://github.com/uasal/config_um_esc.git

@@ -7,8 +7,6 @@ import astropy.units as u
 import numpy as np
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from esc_etc.simulation import Simulation
 from esc_etc.plotting import plot_count_rates, plot_snr_vs_time
