@@ -114,6 +114,16 @@ Your own configuration can be supplied through the `from_config` class methods, 
 
 `pip install -e ".[dev]"` then `pytest`. On every pull request `.github/workflows/tests.yml` runs the suite, `ruff check --select F` and `ruff format --check` on `src` and `tests`, and builds the sdist and wheel, checks them with `twine`, audits their contents and smoke-tests the installed wheel with the Quick Start above.
 
+## Releases
+The version comes from the git tag (setuptools-scm). To release: move the `Unreleased` section of `docs/sphinx/changelog.rst` under a version heading, merge, then tag the merge commit on `main` and push the tag:
+
+```sh
+git tag v0.2.0rc1 && git push origin v0.2.0rc1   # rc tags publish to TestPyPI
+git tag v0.2.0 && git push origin v0.2.0         # plain tags publish to PyPI
+```
+
+`.github/workflows/publish.yml` builds, audits and smoke-tests the wheel, checks that the tag matches the built version, and publishes through PyPI trusted publishing (no tokens; the `pypi` and `testpypi` environments must exist on PyPI and in this repository).
+
 ## Documentation
 
 The full documentation site (installation, a user guide, rendered tutorial

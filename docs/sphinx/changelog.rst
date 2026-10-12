@@ -15,6 +15,9 @@ Unreleased
   configuration files are named module constants in ``esc_etc.sensor``. The
   legacy STP 6.5 m test module, which could only run with University of
   Arizona packages that are not public, is removed with its test data.
+- **Publishing.** ``publish.yml`` releases on tags: ``v*rc*`` to TestPyPI,
+  other ``v*`` tags to PyPI, through trusted publishing, after the same build,
+  audit and installed-wheel smoke test as the CI build job.
 - **Docs hosting.** Read the Docs is the only publisher; the GitHub Pages
   workflow is removed and the Read the Docs build fails on warnings, as a
   local ``sphinx-build -W`` does.
