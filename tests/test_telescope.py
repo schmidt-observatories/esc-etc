@@ -1,6 +1,5 @@
 # tests/test_telescope.py
 import astropy.units as u
-import pytest
 
 
 from esc_etc.telescope import Telescope

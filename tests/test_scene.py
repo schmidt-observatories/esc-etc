@@ -1,10 +1,9 @@
 # tests/test_scene.py
-import astropy.units as u
 import pytest
 
 
 from esc_etc.telescope import Telescope
-from esc_etc.scene import Scene, SceneElement, get_scene
+from esc_etc.scene import SceneElement, get_scene
 
 
 def test_get_scene_elements():

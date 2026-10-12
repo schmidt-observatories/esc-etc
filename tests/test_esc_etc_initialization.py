@@ -4,11 +4,6 @@ matplotlib.use("Agg")
 
 import pytest
 import numpy as np
-import os
-import importlib.util
-import astropy.units as u
-from synphot import SpectralElement
-from synphot.models import Box1D
 import astropy.units as u
 
 # Legacy STP 6.5 m cross-checks: need the UASAL git packages

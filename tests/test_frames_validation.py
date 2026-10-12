@@ -1,7 +1,6 @@
 """Integer frame accounting and input validation (issue #15)."""
 
 import astropy.units as u
-import numpy as np
 import pytest
 
 

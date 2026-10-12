@@ -80,3 +80,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Legacy STP tests (xfail/skip): dead assignments left as-is until the file goes.
+"tests/test_esc_etc_initialization.py" = ["F841"]

@@ -30,7 +30,7 @@ from synphot import Observation, SourceSpectrum, SpectralElement, units as su
 from .meta import _MetaHolder_
 from .telescope import Telescope
 from .sensor import Sensor
-from .scene import Scene, get_scene, mag_units
+from .scene import get_scene, mag_units
 from .coronagraph import Coronagraph
 from .noise import CountRates, AnalyticCoronagraphNoiseModel
 from . import plotting
