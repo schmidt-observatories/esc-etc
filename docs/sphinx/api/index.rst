@@ -9,6 +9,9 @@ the top level of the ``esc_etc`` package, so e.g. ``esc_etc.Simulation`` and
 Top-level public API
 --------------------
 
+``esc_etc.FILTERS`` is the dictionary of ESC filter names (wheel slot and
+designation) accepted by ``filter=``.
+
 .. currentmodule:: esc_etc
 
 .. autosummary::
@@ -28,6 +31,8 @@ Top-level public API
    plot_offaxis_throughput
    plot_bandpass
    plot_spectra
+   plot_aperture
+   plot_overview
    lazuli_style
    use_lazuli_style
    get_data_path
@@ -45,4 +50,5 @@ Modules
    coronagraph
    noise
    plotting
+   uasal_config
    legacy

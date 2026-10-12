@@ -15,6 +15,9 @@ from .sensor import filter_central_wavelength
 
 
 class Telescope(_MetaHolder_):
+    """Collecting area (Lyot-stop), focal geometry, design wavelength and the
+    resolution element ``resel``. Geometry is fixed once built."""
+
     def __init__(self, diameter_primary, surface, f_num, focal_len, primary_filter,
                  resel, diameter_secondary, jitter_rms, zodi_profile_path):
         self._mutable_parameters = []  # geometry is fixed post-config

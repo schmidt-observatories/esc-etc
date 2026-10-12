@@ -6,14 +6,14 @@ applied by Simulation to every count rate (plan physics-fact #1).
 
 Definitions (issue #10):
 
-* ``off_axis_throughput`` k: fraction of an off-axis point source's photons that
-  land in the extraction aperture (Telescope.resel), relative to the same source
-  with no coronagraph. Encircled energy is folded into k; no separate factor is
-  applied. The FPM FITS table does not record whether it is core, peak, or total
-  throughput; core throughput is the assumption used here.
+* ``off_axis_throughput`` k: fraction of an off-axis point source's photons
+  transmitted by the FPM at that separation, relative to the same source with
+  no coronagraph. Simulation multiplies point sources by k and, separately, by
+  the aperture's encircled energy ``Sensor.ee_fraction``. The FPM FITS table
+  does not record whether it is core, peak, or total throughput (issue #30).
 * ``raw_dh_contrast`` C: residual stellar intensity in the dark hole divided by
-  the off-axis PSF at the same separation, both in the extraction aperture, so
-  stellar leakage in the aperture is ``R_host * C * k``.
+  the off-axis PSF at the same separation, so stellar leakage in the aperture
+  is ``R_host * C * k * EE``.
 * ``ppgain``: an ASSUMED/calibrated residual-speckle suppression factor. The
   systematic floor is ``R_speckle / ppgain``. It is not a prediction of what a
   post-processing algorithm will achieve, and it carries no random-noise cost;
@@ -37,6 +37,9 @@ from .meta import _MetaHolder_
 
 
 class Coronagraph(_MetaHolder_):
+    """Raw dark-hole contrast, post-processing gain, planet separation, the FPM
+    off-axis throughput curve, and the reference-subtraction strategy."""
+
     def __init__(self, raw_dh_contrast, ppgain, separation, primary_filter,
                  diameter_primary, lamD, throughput, subtraction="none",
                  ref_brightness_ratio=1.0, ref_time_ratio=1.0):

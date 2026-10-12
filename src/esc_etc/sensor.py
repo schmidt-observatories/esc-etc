@@ -1,9 +1,10 @@
 # src/esc_etc/sensor.py
 """Detector + non-coronagraph optical throughput for the ESC ETC.
 
-The cumulative bandpass is assembled exactly as Observatory.make_STP did, EXCEPT
-the FPM (focal-plane-mask) lambda/D throughput, which is a flat scalar and now
-lives in Coronagraph.off_axis_throughput (see plan physics-fact #1).
+The bandpass is mirrors x filter x polarizers x QE from the configuration, or
+a measured ESC filter curve (``filter=``, ``lifetime=``). The FPM
+(focal-plane-mask) throughput is not part of it; it lives in
+Coronagraph.off_axis_throughput.
 
 ``aperture`` selects the photometric extraction aperture, and every SNR term uses
 it: point sources are credited ``ee_fraction`` of their light (encircled energy of
@@ -130,6 +131,14 @@ def aperture_geometry(aperture, pix_per_lamD, resel_pix):
 
 
 class Sensor(_MetaHolder_):
+    """Detector noise properties, the optical bandpass, and the photometric
+    aperture (``aperture``, ``encircled_energy``) every SNR term uses.
+
+    Mutable: ``read_noise``, ``dark_current``, ``gain``, ``well_depth``,
+    ``peak_pixel_fraction`` (None = automatic), ``headroom``, ``aperture``,
+    ``encircled_energy`` (None = Airy value; otherwise in ``(0, 1]``).
+    """
+
     def __init__(self, bandpass, gain, dark_current, read_noise, well_depth,
                  pixel_size, num_pixels, sensor_area, sensor_temp, plate_scale,
                  telescope, peak_pixel_fraction=None, headroom=0.8,

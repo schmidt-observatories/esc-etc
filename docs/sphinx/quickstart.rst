@@ -18,11 +18,10 @@ A calculation is built from four pieces, combined into a
    Coronagraph (contrast, ppgain, separation)  ─┘
 
 - A :class:`~esc_etc.Telescope` carries the collecting area, focal geometry,
-  primary filter wavelength, and the resolution element (``resel``), the
-  photometric extraction aperture shared by every noise term.
+  primary filter wavelength, and the resolution element (``resel``).
 - A :class:`~esc_etc.Sensor` couples the detector characteristics (read noise,
-  dark current, gain, well depth, number of PSF pixels) with the optical
-  **bandpass**.
+  dark current, gain, well depth) with the optical **bandpass** and the
+  photometric aperture every noise term uses (the resel by default).
 - A :class:`~esc_etc.Scene` holds the host **star**, the **planet** (as a
   delta-magnitude relative to the star), and the **zodi** / **exozodi** sky
   backgrounds, each a :class:`~esc_etc.SceneElement`.
@@ -61,6 +60,7 @@ signal-to-noise itself is under the ``"snr"`` key:
 .. code-block:: python
 
    result = sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)
+   result = sim.get_snr(3600, 100)               # plain numbers are seconds
    result["snr"]        # signal-to-noise ratio
    result["signal_e"]   # source electrons accumulated in total_time
    result["noise_e"]    # total noise (electrons)
@@ -90,7 +90,12 @@ unreachable at a given contrast/ppgain; those entries come back as ``nan``.
 .. code-block:: python
 
    sim.saturation_time()        # frame time (s) at which the well fills
-   sim.is_saturated(100 * u.s)  # True / False for a 100 s frame
+   sim.is_saturated(100)        # True / False for a 100 s frame
+
+This is the brightest pixel in the planet's aperture at the dark-hole
+contrast. It does not model the stellar core behind the mask, so for a bright
+host the detector-safe frame time can be much shorter; see
+:doc:`user_guide/saturation`.
 
 5. Change parameters and recompute
 ----------------------------------
@@ -105,21 +110,30 @@ the original values.
    sim.update(coronagraph__separation=0.6)   # wider separation
    sim.update(coronagraph__ppgain=20)        # more aggressive post-processing
    sim.update(sensor__read_noise=5)          # quieter detector
-   sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"]
+   sim.update(sensor__aperture="optimal")    # a different photometric aperture
+   sim.get_snr(3600, 100)["snr"]
 
    sim.reset()                               # back to the initial configuration
+
+To use one of the ESC filters instead of the generic configuration bandpass,
+build the simulation with ``filter=`` (a key of :data:`esc_etc.FILTERS`) and
+``lifetime="eol"`` or ``"bol"``:
+
+.. code-block:: python
+
+   sim = Simulation.from_default(filter="F630N", lifetime="eol")
 
 6. Plot the results
 -------------------
 
-The packaged lazuli-styled helpers each return ``(fig, ax)``:
+Every standard plot is a method; each accepts ``ax=`` and returns ``(fig, ax)``:
 
 .. code-block:: python
 
-   from esc_etc import plot_count_rates, plot_snr_vs_time
-
-   fig, ax = plot_count_rates(sim)   # bar chart of count-rate contributors
-   fig, ax = plot_snr_vs_time(sim)   # SNR vs integration time
+   fig, axes = sim.plot()                 # 2 x 3 overview
+   fig, ax = sim.plot_count_rates()       # bar chart of count-rate contributors
+   fig, ax = sim.plot_snr_vs_time()       # SNR vs integration time
+   fig, ax = sim.plot_snr_vs_time(sweep={"coronagraph__ppgain": [1, 10, 100]})
 
 The style is applied internally via a context manager (no global state
 mutation). Call :func:`~esc_etc.use_lazuli_style` to apply it to your own
