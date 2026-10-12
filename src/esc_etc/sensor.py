@@ -155,7 +155,10 @@ class Sensor(_MetaHolder_):
 
     def _on_update(self, updated_keys):
         if "peak_pixel_fraction" in updated_keys:
-            self._auto_peak = False
+            self._auto_peak = self.peak_pixel_fraction is None
+        ee_override = self.encircled_energy
+        if ee_override is not None and not 0 < ee_override <= 1:
+            raise ValueError(f"encircled_energy must be in (0, 1], got {ee_override}")
         t = self._telescope
         lam_d = (t.primary_filter / t.diameter_primary).to_value(
             u.arcsec, equivalencies=u.dimensionless_angles())
@@ -178,6 +181,17 @@ class Sensor(_MetaHolder_):
         isp = Path(instrument_support_path)
         tsp = Path(telescope_support_path)
         cp = instrument_config["common_params"][arm]
+        if lifetime not in _FILTERS:
+            raise ValueError(f"lifetime must be one of {sorted(_FILTERS)}, got {lifetime!r}")
+        if filter is None and lifetime != "eol":
+            raise ValueError(f"lifetime={lifetime!r} needs a named filter; the generic "
+                             "config bandpass has no BOL/EOL variants")
+        lam_c = (filter_central_wavelength(filter) if filter else
+                 u.Quantity(cp["optics"]["filter"]["lam_central"])).to(u.AA)
+        if not u.isclose(lam_c, telescope.primary_filter):
+            raise ValueError(
+                f"filter={filter!r} ({lam_c:.0f}) does not match the telescope built for "
+                f"{telescope.primary_filter:.0f}; pass the same filter= to Telescope")
         bandpass = filter_bandpass(filter, lifetime) if filter else cls._config_bandpass(
             cp, isp, telescope_config, tsp)
 
