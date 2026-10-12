@@ -165,6 +165,7 @@ class Sensor(_MetaHolder_):
         ppl = lam_d / self.plate_scale
         resel_pix = t.resel.to_value(u.arcsec ** 2) / self.plate_scale ** 2
         npix, ee = aperture_geometry(self.aperture, ppl, resel_pix)
+        self.pix_per_lamD = float(ppl)
         self.num_psf_pixels = npix * u.pix
         self.aperture_solid_angle = npix * self.plate_scale ** 2 * u.arcsec ** 2
         self.ee_fraction = float(ee if self.encircled_energy is None else self.encircled_energy)
@@ -172,7 +173,17 @@ class Sensor(_MetaHolder_):
             # brightest pixel: pi/4 of the total per (lambda/D)^2, relative to the
             # in-aperture rate (ponytail: Airy, no Lyot broadening or pixel integration)
             self.peak_pixel_fraction = float((np.pi / 4) / ppl ** 2 / self.ee_fraction)
-            self.meta["peak_pixel_fraction"] = self.peak_pixel_fraction
+            # meta keeps None: it records what was set, so a restore re-enters auto mode
+
+    def plot_bandpass(self, **kw):
+        """See :func:`esc_etc.plotting.plot_bandpass`."""
+        from . import plotting
+        return plotting.plot_bandpass(self, **kw)
+
+    def plot_aperture(self, **kw):
+        """See :func:`esc_etc.plotting.plot_aperture`."""
+        from . import plotting
+        return plotting.plot_aperture(self, **kw)
 
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope_config,
