@@ -37,6 +37,16 @@ from .meta import _MetaHolder_
 
 WAVELENGTHS = np.arange(2000, 10000, 0.2) * u.AA
 
+# Instrument numbers that are not in the configuration files. They only enter
+# the generic (filter=None) bandpass chain and the legacy ``num_pixels``
+# attribute; the EOL/BOL filter curves below carry their own optics.
+GENERIC_FILTER_PEAK = 0.98  # peak transmission of the generic box filter
+POLARIZER_FALLBACK = 0.99  # polarizer / wave plate with no curve in the config
+LP1_THROUGHPUT = 0.5  # the first linear polarizer passes one polarization
+LEGACY_SENSOR_AREA = (
+    962.56 * u.um * 962.56 * u.um
+)  # from the original ETC; sets num_pixels, which nothing uses
+
 # Telescope + ESC throughput curves from the Pearl PLSE budget v0.4 (optics, QE,
 # polarization 0.5 included; vortex off-axis factor and Lyot area EXCLUDED because
 # Coronagraph and Telescope.surface apply them). Two lifetimes:
@@ -91,6 +101,11 @@ def filter_bandpass(name, lifetime="eol"):
 def _resample_spectral_element(S, w):
     ww, ff = S._get_arrays(wavelengths=w)
     return SpectralElement(Empirical1D, points=ww, lookup_table=ff)
+
+
+def _flat_element(amplitude):
+    """A wavelength-independent throughput factor over the ETC's wavelength grid."""
+    return SpectralElement(Box1D, amplitude=amplitude, x_0=6000, width=7000)
 
 
 def _mirror_bandpass(coating_file):
@@ -290,7 +305,7 @@ class Sensor(_MetaHolder_):
 
         # Detector
         pixel_size = (u.Quantity(cp["sensor"]["pixel_size"])).to(u.um) * (1.0 / u.pix)
-        sensor_area = 962.56 * u.um * 962.56 * u.um
+        sensor_area = LEGACY_SENSOR_AREA
         gain_setting = cp["sensor"]["gain"]
         sensor_temp = cp["sensor"]["temp_nominal"] * u.Celsius
 
@@ -316,13 +331,10 @@ class Sensor(_MetaHolder_):
         ) * (u.electron / u.pix)
 
         num_pixels = (sensor_area / (pixel_size**2)).to("pix2").value * u.pix
+        # arcsec per pixel: pixel pitch over the focal length (D x f-number)
         plate_scale = (
-            pixel_size.value
-            * 1e-6
-            / telescope.diameter_primary.value
-            / telescope.f_num
-            * 206265
-        )
+            pixel_size * u.pix / (telescope.diameter_primary * telescope.f_num)
+        ).to_value(u.arcsec, equivalencies=u.dimensionless_angles())
 
         return cls(
             bandpass,
@@ -341,7 +353,7 @@ class Sensor(_MetaHolder_):
     @staticmethod
     def _config_bandpass(cp, isp, telescope_config, tsp):
         """Mirrors x generic box filter x polarizers x QE from the config files."""
-        bandpass = SpectralElement(Box1D, amplitude=1, x_0=6000, width=7000)
+        bandpass = _flat_element(1)
         # Telescope mirrors
         for key in telescope_config["telescope"]["optics"].keys():
             coating = tsp / Path(
@@ -357,33 +369,29 @@ class Sensor(_MetaHolder_):
         primary_filter = u.Quantity(cp["optics"]["filter"]["lam_central"]).to("AA")
         fbw = cp["optics"]["filter"]["bandwidth"]
         bandpass = bandpass * SpectralElement(
-            Box1D, amplitude=0.98, x_0=primary_filter, width=fbw * primary_filter
+            Box1D,
+            amplitude=GENERIC_FILTER_PEAK,
+            x_0=primary_filter,
+            width=fbw * primary_filter,
         )
         # Dichroic (flat), when the config has one
         if "dichroic" in cp["optics"]:
-            bandpass = bandpass * SpectralElement(
-                Box1D,
-                amplitude=cp["optics"]["dichroic"]["dichroic_throughput"],
-                x_0=6000,
-                width=7000,
+            bandpass = bandpass * _flat_element(
+                cp["optics"]["dichroic"]["dichroic_throughput"]
             )
         # Polarizers / wave plates (NOT the FPM)
         for key in cp["optics"].keys():
             if "lp" in key or "qwp" in key:
                 coating_init = cp["optics"][key]["pol_throughput"]
                 if coating_init == "none":
-                    bandpass = bandpass * SpectralElement(
-                        Box1D, amplitude=0.99, x_0=6000, width=7000
-                    )
+                    bandpass = bandpass * _flat_element(POLARIZER_FALLBACK)
                 else:
                     coating_ext = isp / Path(coating_init)
                     bandpass = bandpass * SpectralElement.from_file(
                         coating_ext.as_posix(), wave_unit="nm"
                     )
                 if "lp1" in key:
-                    bandpass = bandpass * SpectralElement(
-                        Box1D, amplitude=0.5, x_0=6000, width=7000
-                    )
+                    bandpass = bandpass * _flat_element(LP1_THROUGHPUT)
 
         qe_path = isp / Path(cp["sensor"]["qe"])
         bandpass = bandpass * SpectralElement.from_file(
