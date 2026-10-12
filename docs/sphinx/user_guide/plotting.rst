@@ -4,7 +4,18 @@ Plotting
 Every standard plot is a method on the object that owns the data. Each one
 accepts ``ax=`` to draw onto an existing axis, applies the packaged
 ``lazuli.mplstyle`` through a context manager so that your own matplotlib
-settings are left alone, and returns ``(fig, ax)``.
+settings are left alone, and returns ``(fig, ax)``. The figures on this page
+are produced at build time from the code shown above them, for the default
+simulation:
+
+.. plot::
+   :context: reset
+   :nofigs:
+
+   from esc_etc import Simulation
+
+   sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20,
+                                 contrast=1e-8, ppgain=10, separation=0.4)
 
 The methods
 -----------
@@ -33,6 +44,30 @@ The methods
    * - ``sim.plot_spectra()`` / ``sim.scene.plot_spectra()``
      - The scene-element spectra (star, planet and zodi by default).
 
+The overview
+------------
+
+.. plot::
+   :context: close-figs
+
+   fig, axes = sim.plot()
+
+Single panels
+-------------
+
+Each panel is its own method. The count-rate budget and the aperture
+footprint:
+
+.. plot::
+   :context: close-figs
+
+   fig, ax = sim.plot_count_rates()
+
+.. plot::
+   :context: close-figs
+
+   fig, ax = sim.sensor.plot_aperture()
+
 Parameter sweeps
 ----------------
 
@@ -40,11 +75,14 @@ Parameter sweeps
 parameter you could pass to :meth:`~esc_etc.Simulation.update` and the values
 to try. One curve is drawn per value and the original value is put back:
 
-.. code-block:: python
+.. plot::
+   :context: close-figs
 
-   sim.plot_snr_vs_time(sweep={"coronagraph__raw_dh_contrast": [1e-7, 1e-8, 1e-9]})
-   sim.plot_snr_vs_time(sweep={"coronagraph__ppgain": [5, 10, 20, 50]})
-   sim.plot_snr_vs_time(sweep={"scene__zodi__mag": [22.5, 20]})
+   fig, ax = sim.plot_snr_vs_time(sweep={"coronagraph__raw_dh_contrast": [1e-7, 1e-8, 1e-9]})
+
+The same works for any other parameter, for example
+``sweep={"coronagraph__ppgain": [5, 10, 20, 50]}`` or
+``sweep={"scene__zodi__mag": [22.5, 20]}``.
 
 Several curves on one axis
 --------------------------
@@ -52,14 +90,17 @@ Several curves on one axis
 ``plot_snr_vs_time``, ``plot_bandpass`` and ``plot_offaxis_throughput`` take
 ``label=``; with ``ax=`` that gives a legend without touching the lines:
 
-.. code-block:: python
+.. plot::
+   :context: close-figs
 
    import matplotlib.pyplot as plt
-   from esc_etc import Simulation
 
    fig, ax = plt.subplots()
    for ft in [10, 100, 1000]:
        sim.plot_snr_vs_time(frame_time=ft, ax=ax, label=f"frame time {ft} s")
+
+.. plot::
+   :context: close-figs
 
    fig, ax = plt.subplots()
    Simulation.from_default(filter="F630N", lifetime="eol").plot_bandpass(ax=ax, label="EOL")

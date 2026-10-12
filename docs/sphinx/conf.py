@@ -53,6 +53,7 @@ extensions = [
     "sphinx.ext.intersphinx",    # cross-link to numpy/astropy/etc docs
     "sphinx.ext.mathjax",        # render LaTeX math
     "nbsphinx",                  # render the tutorial Jupyter notebooks
+    "matplotlib.sphinxext.plot_directive",  # execute the user-guide plots
 ]
 
 # Optional: enable Markdown authoring if myst-parser is installed.
@@ -107,6 +108,18 @@ nbsphinx_prolog = """
    ``notebooks/{{ env.doc2path(env.docname, base=None)|basename }}`` in the
    repository. You can download it and run it interactively.
 """
+
+# -- matplotlib plot_directive -----------------------------------------------
+# The user-guide pages illustrate the plot methods with `.. plot::` blocks that
+# run at build time, so every figure matches the code printed above it and a
+# method that stops working fails the docs build instead of leaving a stale
+# PNG behind. The methods apply lazuli.mplstyle themselves, so rcParams are
+# not reset between directives that share a `:context:`.
+plot_include_source = True
+plot_html_show_source_link = False
+plot_html_show_formats = False
+plot_formats = [("png", 150)]
+plot_apply_rcparams = False
 
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {

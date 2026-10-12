@@ -75,11 +75,15 @@ diameter) and looks up the focal-plane mask transmission in the curve loaded
 from the instrument configuration. At the default 0.4 arcsec the throughput
 is 0.58:
 
-.. code-block:: python
+.. plot::
+   :context: reset
 
-   sim.coronagraph.off_axis_throughput()        # at the current separation
+   from esc_etc import Simulation
+
+   sim = Simulation.from_default(separation=0.4, contrast=1e-8, ppgain=10)
+   sim.coronagraph.off_axis_throughput()        # at the current separation: 0.58
    sim.coronagraph.off_axis_throughput(0.6)     # at 0.6 arcsec
-   sim.coronagraph.plot_offaxis_throughput()    # the whole curve, separation marked
+   fig, ax = sim.coronagraph.plot_offaxis_throughput()   # the whole curve, separation marked
 
 This throughput :math:`k` is applied as one scalar to every count rate in
 :meth:`~esc_etc.Simulation.count_rate_components`: planet, speckle, zodi,
@@ -103,5 +107,13 @@ assumed post-processing gain:
 
    sim.reset()
 
-``sim.plot_snr_vs_time(sweep={"coronagraph__ppgain": [5, 10, 20, 50]})``
-draws the same sweep as one curve per value; see :doc:`plotting`.
+``plot_snr_vs_time(sweep=...)`` draws the same sweep as one curve per value.
+Each curve flattens at its own ceiling, ``ppgain`` times the planet-to-speckle
+ratio (see :doc:`snr`):
+
+.. plot::
+   :context: close-figs
+
+   fig, ax = sim.plot_snr_vs_time(sweep={"coronagraph__ppgain": [5, 10, 20, 50]})
+
+See :doc:`plotting` for the other plot methods.

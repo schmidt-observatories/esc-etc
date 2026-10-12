@@ -95,6 +95,29 @@ just under :math:`t_\mathrm{sat}` is the natural choice:
    frame_time = sim.saturation_time()
    result = sim.get_snr(total_time=3600, frame_time=frame_time)
 
+The trade-off for the default scene, with the saturation time marked. Once
+the frame is longer than the whole integration there is a single read, so the
+curve is flat beyond one hour:
+
+.. plot::
+   :context: reset
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from esc_etc import Simulation, lazuli_style
+
+   sim = Simulation.from_default(separation=0.4, contrast=1e-8, ppgain=10)
+   frame_times = np.logspace(0, 4.7, 80)                      # 1 s to 50 000 s
+   snr = [sim.get_snr(total_time=3600, frame_time=ft)["snr"] for ft in frame_times]
+
+   with lazuli_style():
+       fig, ax = plt.subplots()
+       ax.semilogx(frame_times, snr)
+       ax.axvline(sim.saturation_time().value, ls="--", color="0.4", label="saturation_time()")
+       ax.set_xlabel("frame time (s)")
+       ax.set_ylabel("SNR after 3600 s")
+       ax.legend()
+
 .. tip::
 
    If ``saturation_time()`` comes back shorter than a practical readout
