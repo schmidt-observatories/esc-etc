@@ -26,9 +26,6 @@ change the numbers.
      - Frame time and read noise, inverting for integration time, and the
        saturation check with its caveat.
 
-The same directory also holds ``ESC_ExposureTimeSNRCalculator_Demo.ipynb``
-and ``etc_esc_requirements.py``, which use the pre-refactor API and do not
-run; they are kept for reference only.
 
 .. toctree::
    :maxdepth: 1
