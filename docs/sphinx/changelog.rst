@@ -5,8 +5,11 @@ This page summarizes notable changes. The authoritative history is the git
 log. A detailed list of the changes
 made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 
-Unreleased
-----------
+0.1.0 (2026-10-12)
+------------------
+
+First public release on PyPI. The sections after this one record the work
+that led up to it.
 
 - **Release hygiene** (issue #27). ``esc_calc_snr(plot=True)`` draws the
   overview instead of ignoring the argument. ``Sensor.from_config`` computes

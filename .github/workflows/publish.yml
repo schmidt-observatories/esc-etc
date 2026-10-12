@@ -1,6 +1,6 @@
 name: Publish
 
-# Tag-driven release. Push v0.2.0rc1 -> TestPyPI; push v0.2.0 -> PyPI.
+# Tag-driven release. Push v0.1.0rc1 -> TestPyPI; push v0.1.0 -> PyPI.
 # workflow_dispatch builds and audits without publishing (a dry run).
 #
 # The version comes from setuptools-scm, so the tag IS the version: tag the

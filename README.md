@@ -118,8 +118,8 @@ Your own configuration can be supplied through the `from_config` class methods, 
 The version comes from the git tag (setuptools-scm). To release: move the `Unreleased` section of `docs/sphinx/changelog.rst` under a version heading, merge, then tag the merge commit on `main` and push the tag:
 
 ```sh
-git tag v0.2.0rc1 && git push origin v0.2.0rc1   # rc tags publish to TestPyPI
-git tag v0.2.0 && git push origin v0.2.0         # plain tags publish to PyPI
+git tag v0.1.0rc1 && git push origin v0.1.0rc1   # rc tags publish to TestPyPI
+git tag v0.1.0 && git push origin v0.1.0         # plain tags publish to PyPI
 ```
 
 `.github/workflows/publish.yml` builds, audits and smoke-tests the wheel, checks that the tag matches the built version, and publishes through PyPI trusted publishing (no tokens; the `pypi` and `testpypi` environments must exist on PyPI and in this repository).
