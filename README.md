@@ -7,38 +7,26 @@ Derived from the exposure time calculator developed by Aaron Goldtooth, with upd
 Additional Contributions from Sanchit Sabhlok and Jess Johnson.
 
 ## Requirements
-All important properties related to the instrument including mirrors, optics, coating throughput, filters, and detectors, are stored in the repositories outlined below. 
 
-> [!Note] 
-> The exposure time calculator also allows for users to input their own configurations, **but** this feature can only be used if the configuration(s) follow the same organizational structure as defined in these configuration repositories listed. 
-> 
-> Users can also use the class functions built into the backend to create their own instruments for calculating exposure times.
+Python 3.11 or newer, plus astropy, numpy, scipy, matplotlib, pandas and synphot (installed automatically).
 
-The installation instructions for these packages can be found on their corresponding GitHub repos. 
+All instrument and telescope properties (mirrors, coatings, filters, detector tables) come from the UASAL configuration repositories [config_um](https://github.com/uasal/config_um) (UA Ultramarine 3 m telescope) and [config_um_esc](https://github.com/uasal/config_um_esc) (ESC instrument). A snapshot of those files is **vendored inside the package** under `src/esc_etc/data/uasal/` (provenance in `SNAPSHOT.txt`), so a plain `pip install` needs no git access. Maintainers refresh the snapshot with:
 
-### Telescope
+```
+$ pip install -r scripts/requirements-uasal.txt
+$ python scripts/sync_uasal_configs.py
+```
 
-1. [config_um](https://github.com/uasal/config_um) - The configuration repo for UA Ultramarine 3m telescope concept.
-2. [config_stp](https://github.com/uasal/config_stp) - The configuration repo for the Space Telescope Project 6.5m (https://arxiv.org/abs/2309.04934).
+> [!Note]
+> The exposure time calculator also allows for users to input their own configurations via the `from_config` class methods, **but** the configuration(s) must follow the same organizational structure as the UASAL configuration repositories.
 
-### Instrument
-1. [config_um_esc](https://github.com/uasal/config_um_esc) - Configuration repo for the ESC instrument.
+### UASAL Archive (optional)
 
-### UASAL Archive
-
-For full functionality including stellar and galactic spectra, you will need to set up access to the [UASAL archive](https://github.com/uasal/uasal_archive) and add a path variable `$UASAL_ARCHIVE` to your environment, pointing to the location of the cloned UASAL Archive directory. 
-
-The installation instructions for these packages can be found on their corresponding GitHub repos. 
-
-## Dependencies
-
-All UASAL config packages are dependent on [utils_config](https://github.com/uasal/utils_config) but will be automatically installed when installing the configuration repositories.
-
-Additional package dependencies required for the ETC - astropy, numpy, matplotlib, scipy and synphot.
+For full functionality including stellar and galactic spectra, you will need to set up access to the [UASAL archive](https://github.com/uasal/uasal_archive) and add a path variable `$UASAL_ARCHIVE` to your environment, pointing to the location of the cloned UASAL Archive directory.
 
 ## Installation
 
-The Exposure Time Calculator is a python package that can be installed via a download from GitHub and then installing on your system locally. You can directly clone the [ESC ETC GitHub Repo](https://github.com/schmidt-observatories/esc-etc) or fork the repo and clone the fork. 
+The Exposure Time Calculator is a python package. Once released it installs from PyPI with `pip install esc_etc`. For development, clone the [ESC ETC GitHub Repo](https://github.com/schmidt-observatories/esc-etc) or fork the repo and clone the fork. 
 
 ```
 $ git clone https://github.com/schmidt-observatories/esc-etc.git
@@ -49,7 +37,7 @@ $ pip install -e .
 > Use an **editable** install (`pip install -e .`). A plain `pip install .` copies the package into `site-packages` and can shadow the repository's `src/` tree, reintroducing import/version surprises. For development always prefer `-e`.
 
 > [!Note]
-> To install package with optional dependencies *(ex. config_stp, config_um, pytest, etc...)*, run the following pip command instead:<br>
+> To install the package with the development dependencies *(pytest, build, twine)*, run the following pip command instead:<br>
 > 
 > `pip install -e '.[dev]'`<br>
 > **OR**<br>

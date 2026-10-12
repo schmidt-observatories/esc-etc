@@ -2,8 +2,6 @@ import astropy.units as u
 import numpy as np
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from esc_etc.telescope import Telescope
 from esc_etc.coronagraph import Coronagraph

@@ -1,0 +1,22 @@
+# This is the refactored TOML baseline observatory configuration in SI units
+
+description = "Ultramarine Observatory Baseline Configuration"
+
+[pointing]
+jitter_rms = '10e-3arcsecond' # Speculated requirement value by P. Ingraham 2025-03-10
+field_of_regard_min = ''
+field_of_regard_max = ''
+
+[motion]
+slew_settle_time_small = "5minute" # Speculated requirement value by P. Ingraham 2025-03-10 based on STP's L3-7009
+slew_settle_time_large = "90minute" # Speculated requirement value by P. Ingraham 2025-03-10 based on STP
+slew_avg_speed = "0.44 degree/second" # estimate from JDP for STP, does not include settling
+
+[acquisition]
+offset_motion_time_fine = "30second" # TBR from mission lifetime budget, speculated requirement value by P. Ingraham 2025-03-10
+offset_motion_time_coarse = "120second" # TBR from mission lifetime budget, speculated requirement value by P. Ingraham 2025-03-10
+offset_measure_time_fine = "10second" # TBR from mission lifetime budget, speculated requirement value by P. Ingraham 2025-03-10
+offset_measure_time_coarse = "60second" # TBR from mission lifetime budget, speculated requirement value by P. Ingraham 2025-03-10
+
+[general]
+mission_length = "3year" # Speculated requirement value by P. Ingraham 2025-03-10

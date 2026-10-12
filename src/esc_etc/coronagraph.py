@@ -85,10 +85,10 @@ class Coronagraph(_MetaHolder_):
     @classmethod
     def from_default(cls, telescope, raw_dh_contrast=1e-8, ppgain=10, separation=0.4,
                      arm="arm_a"):
-        import config_um_esc
+        from . import uasal_config
         return cls.from_config(
-            instrument_config=config_um_esc.load_config_values(),
-            instrument_support_path=config_um_esc.get_data_path(),
+            instrument_config=uasal_config.load_config_values("config_um_esc"),
+            instrument_support_path=uasal_config.get_data_path("config_um_esc"),
             telescope=telescope, raw_dh_contrast=raw_dh_contrast, ppgain=ppgain,
             separation=separation, arm=arm,
         )

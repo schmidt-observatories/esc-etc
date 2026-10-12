@@ -57,11 +57,10 @@ class Telescope(_MetaHolder_):
 
     @classmethod
     def from_default(cls, arm="arm_a", filter=None):
-        import config_um_esc
-        import config_um
+        from . import uasal_config
         return cls.from_config(
-            telescope_config=config_um.load_config_values(),
-            instrument_config=config_um_esc.load_config_values(),
-            telescope_support_path=config_um.get_data_path(),
+            telescope_config=uasal_config.load_config_values("config_um"),
+            instrument_config=uasal_config.load_config_values("config_um_esc"),
+            telescope_support_path=uasal_config.get_data_path("config_um"),
             arm=arm, filter=filter,
         )

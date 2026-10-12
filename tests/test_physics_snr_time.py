@@ -9,8 +9,6 @@ Measured 2026-06-01:
 import numpy as np
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from physics_helpers import esc_snr
 

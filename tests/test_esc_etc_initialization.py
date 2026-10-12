@@ -10,19 +10,12 @@ from synphot import SpectralElement
 from synphot.models import Box1D
 import astropy.units as u
 
-try:
-    import config_stp
-    import config_stp_esc
-    import config_um_esc
-    import config_um
-except:
-    print("Could not import configuration repos.")
-
-try:
-    import utils_config
-except:
-    print("Could not import utils_config. Cannot parse tomls. Exiting.")
-    exit()
+# Legacy STP 6.5 m cross-checks: need the UASAL git packages
+# (scripts/requirements-uasal.txt plus config_stp / config_stp_esc); skipped otherwise.
+config_stp = pytest.importorskip("config_stp")
+config_stp_esc = pytest.importorskip("config_stp_esc")
+utils_config = pytest.importorskip("utils_config")
+config_um_esc = pytest.importorskip("config_um_esc")
 
 from esc_etc import ExposureTimeSNRCalculatorESC as etsc
 

@@ -4,8 +4,6 @@ import numpy as np
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 from esc_etc import Sensor, Simulation, Telescope
 

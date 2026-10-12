@@ -4,8 +4,6 @@ excluded because Coronagraph and Telescope.surface apply them)."""
 import astropy.units as u
 import pytest
 
-pytest.importorskip("config_stp_esc")
-pytest.importorskip("config_um")
 
 from esc_etc import FILTERS, Sensor, Simulation, Telescope
 

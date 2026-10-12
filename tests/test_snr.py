@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
 
-pytest.importorskip("config_um_esc")
-pytest.importorskip("config_um")
 
 import esc_etc
 import esc_etc.ExposureTimeSNRCalculatorESC

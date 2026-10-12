@@ -42,6 +42,9 @@ class _MetaHolder_:
         return updated
 
     def reset(self):
+        for child in vars(self).values():
+            if isinstance(child, _MetaHolder_):
+                child.reset()
         for key, value in self._initial.items():
             setattr(self, key, value)
             self.meta[key] = value

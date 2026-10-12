@@ -1,0 +1,3 @@
+# Vendored UASAL config snapshot, written by scripts/sync_uasal_configs.py on 2026-10-10
+config_um 0.0.post4+g838ad1ca0
+config_um_esc 0.0.post8+g6b978bd98

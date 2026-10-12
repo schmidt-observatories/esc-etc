@@ -1,0 +1,298 @@
+#===============================================================================
+# NOTE: This file does not follow the standard naming conventions, it follows
+# the naming standards of EXOSIMS instead so it is easily searchable and 
+# addressable within EXOSIMS, and is almost directly-insertable into MissionSim.
+#
+# This file contains all parameters for each module specified in config_stp_esc
+# in one of two forms:
+# 1. Commented out - Just to indicate it exists
+# 2. As an overwrite
+#
+# When it comes to overwrites, they come in one of two forms:
+# 1. A specified path in the final configuration that simply substitutes the
+#    specified path's value in
+# 2. A value of "func", which means there is a function in "overwrites.py" of
+#    the same name as that function that will do the more complex overwrite
+# See pupilDiam and optics for examples
+#
+# Any key that is present in this file should not be present in the 
+# config_stp_esc EXOSIMS.toml file
+#===============================================================================
+
+[modules]
+PlanetPopulation = "SAG13"
+StarCatalog = "HWOMissionStars"
+OpticalSystem = " "
+ZodiacalLight = " "
+BackgroundSources = " "
+PlanetPhysicalModel = " "
+Observatory = "ObservatoryL2Halo"
+TimeKeeping = " "
+PostProcessing = " "
+Completeness = "BrownCompleteness"
+TargetList = " "
+SimulatedUniverse = "SAG13Universe"
+SurveySimulation = " "
+SurveyEnsemble = " "
+
+#===============================================================================
+[MissionSim]
+#===============================================================================
+# Prototype Documentation
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/MissionSim.py
+#cachedir = ""
+#checkInputs = true
+#logfile = ""
+#loglevel = "INFO"
+#nopar = true
+#verbose = true
+#===============================================================================
+
+#===============================================================================
+[OpticalSystem]
+#===============================================================================
+# Prototype Documentation
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/OpticalSystem.py
+obscurFac = 0.0                                                             
+#shapeFac = 0.785398163397                                                       
+#pupilDiam = "esc.common_params.arm_a.pupil.aper_clear_OD" 
+intCutoff = "13d" # TESS orbital period of a bit over 13 days.
+#stabilityFact = 1
+#binaryleakfilepath = 
+#texp_flag = false
+use_core_thruput_for_ez = true # Using the core throughput as the extended source throughput for computing exozodi contribution (for now)
+#csv_angsep_colname = "r_as"
+
+[OpticalSystem.scienceInstruments]
+# Names must include the substring "imager" or "spectro" to indicate they are
+# imaging or spectrometry systems
+[OpticalSystem.scienceInstruments.esc_imager]
+#QE = "func" # 0.9
+#optics = "func" 
+#FoV = "func" # arcsec
+pixelNumber = 256
+#pixelSize = "esc.common_params.arm_a.sensor.pixel_size"
+#pixelScale = "func" #"0.02arcsec" # arcsec
+#sread = "func" #1e-6 # e/pix/read
+#idark = "func" #1e-4 # e/pix/s
+#texp = "esc.common_params.arm_a.sensor.exposure_time" 
+
+#[OpticalSystem.scienceInstruments.esc_spectro]
+#QE = 0.9
+#optics = 0.5
+#FoV = "10arcsec" # arcsec
+#pixelNumber = 1000
+#pixelSize = "1e-5m" # m, check this is treated properly by the reader
+#pixelScale = "0.02arcsec" # arcsec
+#sread = 1e-6 # e/pix/read
+#idark = 1e-4 # e/pix/s
+#texp = "100s" # s
+#Rs = 50
+#lenslSamp = 2
+
+[OpticalSystem.starlightSuppressionSystems]
+[OpticalSystem.starlightSuppressionSystems.vvc]
+#name = "coronagraph"
+#lam = "esc.common_params.spectrum.wvl_reference" # nm 
+#BW = "esc.common_params.spectrum.bandwidth"
+#occ_trans = 0.2
+#core_thruput = "func" 
+#core_contrast = 'esc.common_params.ETC.rawDH_contrast_CBE'
+#contrast_floor = 
+#core_platescale = "func"
+input_angle_units = "arcsec"
+#ohTime = 1 # days
+#IWA = "func" # input_angle_units
+#OWA = "func" # input_angle_units
+koAngles_Sun = [54, 126]
+koAngles_Earth = [20, 180]
+koAngles_Moon = [10, 180]
+#koAngles_Small = ["0deg", "180deg"] # deg
+
+[OpticalSystem.observingModes]
+[OpticalSystem.observingModes.default]
+detectionMode = true
+instName = "esc_imager"
+systName = "vvc"
+SNR = 5
+timeMultiplier = 3
+#lam = "esc.common_params.spectrum.wvl_reference"
+#deltaLam = 
+#BW = "esc.common_params.spectrum.bandwidth"
+#bandpass_model = "box"
+#bandpass_step = 0.1 # nm
+
+#===============================================================================
+[Observatory]
+#===============================================================================
+# Prototype Documentation: 
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/Observatory.py
+#allowRefueling = false
+#checkKeepoutEnd = true
+#coMass = "5800.0kg" # kg
+#constTOF = "14d" # days
+#defburnPortion = 0.05
+#dryMass = "3400.0kg" # kg
+#emission_coefficient_back = 0.2
+#emission_coefficient_front = 0.8
+#external_fuel_mass = "0kg" # kg
+#forceStaticEphem = false
+#ko_dtStep = "1d" # days
+#koAngles_SolarPanel = ["0deg", "180deg"] # deg
+#maxdVpct = 0.02 # 
+#non_lambertian_coefficient_back = 0.004
+#non_lambertian_coefficient_front = 0.038
+#nreflection_coefficient = 0.999
+#occ_dtmax = "61.0d" # days
+#occ_dtmin = "0.055d" # days
+#occulterSep = "55000.0km" # km
+#scMass = "6000.0kg" # kg
+#settlingTime = "1d" # days
+#sk_Tmax = "365.0d" # days
+#sk_Tmin = "0.0d" # days
+#skEff = 0.7098
+#skIsp = "220.0s" # s
+#skMass = "0.0kg" # kg
+#slewEff = 1.0 
+#slewIsp = "4160.0s" # s
+#slewMass = "0.0kg" # kg
+#specular_reflection_factor = 0.975
+##spkpath = ""
+#SRP = true
+#thrust = "450mN" # mN
+#twotanks = false
+
+#===============================================================================
+[PlanetPopulation]
+#===============================================================================
+# Prototype Documentation
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/PlanetPopulation.py
+#arange = ["0.09084645AU", "30.0AU"] # AU
+#smaknee = "10AU"
+#erange = [0.01, 0.99]
+#Irange = ["0.0deg", "180.0deg"] # deg
+#Orange = ["0.0deg", "360.0deg"] # deg
+#wrange = ["0.0deg", "360.0deg"] # deg
+#Mprange = ["1.0M_earth", "4131.0M_earth"] # M_earths
+#Rprange = ["1.0R_earth", "30.0R_earth"] #R_earth
+#prange = [0.1, 0.6] # geometric albedo
+#eta = 3.0 # Planets / star
+#constrainOrbits = false
+#scaleOrbits = false
+
+#===============================================================================
+[PlanetPhysicalModel]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/PlanetPhysicalModel.py
+#whichPlanetPhaseFunction = "lambert"
+
+#===============================================================================
+[ZodiacalLight]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/ZodiacalLight.py
+#commonSystemfEZ = false
+#magEZ = "func" 
+#magZ = "stp.astrophysics.zodi.zodi_mag_r" 
+#varEZ = 0 # mag/arcsec^2
+
+#===============================================================================
+[BackgroundSources]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/BackgroundSources.py
+
+#===============================================================================
+[PostProcessing]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/PostProcessing.py
+#FAdMag0 = 15 # delta-mag
+#FAP = 3e-7
+#MDP = 1e-3
+#ppFact = "func"
+#ppFact_char = 0.1
+
+#===============================================================================
+[Completeness]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/BackgroundSources.py
+#minComp = 0.1
+
+#===============================================================================
+[TargetList]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/TargetList.py
+#cherryPickStars = ""
+#earths_only = false
+#explainFiltering = false
+#fillMissingBandMags = false
+#fillPhotometry = false
+#filter_for_char = false
+#filterBinaries = false
+#getKnownPlanets = false
+#int_dMag = "esc.common_params.sources.companion.delta_magnitude"
+#int_WA = ""
+#keepStarCatalog = false
+#massLuminosityRelationship = "Henry1993"
+#popStars = ""
+#scaleWAdMag = false
+#skipSaturationCalcs = false
+#staticStars = true
+
+#===============================================================================
+[SimulatedUniverse]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/SimulatedUniverse.py
+#commonSystemPlane = false
+#commonSystemPlaneParams = ["0.0deg", "2.25deg", "0.0deg", "2.25deg"] # deg
+#fixedPlanPerStar = ""
+#lucky_planets = false
+#Min = ""
+
+#===============================================================================
+[TimeKeeping]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/TimeKeeping.py
+#missionStart = 60634 # MJD - used in TargetList & Timekeeping for some reason
+#missionLife = "stp.observatory.general.mission_length"
+#missionPortion = 1
+#missionSchedule = ""
+#OBduration = inf
+
+#===============================================================================
+[SurveySimulation]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/SurveySimulation.py
+#charMargin = 0.15
+#debug_plot_path = true
+#defaultAddExoplanetObsTime = true
+#dt_max = "1d" # days
+#find_known_RV = false
+#include_known_RV = ""
+#make_debug_bird_plots = false
+#nofZ = false
+#nokoMap = false
+#ntFlux = 1
+#nVisitsMax = 5
+#record_counts_path = ""
+
+#===============================================================================
+[SurveyEnsemble]
+#===============================================================================
+# Prototype Documentation:
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/SurveyEnsemble.py
+
+#===============================================================================
+[StarCatalog]
+#===============================================================================
+# Prototype Documentation
+# https://github.com/dsavransky/EXOSIMS/blob/master/EXOSIMS/Prototypes/StarCatalog.py
+#ntargs = 1
+#VmagFill = 0.1

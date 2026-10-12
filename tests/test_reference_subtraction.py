@@ -3,8 +3,6 @@ import astropy.units as u
 import numpy as np
 import pytest
 
-pytest.importorskip("config_stp_esc")
-pytest.importorskip("config_um")
 
 from esc_etc import Simulation
 
