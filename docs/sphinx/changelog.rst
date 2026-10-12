@@ -21,8 +21,14 @@ Unreleased
   photometric apertures, :doc:`configuration` lists the twelve ESC filters and
   the bundled files, and :doc:`limitations` collects the open physics items.
   The docs toolchain installs through the ``[docs]`` extra, as in wcc-etc.
+- **Lazuli naming.** The bundled configuration lives under
+  ``esc_etc/data/lazuli/`` as ``telescope`` and ``esc``, addressed in code as
+  ``uasal_config.TELESCOPE`` and ``uasal_config.INSTRUMENT``. The UASAL
+  package names (``config_um``, ``config_um_esc``; "UM" was the UA code name
+  for Lazuli) appear only in ``uasal_config.UPSTREAM``, the sync script and
+  ``SNAPSHOT.txt``. Docs say Lazuli instead of "UM 3 m".
 - **Packaging for PyPI.** The UASAL configuration (``config_um`` and
-  ``config_um_esc``) is vendored as a snapshot under ``esc_etc/data/uasal/``
+  ``config_um_esc``) is vendored as a snapshot inside the package
   and read by ``esc_etc.uasal_config``; the git dependencies are gone, so the
   package installs from a wheel. ``scipy`` is declared, Python 3.11 or newer is
   required, and
@@ -115,7 +121,7 @@ Physics
   ``Coronagraph.off_axis_throughput`` and ``Telescope.surface`` apply them per
   target. Blue-arm curves are provisional (placeholder gold-DM and polarizer
   curves in the budget).
-- **3 m Ultramarine default** (``config_um_esc``). ``from_default`` on every
+- **Lazuli 3 m default** (``config_um_esc``). ``from_default`` on every
   component now reads the ESC instrument from ``config_um_esc`` (3.0 m clear
   aperture, ASI294MM, silver ESC optics, 0.9 dichroic) instead of
   ``config_stp_esc`` (2.43 m, ASI6200MM, Al+MgF2), matching the telescope in

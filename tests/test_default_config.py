@@ -1,5 +1,5 @@
-"""The default configuration is the UA Ultramarine 3 m telescope with the
-config_um_esc ESC instrument (issue: esc_etc defaulted to the 2.43 m config_um_esc)."""
+"""The default configuration is the Lazuli 3 m telescope with the ESC instrument
+(issue: esc_etc defaulted to the legacy 2.43 m config_stp_esc)."""
 
 import copy
 
@@ -15,7 +15,7 @@ def test_default_telescope_is_3m():
 
 
 def test_default_sensor_builds_at_nominal_temperature():
-    # config_um_esc says -20 C, just below the dark-current table's first row;
+    # the instrument config says -20 C, just below the dark-current table's first row;
     # the table value is clamped instead of raising.
     s = Sensor.from_default(Telescope.from_default())
     assert s.sensor_temp.value == -20
@@ -24,13 +24,13 @@ def test_default_sensor_builds_at_nominal_temperature():
 
 def test_dichroic_throughput_is_applied():
     t = Telescope.from_default()
-    cfg = copy.deepcopy(uasal_config.load_config_values("config_um_esc"))
+    cfg = copy.deepcopy(uasal_config.load_config_values(uasal_config.INSTRUMENT))
     cfg["common_params"]["arm_a"]["optics"]["dichroic"]["dichroic_throughput"] = 0.5
     half = Sensor.from_config(
         cfg,
-        uasal_config.get_data_path("config_um_esc"),
-        uasal_config.load_config_values("config_um"),
-        uasal_config.get_data_path("config_um"),
+        uasal_config.get_data_path(uasal_config.INSTRUMENT),
+        uasal_config.load_config_values(uasal_config.TELESCOPE),
+        uasal_config.get_data_path(uasal_config.TELESCOPE),
         t,
     )
     full = Sensor.from_default(t)

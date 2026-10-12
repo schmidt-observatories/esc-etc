@@ -53,10 +53,10 @@ Where the instrument comes from
 -------------------------------
 
 The telescope and instrument properties (mirrors, coatings, filters, detector
-tables) come from the configuration packages of the University of Arizona
-Space Astrophysics Laboratory (UASAL): ``config_um`` for the 3 m Ultramarine
-telescope and ``config_um_esc`` for the ESC. A snapshot of their files ships
-inside ``esc_etc``, so nothing else is installed. :doc:`configuration` lists
+tables) come from configuration files for the Lazuli 3 m telescope and the
+ESC, maintained by the University of Arizona Space Astrophysics Laboratory
+(UASAL). A snapshot of those files ships inside ``esc_etc``, so nothing else
+is installed. :doc:`configuration` lists
 what is in the snapshot and how to point the ETC at your own instrument.
 
 Contents
