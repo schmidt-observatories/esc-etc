@@ -20,8 +20,8 @@ readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE", "COPYRIGHT"]
 requires-python = ">=3.11"
-# The UASAL config_um / config_um_esc files are vendored under
-# src/esc_etc/data/uasal (see scripts/sync_uasal_configs.py), so no git
+# The Lazuli telescope and ESC configuration (UASAL config_um / config_um_esc)
+# is vendored under src/esc_etc/data/lazuli (scripts/sync_uasal_configs.py), so no git
 # dependencies: PyPI rejects direct URL requirements.
 dependencies = [
     "synphot",
@@ -72,7 +72,7 @@ testpaths = [
 omit=["src/esc_etc/_version.py"] # Modify the path where the _version.py lives
 
 [tool.setuptools.package-data]
-"esc_etc" = ["data/*.mplstyle", "data/esc_filters_eol/*.csv", "data/esc_filters_bol/*.csv", "data/uasal/**/*"]
+"esc_etc" = ["data/*.mplstyle", "data/esc_filters_eol/*.csv", "data/esc_filters_bol/*.csv", "data/lazuli/**/*"]
 
 [tool.ruff]
 src = ["src"]

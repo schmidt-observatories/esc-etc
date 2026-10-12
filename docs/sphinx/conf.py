@@ -82,7 +82,7 @@ autodoc_default_options = {
     "undoc-members": True,
     "show-inheritance": True,
 }
-# The UASAL configuration is vendored inside the package (esc_etc/data/uasal),
+# The Lazuli configuration is vendored inside the package (esc_etc/data/lazuli),
 # so esc_etc has no git dependencies and autodoc imports it as is.
 autodoc_mock_imports = []
 

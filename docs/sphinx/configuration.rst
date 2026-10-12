@@ -3,12 +3,14 @@ Configuration and filters
 
 Instrument and telescope properties (mirrors, optics, coating throughputs,
 filters, detector tables) are not hard-coded in ``esc_etc``. They come from
-two configuration packages of the University of Arizona Space Astrophysics
-Laboratory (UASAL): `config_um <https://github.com/uasal/config_um>`_ for the
-3 m Ultramarine telescope and `config_um_esc
-<https://github.com/uasal/config_um_esc>`_ for the ESC instrument. A copy of
-their files ships inside ``esc_etc``, so a plain ``pip install`` needs no git
-access.
+two sets of TOML files and support data bundled under ``esc_etc/data/lazuli/``:
+``telescope`` for the Lazuli 3 m telescope and ``esc`` for the ESC instrument.
+Both are snapshots of configuration packages maintained by the University of
+Arizona Space Astrophysics Laboratory (UASAL), `config_um
+<https://github.com/uasal/config_um>`_ and `config_um_esc
+<https://github.com/uasal/config_um_esc>`_ ("UM" is the UA code name for
+Lazuli). Because the copies ship inside ``esc_etc``, a plain ``pip install``
+needs no git access.
 
 The default instrument
 ----------------------
@@ -139,16 +141,16 @@ Supplying your own configuration
 
 The ``from_config`` constructors take an already-loaded configuration
 dictionary and a support-data path, so you can point the ETC at a custom
-instrument that follows the same layout as the UASAL packages. The bundled
-snapshot is loaded the same way:
+instrument that follows the same layout as the bundled snapshot, which is
+loaded the same way:
 
 .. code-block:: python
 
    from esc_etc import uasal_config
 
    coronagraph = Coronagraph.from_config(
-       instrument_config=uasal_config.load_config_values("config_um_esc"),
-       instrument_support_path=uasal_config.get_data_path("config_um_esc"),
+       instrument_config=uasal_config.load_config_values(uasal_config.INSTRUMENT),
+       instrument_support_path=uasal_config.get_data_path(uasal_config.INSTRUMENT),
        telescope=telescope,
        raw_dh_contrast=1e-8, ppgain=10, separation=0.4, arm="arm_a",
    )
@@ -185,21 +187,22 @@ What is in the bundled snapshot
 
    * - Path under ``esc_etc/data/``
      - Contents
-   * - ``uasal/config_um/configs/*.toml``
+   * - ``lazuli/telescope/configs/*.toml``
      - Telescope geometry and coatings (M1 to M4), observatory pointing and
        jitter, zodiacal-light defaults.
-   * - ``uasal/config_um/support_data/``
+   * - ``lazuli/telescope/support_data/``
      - Zodiacal-light spectral template and the mirror coating reflectance
        curves.
-   * - ``uasal/config_um_esc/configs/*.toml``
+   * - ``lazuli/esc/configs/*.toml``
      - The ESC optical train per arm, source and spectrum defaults, and an
        EXOSIMS parameter file.
-   * - ``uasal/config_um_esc/support_data/``
+   * - ``lazuli/esc/support_data/``
      - ESC coatings, the ZWO detector tables (gain, read noise, well depth,
        dark current, quantum efficiency), the polarizer transmission and the
        vortex off-axis throughput curve.
-   * - ``uasal/SNAPSHOT.txt``
-     - Which revision of each package the snapshot came from, and when.
+   * - ``lazuli/SNAPSHOT.txt``
+     - Which UASAL package and revision each directory was copied from, and
+       when.
    * - ``esc_filters_eol/``, ``esc_filters_bol/``
      - The twelve filter curves above, at end of life and at beginning of life.
    * - ``lazuli.mplstyle``
@@ -207,5 +210,7 @@ What is in the bundled snapshot
 
 Maintainers refresh the snapshot from the installed UASAL packages with
 ``pip install -r scripts/requirements-uasal.txt`` followed by
-``python scripts/sync_uasal_configs.py``; ``tests/test_uasal_snapshot.py``
-fails when the installed packages and the snapshot drift apart.
+``python scripts/sync_uasal_configs.py``, then commit ``esc_etc/data/lazuli/``.
+The mapping from the bundled names to the upstream packages is
+``esc_etc.uasal_config.UPSTREAM``, and ``tests/test_uasal_snapshot.py`` fails
+when the installed packages and the snapshot drift apart.

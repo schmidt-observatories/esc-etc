@@ -19,10 +19,10 @@ JUNK = re.compile(
 REQUIRED = [
     "esc_etc/_version.py",
     "esc_etc/data/lazuli.mplstyle",
-    "esc_etc/data/uasal/SNAPSHOT.txt",
-    "esc_etc/data/uasal/config_um/configs/telescope.toml",
-    "esc_etc/data/uasal/config_um_esc/configs/common_params.toml",
-    "esc_etc/data/uasal/config_um_esc/support_data/transmissive_optics/vvc_throughput_vs_lamD.fits",
+    "esc_etc/data/lazuli/SNAPSHOT.txt",
+    "esc_etc/data/lazuli/telescope/configs/telescope.toml",
+    "esc_etc/data/lazuli/esc/configs/common_params.toml",
+    "esc_etc/data/lazuli/esc/support_data/transmissive_optics/vvc_throughput_vs_lamD.fits",
 ]
 FILTER_SETS = {"esc_filters_eol": 12, "esc_filters_bol": 12}  # curves per lifetime
 MAX_BYTES = 5 * 1024**2  # clean wheel is ~0.9 MB, sdist ~1.9 MB

@@ -5,7 +5,7 @@ __version__ = importlib.metadata.version(__package__)
 
 
 def get_data_path():
-    """Path to the packaged data directory (filter curves, vendored UASAL configs)."""
+    """Path to the packaged data directory (filter curves, vendored Lazuli configuration)."""
     return str(Path(__file__).parent.resolve() / "data") + "/"
 
 

@@ -134,8 +134,8 @@ class Coronagraph(_MetaHolder_):
         from . import uasal_config
 
         return cls.from_config(
-            instrument_config=uasal_config.load_config_values("config_um_esc"),
-            instrument_support_path=uasal_config.get_data_path("config_um_esc"),
+            instrument_config=uasal_config.load_config_values(uasal_config.INSTRUMENT),
+            instrument_support_path=uasal_config.get_data_path(uasal_config.INSTRUMENT),
             telescope=telescope,
             raw_dh_contrast=raw_dh_contrast,
             ppgain=ppgain,

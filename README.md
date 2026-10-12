@@ -99,7 +99,7 @@ Also on the documentation site, with the issue links. In short:
 - Not yet validated against as-measured detector, vortex or on-sky data (#34).
 
 # Notes
-Instrument and telescope properties (mirrors, coatings, filters, detector tables) come from the UASAL configuration repositories [config_um](https://github.com/uasal/config_um) (UA Ultramarine 3 m telescope) and [config_um_esc](https://github.com/uasal/config_um_esc) (ESC instrument). A snapshot of those files is vendored inside the package under `src/esc_etc/data/uasal/` (provenance in `SNAPSHOT.txt`), so a plain `pip install` needs no git access. Maintainers refresh the snapshot with:
+Instrument and telescope properties (mirrors, coatings, filters, detector tables) come from configuration files for the Lazuli 3 m telescope and the ESC instrument, bundled under `src/esc_etc/data/lazuli/` (`telescope/` and `esc/`), so a plain `pip install` needs no git access. They are snapshots of the UASAL repositories [config_um](https://github.com/uasal/config_um) and [config_um_esc](https://github.com/uasal/config_um_esc) ("UM" is the UA code name for Lazuli); `SNAPSHOT.txt` records which revision each came from. Maintainers refresh the snapshot with:
 
 ```sh
 pip install -r scripts/requirements-uasal.txt
@@ -108,7 +108,7 @@ python scripts/sync_uasal_configs.py
 
 What ships in the wheel and where each file comes from is listed in [`DATA_SOURCES.md`](DATA_SOURCES.md).
 
-Your own configuration can be supplied through the `from_config` class methods, as long as it follows the same organizational structure as the UASAL repositories.
+Your own configuration can be supplied through the `from_config` class methods, as long as it follows the same layout as the bundled snapshot.
 
 ## Tests
 
