@@ -7,9 +7,11 @@ keywords, accepts ax=None, applies the lazuli style via a context manager, and
 returns (fig, ax). The style ships as data/lazuli.mplstyle (byte-identical to the
 canonical lazuli-transit copy).
 """
+import contextlib
 import importlib.resources
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.patches import Circle, Rectangle
@@ -31,12 +33,19 @@ def _style_path():
     return importlib.resources.files("esc_etc") / "data" / "lazuli.mplstyle"
 
 
+@contextlib.contextmanager
 def lazuli_style():
     """Context manager applying the lazuli style without touching global rcParams.
 
     Usage: ``with lazuli_style(): ...``. Every helper wraps its drawing in this.
     """
-    return plt.style.context(str(_style_path()))
+    with plt.style.context(str(_style_path())):
+        yield
+        # Jupyter's inline backend switches interactive mode on when the first
+        # figure is created, i.e. inside this block; style.context would restore
+        # the old value on exit and every later figure would go undisplayed.
+        interactive = matplotlib.is_interactive()
+    matplotlib.interactive(interactive)
 
 
 def use_lazuli_style():
