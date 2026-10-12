@@ -4,6 +4,7 @@ The ESC ETC is now a compositional OO package (esc_etc.simulation.Simulation and
 its components). This module preserves the historical procedural API by building
 the new objects under the hood. Prefer `from esc_etc import Simulation`.
 """
+
 import warnings
 
 from astropy import units as u
@@ -49,10 +50,23 @@ class Observatory:
         return self._sim.saturation_time()
 
 
-def esc_calc_snr(exp_time, int_time, hoststarmag=-0.353, contrast=1e-8,
-                 planetdeltamag=20, bg_flux=22.5, exobg_flux=21,
-                 flux_units="vega", separation=0.2, ppgain=10, verbose=True,
-                 plot=False, filter=None, lifetime="eol", aperture="resel"):
+def esc_calc_snr(
+    exp_time,
+    int_time,
+    hoststarmag=-0.353,
+    contrast=1e-8,
+    planetdeltamag=20,
+    bg_flux=22.5,
+    exobg_flux=21,
+    flux_units="vega",
+    separation=0.2,
+    ppgain=10,
+    verbose=True,
+    plot=False,
+    filter=None,
+    lifetime="eol",
+    aperture="resel",
+):
     """Build the OO Simulation and compute SNR, preserving legacy semantics.
 
     Historical time mapping (plan physics-fact #5): total integration time is
@@ -65,12 +79,20 @@ def esc_calc_snr(exp_time, int_time, hoststarmag=-0.353, contrast=1e-8,
     if verbose:
         warnings.warn(
             "esc_calc_snr/Observatory are deprecated; use esc_etc.Simulation.",
-            DeprecationWarning, stacklevel=2,
+            DeprecationWarning,
+            stacklevel=2,
         )
     sim = Simulation.from_default(
-        hoststarmag=hoststarmag, planetdeltamag=planetdeltamag, contrast=contrast,
-        ppgain=ppgain, separation=separation, bg_flux=bg_flux, exobg_flux=exobg_flux,
-        mag_system=flux_units, filter=filter, lifetime=lifetime,
+        hoststarmag=hoststarmag,
+        planetdeltamag=planetdeltamag,
+        contrast=contrast,
+        ppgain=ppgain,
+        separation=separation,
+        bg_flux=bg_flux,
+        exobg_flux=exobg_flux,
+        mag_system=flux_units,
+        filter=filter,
+        lifetime=lifetime,
     )
     sim.sensor.update(aperture=aperture)
     out = sim.get_snr(total_time=exp_time * u.s, frame_time=int_time * u.s)

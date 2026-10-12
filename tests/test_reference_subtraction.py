@@ -1,4 +1,5 @@
 """Reference-differential imaging noise and time accounting (issue #12)."""
+
 import astropy.units as u
 import numpy as np
 import pytest
@@ -11,9 +12,11 @@ T, FT = 3600 * u.s, 100 * u.s
 
 def _background_var(sim, t, star_scale=1.0):
     r, s = sim.count_rate_components(), sim.sensor
-    return ((star_scale * r.speckle + r.zodi + r.exozodi) * t
-            + s.dark_current * t * s.num_psf_pixels
-            + s.num_psf_pixels * s.read_noise ** 2 * np.ceil((t / FT).value)).value
+    return (
+        (star_scale * r.speckle + r.zodi + r.exozodi) * t
+        + s.dark_current * t * s.num_psf_pixels
+        + s.num_psf_pixels * s.read_noise**2 * np.ceil((t / FT).value)
+    ).value
 
 
 def test_none_is_single_image_and_rdi_adds_hand_computed_reference_variance():
@@ -24,8 +27,12 @@ def test_none_is_single_image_and_rdi_adds_hand_computed_reference_variance():
     # equal-brightness reference for equal time: kappa = 1, var_ref = background var
     sim.update(coronagraph__subtraction="rdi")
     rdi = sim.get_snr(T, FT)
-    assert rdi["noise_e"] ** 2 - none["noise_e"] ** 2 == pytest.approx(_background_var(sim, T), rel=1e-9)
-    assert rdi["reference_noise_e"] ** 2 == pytest.approx(_background_var(sim, T), rel=1e-9)
+    assert rdi["noise_e"] ** 2 - none["noise_e"] ** 2 == pytest.approx(
+        _background_var(sim, T), rel=1e-9
+    )
+    assert rdi["reference_noise_e"] ** 2 == pytest.approx(
+        _background_var(sim, T), rel=1e-9
+    )
     assert rdi["charged_time"] == 2 * T and rdi["science_time"] == T
     assert rdi["snr"] < none["snr"]
 

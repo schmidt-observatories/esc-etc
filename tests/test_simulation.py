@@ -7,9 +7,15 @@ from esc_etc.simulation import Simulation
 
 
 def test_baseline_snr_and_counts_match_anchor():
-    sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20.0,
-                                  contrast=1e-8, ppgain=10, separation=0.4,
-                                  bg_flux=22.5, exobg_flux=21.0)
+    sim = Simulation.from_default(
+        hoststarmag=-0.353,
+        planetdeltamag=20.0,
+        contrast=1e-8,
+        ppgain=10,
+        separation=0.4,
+        bg_flux=22.5,
+        exobg_flux=21.0,
+    )
     rates = sim.count_rate_components()
     assert rates.source.value == pytest.approx(2.479242, rel=1e-3)
     assert rates.zodi.value == pytest.approx(8.646151e-04, rel=1e-3)
@@ -24,15 +30,23 @@ def test_noise_model_seam_is_used():
     class Sentinel:
         def snr(self, *a, **k):
             return {"snr": 42.0}
+
     sim.noise_model = Sentinel()
     assert sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"] == 42.0
 
 
 def test_int_time_round_trips_against_snr():
     import numpy as np
-    sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20.0,
-                                  contrast=1e-8, ppgain=10, separation=0.4,
-                                  bg_flux=22.5, exobg_flux=21.0)
+
+    sim = Simulation.from_default(
+        hoststarmag=-0.353,
+        planetdeltamag=20.0,
+        contrast=1e-8,
+        ppgain=10,
+        separation=0.4,
+        bg_flux=22.5,
+        exobg_flux=21.0,
+    )
     snr_val = sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"]
     out = sim.get_int_time_for_snr(snr_val, frame_time=100 * u.s)
     it = out["int_time"]

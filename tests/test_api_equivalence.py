@@ -1,6 +1,7 @@
 # tests/test_api_equivalence.py
 """The new OO engine must reproduce the frozen legacy grid, and the fluent
 Simulation API must agree with the esc_calc_snr shim."""
+
 import json
 import os
 
@@ -27,19 +28,28 @@ def test_new_engine_matches_legacy_grid(record):
 
 
 def test_fluent_api_matches_shim():
-    sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20.0,
-                                  contrast=1e-8, ppgain=10, separation=0.4,
-                                  bg_flux=22.5, exobg_flux=21.0)
+    sim = Simulation.from_default(
+        hoststarmag=-0.353,
+        planetdeltamag=20.0,
+        contrast=1e-8,
+        ppgain=10,
+        separation=0.4,
+        bg_flux=22.5,
+        exobg_flux=21.0,
+    )
     fluent = sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"]
-    shim, _ = esc_mod.esc_calc_snr(3600, 100, separation=0.4, contrast=1e-8,
-                                   ppgain=10, verbose=False, plot=False)
+    shim, _ = esc_mod.esc_calc_snr(
+        3600, 100, separation=0.4, contrast=1e-8, ppgain=10, verbose=False, plot=False
+    )
     assert fluent == pytest.approx(float(shim), rel=1e-9)
 
 
 def test_shim_passes_filter_through():
-    shim, esc = esc_mod.esc_calc_snr(3600, 100, separation=0.4, verbose=False,
-                                     plot=False, filter="R1")
+    shim, esc = esc_mod.esc_calc_snr(
+        3600, 100, separation=0.4, verbose=False, plot=False, filter="R1"
+    )
     fluent = Simulation.from_default(separation=0.4, filter="R1").get_snr(
-        total_time=3600 * u.s, frame_time=100 * u.s)["snr"]
+        total_time=3600 * u.s, frame_time=100 * u.s
+    )["snr"]
     assert float(shim) == pytest.approx(float(fluent))
     assert esc._sim.telescope.primary_filter.to_value(u.nm) == pytest.approx(620)

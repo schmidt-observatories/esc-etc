@@ -1,13 +1,22 @@
 # tests/test_plotting_style.py
 import pytest
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 
 from esc_etc.plotting import (
-    TEAL, RED, AMBER, BLUE, GREEN, DARKBLUE, LAZULI_COLORS,
-    lazuli_style, use_lazuli_style, _style_path, _apply_axis_cosmetics,
+    TEAL,
+    RED,
+    AMBER,
+    BLUE,
+    GREEN,
+    DARKBLUE,
+    LAZULI_COLORS,
+    lazuli_style,
+    use_lazuli_style,
+    _style_path,
+    _apply_axis_cosmetics,
 )
 
 
@@ -53,6 +62,7 @@ def test_lazuli_style_keeps_interactive_state_switched_on_inside_the_context():
     # Jupyter's inline backend activates lazily on the first figure, i.e. inside
     # the style context; the context must not undo that or later figures vanish.
     import matplotlib
+
     before = matplotlib.is_interactive()
     try:
         matplotlib.interactive(False)
@@ -65,12 +75,13 @@ def test_lazuli_style_keeps_interactive_state_switched_on_inside_the_context():
 
 def test_lazuli_style_keeps_interactive_state_when_the_body_raises():
     import matplotlib
+
     before = matplotlib.is_interactive()
     try:
         matplotlib.interactive(False)
         with pytest.raises(RuntimeError):
             with lazuli_style():
-                matplotlib.interactive(True)      # the inline backend activating
+                matplotlib.interactive(True)  # the inline backend activating
                 raise RuntimeError("plot failed")
         assert matplotlib.is_interactive()
     finally:

@@ -9,11 +9,6 @@ build:
   apt_packages:
     # nbsphinx renders the tutorial notebooks via pandoc
     - pandoc
-  jobs:
-    # The tutorial notebooks are rendered from saved outputs
-    # (nbsphinx_execute = "never"), so nothing runs at build time.
-    post_install:
-      - pip install -e .
 
 sphinx:
   configuration: docs/sphinx/conf.py
@@ -21,8 +16,12 @@ sphinx:
 
 python:
   install:
-    # Sphinx + theme + nbsphinx + esc_etc's third-party runtime deps
-    - requirements: docs/sphinx/requirements.txt
+    # Install the package itself so autodoc can import esc_etc, plus the
+    # Sphinx toolchain from the [docs] extra in pyproject.toml
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
 
 formats:
   - htmlzip

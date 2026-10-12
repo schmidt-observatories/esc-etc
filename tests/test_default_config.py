@@ -1,5 +1,6 @@
 """The default configuration is the UA Ultramarine 3 m telescope with the
 config_um_esc ESC instrument (issue: esc_etc defaulted to the 2.43 m config_um_esc)."""
+
 import copy
 
 import astropy.units as u
@@ -25,11 +26,17 @@ def test_dichroic_throughput_is_applied():
     t = Telescope.from_default()
     cfg = copy.deepcopy(uasal_config.load_config_values("config_um_esc"))
     cfg["common_params"]["arm_a"]["optics"]["dichroic"]["dichroic_throughput"] = 0.5
-    half = Sensor.from_config(cfg, uasal_config.get_data_path("config_um_esc"),
-                              uasal_config.load_config_values("config_um"),
-                              uasal_config.get_data_path("config_um"), t)
+    half = Sensor.from_config(
+        cfg,
+        uasal_config.get_data_path("config_um_esc"),
+        uasal_config.load_config_values("config_um"),
+        uasal_config.get_data_path("config_um"),
+        t,
+    )
     full = Sensor.from_default(t)
-    assert float(half.bandpass(630 * u.nm)) == pytest.approx(0.5 / 0.9 * float(full.bandpass(630 * u.nm)), rel=1e-6)
+    assert float(half.bandpass(630 * u.nm)) == pytest.approx(
+        0.5 / 0.9 * float(full.bandpass(630 * u.nm)), rel=1e-6
+    )
 
 
 def test_default_simulation_geometry():

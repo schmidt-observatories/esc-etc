@@ -1,6 +1,6 @@
 """Integer frame accounting and input validation (issue #15)."""
+
 import astropy.units as u
-import numpy as np
 import pytest
 
 
@@ -19,9 +19,13 @@ def test_reads_are_integer_and_at_least_one(sim):
     assert one_a == pytest.approx(one_b)
     # 150 s of 100 s frames is two reads (one full + one short), same as 2 x 75 s.
     assert sim.get_snr(150 * u.s, 100 * u.s)["snr"] == pytest.approx(
-        sim.get_snr(150 * u.s, 75 * u.s)["snr"])
+        sim.get_snr(150 * u.s, 75 * u.s)["snr"]
+    )
     # more reads -> more read noise -> lower SNR
-    assert sim.get_snr(150 * u.s, 100 * u.s)["snr"] < sim.get_snr(150 * u.s, 150 * u.s)["snr"]
+    assert (
+        sim.get_snr(150 * u.s, 100 * u.s)["snr"]
+        < sim.get_snr(150 * u.s, 150 * u.s)["snr"]
+    )
 
 
 def test_int_time_is_whole_frames_and_meets_target(sim):
@@ -32,8 +36,13 @@ def test_int_time_is_whole_frames_and_meets_target(sim):
     assert sim.get_snr(t, 100 * u.s)["snr"] >= 7.0 - 1e-9
 
 
-@pytest.mark.parametrize("kw", [dict(total_time=0 * u.s, frame_time=100 * u.s),
-                                dict(total_time=100 * u.s, frame_time=-1 * u.s)])
+@pytest.mark.parametrize(
+    "kw",
+    [
+        dict(total_time=0 * u.s, frame_time=100 * u.s),
+        dict(total_time=100 * u.s, frame_time=-1 * u.s),
+    ],
+)
 def test_nonpositive_times_raise(sim, kw):
     with pytest.raises(ValueError):
         sim.get_snr(**kw)

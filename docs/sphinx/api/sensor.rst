@@ -1,5 +1,5 @@
-Sensor
-======
+Sensor (``esc_etc.sensor``)
+===========================
 
 .. automodule:: esc_etc.sensor
    :members:

@@ -1,5 +1,6 @@
 # tests/test_plotting_curves.py
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,8 +16,9 @@ from esc_etc.plotting import plot_offaxis_throughput, plot_bandpass, plot_spectr
 def test_offaxis_throughput_raw_path():
     seps = np.linspace(0.1, 0.5, 20)
     tput = np.linspace(0.1, 0.6, 20)
-    fig, ax = plot_offaxis_throughput(separations=seps, throughputs=tput,
-                                      mark_separation=False)
+    fig, ax = plot_offaxis_throughput(
+        separations=seps, throughputs=tput, mark_separation=False
+    )
     assert len(ax.get_lines()[0].get_xdata()) == 20
     assert ax.get_xlabel() != "" and ax.get_ylabel() != ""
     plt.close(fig)
@@ -29,7 +31,7 @@ def test_offaxis_throughput_requires_inputs():
 
 def test_bandpass_raw_path():
     wave = np.linspace(400, 800, 50)  # nm
-    tput = np.exp(-((wave - 600) ** 2) / (2 * 30 ** 2))
+    tput = np.exp(-((wave - 600) ** 2) / (2 * 30**2))
     fig, ax = plot_bandpass(wavelength=wave, throughput=tput)
     assert len(ax.get_lines()[0].get_xdata()) == 50
     assert ax.get_xlabel() != "" and ax.get_ylabel() != ""

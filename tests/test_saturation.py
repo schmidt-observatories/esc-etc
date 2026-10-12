@@ -1,4 +1,5 @@
 """Peak-pixel saturation model (issue #11)."""
+
 import astropy.units as u
 import pytest
 
@@ -19,11 +20,16 @@ def test_saturation_time_uses_specified_fraction_headroom_and_dark():
     sim = Simulation.from_default()
     sim.update(sensor__peak_pixel_fraction=0.1, sensor__headroom=1.0)
     r, s = sim.count_rate_components(), sim.sensor
-    per_pix = (0.1 * (r.source + r.speckle)
-               + (r.zodi + r.exozodi) / s.num_psf_pixels.value).value + s.dark_current.value
-    assert sim.saturation_time().to_value(u.s) == pytest.approx(s.well_depth.value / per_pix)
+    per_pix = (
+        0.1 * (r.source + r.speckle) + (r.zodi + r.exozodi) / s.num_psf_pixels.value
+    ).value + s.dark_current.value
+    assert sim.saturation_time().to_value(u.s) == pytest.approx(
+        s.well_depth.value / per_pix
+    )
     sim.update(sensor__headroom=0.5)
-    assert sim.saturation_time().to_value(u.s) == pytest.approx(0.5 * s.well_depth.value / per_pix)
+    assert sim.saturation_time().to_value(u.s) == pytest.approx(
+        0.5 * s.well_depth.value / per_pix
+    )
 
 
 def test_dark_current_shortens_saturation_time():
