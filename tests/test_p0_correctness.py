@@ -104,3 +104,21 @@ def test_component_api_matches_simulation_path():
     ref = Simulation.from_default(filter="B1").sensor
     assert s.num_psf_pixels == ref.num_psf_pixels
     assert s.peak_pixel_fraction == pytest.approx(ref.peak_pixel_fraction)
+
+
+@pytest.mark.parametrize(
+    "key, unit",
+    [
+        ("read_noise", u.electron**0.5 / u.pix**0.5),
+        ("dark_current", u.electron / (u.s * u.pix)),
+        ("well_depth", u.electron / u.pix),
+    ],
+)
+def test_update_sensor_quantities_accept_plain_numbers(key, unit):
+    # The docs show sim.update(sensor__read_noise=5); a bare number must behave
+    # like the same value in the sensor's own unit, not break the next get_snr.
+    sim = Simulation.from_default()
+    sim.update(**{f"sensor__{key}": 5})
+    plain = sim.get_snr(3600, 100)["snr"], sim.saturation_time()
+    sim.update(**{f"sensor__{key}": 5 * unit})
+    assert plain == (sim.get_snr(3600, 100)["snr"], sim.saturation_time())
