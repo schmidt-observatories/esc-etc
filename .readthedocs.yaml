@@ -12,7 +12,7 @@ build:
 
 sphinx:
   configuration: docs/sphinx/conf.py
-  fail_on_warning: false
+  fail_on_warning: true   # same strictness as a local sphinx-build -W
 
 python:
   install:
