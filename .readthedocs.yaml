@@ -10,16 +10,10 @@ build:
     # nbsphinx renders the tutorial notebooks via pandoc
     - pandoc
   jobs:
-    # esc_etc's UASAL config dependencies (config_um / config_stp_esc /
-    # utils_config) are git installs and are only imported lazily inside the
-    # from_default / from_config constructors. We mock those imports for the
-    # docs (docs/sphinx/conf.py: autodoc_mock_imports) and install the package
-    # WITHOUT its deps; the real third-party libraries autodoc needs come from
-    # docs/sphinx/requirements.txt (installed via python.install below). The
-    # tutorial notebooks are rendered from saved outputs (nbsphinx_execute =
-    # "never"), so the configs are not needed at build time.
+    # The tutorial notebooks are rendered from saved outputs
+    # (nbsphinx_execute = "never"), so nothing runs at build time.
     post_install:
-      - pip install -e . --no-deps
+      - pip install -e .
 
 sphinx:
   configuration: docs/sphinx/conf.py

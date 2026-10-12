@@ -62,8 +62,8 @@ through :meth:`Simulation.update <esc_etc.Simulation.update>`:
 **Peak-pixel fraction.** The default is computed for an unobscured Airy pattern
 at the sensor plate scale: peak intensity :math:`\pi/4` per
 :math:`(\lambda/D)^2`, divided by the encircled energy inside the extraction
-aperture. At the default configuration this is about 0.045 of the in-aperture
-rate, versus 0.033 for the aperture mean. It ignores Lyot-stop broadening and
+aperture. At the default configuration this is about 0.069 of the in-aperture
+rate, versus 0.051 for the aperture mean. It ignores Lyot-stop broadening and
 finite-pixel integration; when a real PSF image is available, set the fraction
 from it:
 

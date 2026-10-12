@@ -5,11 +5,14 @@ host on the FPM-free Sensor.bandpass, derives planet/speckle by scaling, compute
 zodi/exozodi with the resel factor, then multiplies EVERY rate by the flat FPM
 throughput k = coronagraph.off_axis_throughput (plan physics-fact #1).
 
-Every SNR term is evaluated in ONE extraction aperture, Omega = telescope.resel
-= pi (lambda/2D)^2 (issue #10):
+Every SNR term is evaluated in ONE photometric aperture, chosen by
+``Sensor.aperture`` (the resel, Omega = pi (lambda/2D)^2, by default; issue #10)
+with encircled energy EE = ``Sensor.ee_fraction`` for point sources::
 
-    R_planet  = R_host * 10^(-0.4 dmag) * k     k = planet throughput into Omega
-    R_speckle = R_host * C * k                  C = raw contrast, see Coronagraph
+    R_planet  = R_planet,ref * k * EE           planet spectrum normalised dmag
+                                                fainter than the host; k = FPM
+                                                off-axis throughput
+    R_speckle = R_host * C * k * EE             C = raw contrast, see Coronagraph
     R_zodi    = SB_zodi * Omega * k             (exozodi likewise)
     N_pix     = Omega / plate_scale^2           (dark current, read noise)
 
@@ -29,11 +32,20 @@ from .sensor import Sensor
 from .scene import Scene, get_scene, mag_units
 from .coronagraph import Coronagraph
 from .noise import CountRates, AnalyticCoronagraphNoiseModel
+from . import plotting
 
 FORCE = None
 
 
 class Simulation(_MetaHolder_):
+    """A telescope, sensor, scene and coronagraph, turned into SNR and time.
+
+    Build one with :meth:`from_default` or :meth:`from_components`. Change
+    parameters with ``update(child__param=...)`` and put everything back with
+    ``reset()``. Times passed to the methods may be astropy quantities or plain
+    numbers in seconds. Every standard plot is a ``plot_*`` method.
+    """
+
     def __init__(self, telescope, sensor, scene, coronagraph, noise_model=None):
         self._mutable_parameters = []
         self.telescope = telescope
@@ -57,9 +69,11 @@ class Simulation(_MetaHolder_):
         """See ``get_scene`` for what band each magnitude is quoted in.
 
         ``filter`` (None = the generic config box filter, or a key of
-        :data:`esc_etc.FILTERS` such as ``"R1"`` / ``"F620N"``) selects an
-        end-of-life ESC filter curve as the full sensor bandpass and its design
-        wavelength as the telescope's central wavelength.
+        :data:`esc_etc.FILTERS` such as ``"R1"`` / ``"F620N"``) uses that ESC
+        filter's measured curve as the full sensor bandpass and its design
+        wavelength as the telescope's central wavelength. ``lifetime`` picks the
+        ``"eol"`` (end of life, default) or ``"bol"`` curve set; it needs a
+        named filter, and anything else raises ``ValueError``.
         """
         telescope = Telescope.from_default(arm=arm, filter=filter)
         sensor = Sensor.from_default(telescope, arm=arm, filter=filter, lifetime=lifetime)
@@ -136,12 +150,26 @@ class Simulation(_MetaHolder_):
                           "the brightest dark-hole pixel saturates", stacklevel=3)
 
     def get_snr(self, total_time, frame_time):
+        """SNR after ``total_time`` on target in frames of ``frame_time``.
+
+        Both times accept astropy quantities or plain numbers (seconds).
+        Returns a dict with ``snr``, ``signal_e``, ``noise_e``,
+        ``reference_noise_e``, ``science_time``, ``charged_time`` and the
+        speckle floor rate ``M``. Warns when a frame would saturate.
+        """
         rates = self.count_rate_components()
         self._warn_if_saturated(frame_time, rates)
         return self.noise_model.snr(rates, self.sensor, self.coronagraph,
                                     total_time, frame_time)
 
     def get_int_time_for_snr(self, snr, frame_time):
+        """Integration time to reach ``snr`` with frames of ``frame_time``
+        (quantity or seconds).
+
+        Returns ``int_time`` (whole frames), ``int_time_continuous`` (exact)
+        and the ``noise_terms`` rates. NaN when ``snr`` is above the speckle
+        plateau.
+        """
         rates = self.count_rate_components()
         self._warn_if_saturated(frame_time, rates)
         return self.noise_model.int_time_for_snr(snr, rates, self.sensor,
@@ -166,4 +194,36 @@ class Simulation(_MetaHolder_):
         return (s.headroom * s.well_depth / peak).to(u.s)
 
     def is_saturated(self, frame_time):
-        return frame_time > self.saturation_time()
+        """True when a frame of ``frame_time`` (quantity or seconds) exceeds
+        :meth:`saturation_time`."""
+        return u.Quantity(frame_time, u.s) > self.saturation_time()
+
+    # Plots: thin delegates to esc_etc.plotting, which documents the keywords.
+    # Every one accepts ax= and returns (fig, ax); plot() returns (fig, axes).
+    def plot(self, **kw):
+        """2 x 3 overview; see :func:`esc_etc.plotting.plot_overview`."""
+        return plotting.plot_overview(self, **kw)
+
+    def plot_count_rates(self, **kw):
+        """See :func:`esc_etc.plotting.plot_count_rates`."""
+        return plotting.plot_count_rates(self, **kw)
+
+    def plot_snr_vs_time(self, **kw):
+        """See :func:`esc_etc.plotting.plot_snr_vs_time` (supports ``sweep=``)."""
+        return plotting.plot_snr_vs_time(self, **kw)
+
+    def plot_bandpass(self, **kw):
+        """See :func:`esc_etc.plotting.plot_bandpass`."""
+        return plotting.plot_bandpass(self.sensor, **kw)
+
+    def plot_spectra(self, **kw):
+        """See :func:`esc_etc.plotting.plot_spectra`."""
+        return plotting.plot_spectra(self.scene, **kw)
+
+    def plot_offaxis_throughput(self, **kw):
+        """See :func:`esc_etc.plotting.plot_offaxis_throughput`."""
+        return plotting.plot_offaxis_throughput(self.coronagraph, **kw)
+
+    def plot_aperture(self, **kw):
+        """See :func:`esc_etc.plotting.plot_aperture`."""
+        return plotting.plot_aperture(self.sensor, **kw)

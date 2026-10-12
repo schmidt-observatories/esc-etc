@@ -1,4 +1,5 @@
 # tests/test_plotting_style.py
+import pytest
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -46,3 +47,31 @@ def test_apply_axis_cosmetics_sets_grid_and_inward_ticks():
     _apply_axis_cosmetics(ax)
     assert ax.xaxis.get_gridlines()  # grid lines exist
     plt.close(fig)
+
+
+def test_lazuli_style_keeps_interactive_state_switched_on_inside_the_context():
+    # Jupyter's inline backend activates lazily on the first figure, i.e. inside
+    # the style context; the context must not undo that or later figures vanish.
+    import matplotlib
+    before = matplotlib.is_interactive()
+    try:
+        matplotlib.interactive(False)
+        with lazuli_style():
+            matplotlib.interactive(True)
+        assert matplotlib.is_interactive()
+    finally:
+        matplotlib.interactive(before)
+
+
+def test_lazuli_style_keeps_interactive_state_when_the_body_raises():
+    import matplotlib
+    before = matplotlib.is_interactive()
+    try:
+        matplotlib.interactive(False)
+        with pytest.raises(RuntimeError):
+            with lazuli_style():
+                matplotlib.interactive(True)      # the inline backend activating
+                raise RuntimeError("plot failed")
+        assert matplotlib.is_interactive()
+    finally:
+        matplotlib.interactive(before)

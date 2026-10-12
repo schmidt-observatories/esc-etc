@@ -49,6 +49,9 @@ class SceneElement(_MetaHolder_):
 
 
 class Scene(_MetaHolder_):
+    """The host ``star``, the ``planet``, and the ``zodi`` / ``exozodi``
+    backgrounds, each a :class:`SceneElement`."""
+
     def __init__(self, star, planet, zodi, exozodi):
         self._mutable_parameters = []
         self.star = star
@@ -56,6 +59,11 @@ class Scene(_MetaHolder_):
         self.zodi = zodi
         self.exozodi = exozodi
         self._init_meta()
+
+    def plot_spectra(self, **kw):
+        """See :func:`esc_etc.plotting.plot_spectra`."""
+        from . import plotting
+        return plotting.plot_spectra(self, **kw)
 
 
 def get_scene(telescope, hoststarmag=-0.353, planetdeltamag=20.0, bg_flux=22.5,

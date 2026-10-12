@@ -81,12 +81,9 @@ autodoc_default_options = {
     "undoc-members": True,
     "show-inheritance": True,
 }
-# The UASAL config packages (config_um, config_stp_esc, utils_config) are only
-# imported lazily inside the `from_default` / `from_config` constructors, so
-# autodoc can import esc_etc without them. They are mocked here defensively so
-# the docs build cleanly even when installed with `pip install -e . --no-deps`
-# (i.e. without the private/git config dependencies).
-autodoc_mock_imports = ["config_um", "config_stp_esc", "config_stp", "utils_config"]
+# The UASAL configuration is vendored inside the package (esc_etc/data/uasal),
+# so esc_etc has no git dependencies and autodoc imports it as is.
+autodoc_mock_imports = []
 
 # -- napoleon ----------------------------------------------------------------
 napoleon_google_docstring = True
@@ -100,7 +97,7 @@ napoleon_use_ivar = True
 
 # -- nbsphinx ----------------------------------------------------------------
 # Use the outputs already saved in the notebooks; do not re-execute at build
-# time (keeps RTD/CI fast and free of the full config stack at run time).
+# time (keeps RTD/CI fast). Regenerate them with scripts/build_tutorials.py.
 nbsphinx_execute = "never"
 nbsphinx_allow_errors = False
 nbsphinx_prolog = """

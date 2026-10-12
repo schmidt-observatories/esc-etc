@@ -39,13 +39,6 @@ To additionally pull the optional development dependencies (``pytest``,
 
    pip install -e '.[dev]'
 
-UASAL archive (optional)
-------------------------
-
-For full functionality — including stellar and galactic spectra — set up access
-to the `UASAL archive <https://github.com/uasal/uasal_archive>`_ and point the
-``$UASAL_ARCHIVE`` environment variable at your cloned copy.
-
 Verify the installation
 ------------------------
 
@@ -72,6 +65,8 @@ The package ships with a ``pytest`` suite. From the repository root:
 
    pip install -e '.[dev]'    # editable install + pytest
    pytest
+
+The same suite runs on every pull request (``.github/workflows/tests.yml``).
 
 Building the documentation locally
 -----------------------------------

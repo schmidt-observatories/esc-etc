@@ -9,7 +9,7 @@ import pytest
 
 
 from esc_etc.simulation import Simulation
-from esc_etc.plotting import plot_count_rates, plot_snr_vs_time
+from esc_etc.plotting import plot_count_rates, plot_snr_vs_time, plot_aperture
 
 
 def test_count_rates_and_snr_from_simulation():
@@ -24,3 +24,15 @@ def test_count_rates_and_snr_from_simulation():
                                frame_time=100 * u.s)
     assert len(ax.get_lines()[0].get_xdata()) == 3
     plt.close(fig)
+
+
+def test_plot_aperture_footprint_matches_sensor_pixels():
+    sim = Simulation.from_default()
+    for ap, patch in [("resel", "Circle"), ("box", "Rectangle"), ("matched", "Circle")]:
+        sim.update(sensor__aperture=ap)
+        fig, ax = plot_aperture(sim)
+        p = ax.patches[0]                      # first patch is the aperture footprint
+        assert type(p).__name__ == patch
+        area = p.get_width() ** 2 if patch == "Rectangle" else np.pi * p.radius ** 2
+        assert area == pytest.approx(sim.sensor.num_psf_pixels.value, rel=1e-6)
+        plt.close(fig)
