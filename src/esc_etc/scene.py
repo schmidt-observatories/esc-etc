@@ -49,6 +49,9 @@ class SceneElement(_MetaHolder_):
 
 
 class Scene(_MetaHolder_):
+    """The host ``star``, the ``planet``, and the ``zodi`` / ``exozodi``
+    backgrounds, each a :class:`SceneElement`."""
+
     def __init__(self, star, planet, zodi, exozodi):
         self._mutable_parameters = []
         self.star = star

@@ -31,23 +31,28 @@ Highlights
   source, zodiacal and exozodiacal light, residual speckle with a
   post-processing noise floor, dark current, and read noise.
 - **Coronagraph physics** — raw dark-hole contrast, post-processing gain, planet
-  separation, and the off-axis (focal-plane mask) :math:`\lambda/D` throughput
-  curve applied as a flat scalar to every count rate.
+  separation, the off-axis (focal-plane mask) :math:`\lambda/D` throughput
+  curve applied as a flat scalar to every count rate, and optional
+  reference-star subtraction.
+- **The ESC filter set** — ``filter="F630N"`` uses a filter's measured
+  end-to-end curve, at end of life or beginning of life.
+- **A switchable photometric aperture** — resel, optimal, box or matched, with
+  the encircled energy charged to every point source.
 - **Integration-time inversion** — solve for the integration time that reaches a
   target SNR, with per-frame saturation checks.
-- **Plotting** — lazuli-styled matplotlib helpers for the count-rate / noise
-  breakdown, SNR vs. integration time, off-axis throughput, sensor bandpass, and
+- **Plotting** — ``sim.plot()`` for an overview, and a ``plot_*(ax=None)``
+  method on every object for the count-rate breakdown, SNR vs. time (with
+  parameter sweeps), off-axis throughput, bandpass, aperture footprint and
   scene spectra.
 
 A configurable instrument
 --------------------------
 
 Instrument and telescope properties (mirrors, optics, coatings, filters,
-detectors) live in the UASAL configuration repositories — ``config_um`` (the UA
-Ultramarine 3 m telescope concept) and ``config_um_esc`` (the ESC instrument).
-:meth:`Simulation.from_default <esc_etc.Simulation.from_default>` pulls these in
-for you; see :doc:`configuration` for the details and for how to supply your
-own.
+detectors) come from the UASAL configuration packages ``config_um`` (the UA
+Ultramarine 3 m telescope) and ``config_um_esc`` (the ESC instrument). A
+snapshot of their files ships inside ``esc_etc``, so nothing else is installed;
+see :doc:`configuration` for how it is refreshed and how to supply your own.
 
 Contents
 --------

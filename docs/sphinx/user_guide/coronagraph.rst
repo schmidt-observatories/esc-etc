@@ -2,7 +2,8 @@ Coronagraph and contrast
 ========================
 
 The :class:`~esc_etc.Coronagraph` owns the coronagraph-specific physics. It has
-three mutable knobs and a configuration-derived throughput curve.
+three physics knobs, three reference-subtraction parameters, and a
+configuration-derived throughput curve.
 
 The three knobs
 ---------------

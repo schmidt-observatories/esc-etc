@@ -15,12 +15,15 @@ The four building blocks
    * - :class:`~esc_etc.Telescope`
      - The optics: primary diameter, throughput surface / collecting area, focal
        ratio and length, the primary-filter wavelength, and the resolution
-       element (``resel``, :math:`\pi(\lambda/2D)^2`), which is the single
-       photometric extraction aperture used by every noise term.
+       element (``resel``, :math:`\pi(\lambda/2D)^2`), the default photometric
+       aperture.
    * - :class:`~esc_etc.Sensor`
      - The detector + optical path: read noise, dark current, gain, well depth,
-       number of PSF pixels, and the optical **bandpass** (the product of mirror
-       coatings, filter, and detector QE).
+       the optical **bandpass** (mirror coatings, filter and detector QE, or a
+       measured ESC filter curve), and the photometric ``aperture`` every noise
+       term uses (``"resel"`` by default, or ``"optimal"``, ``"box"``,
+       ``"matched"``) with the encircled energy ``ee_fraction`` it credits to a
+       point source.
    * - :class:`~esc_etc.Scene`
      - What is on the sky: the host **star**, the **planet** (a delta-magnitude
        relative to the star), and the **zodi** / **exozodi** sky backgrounds.
@@ -79,12 +82,21 @@ belongs to:
    sim.update(sensor__read_noise=5)          # detector knob
    sim.update(scene__star__mag=-0.2)         # scene element (routed via Scene)
 
-   sim.describe()                            # print the current tunable params
-   sim.reset()                               # restore the original configuration
+   sim.sensor.describe()                     # print a component's tunable params
+   sim.reset()                               # restore every component
 
 Updating a coronagraph parameter such as ``raw_dh_contrast``, ``ppgain``, or
 ``separation`` changes the speckle scaling, the noise floor, and the off-axis
-throughput respectively, so the next SNR call reflects the change.
+throughput respectively, so the next SNR call reflects the change. A value the
+component refuses (``encircled_energy`` outside ``(0, 1]``, a non-positive
+``ppgain``) raises ``ValueError`` and leaves the object unchanged.
+
+Times
+-----
+
+``total_time`` and ``frame_time`` may be astropy quantities in any time unit
+or plain numbers, which are read as seconds: ``sim.get_snr(3600, 100)`` and
+``sim.get_snr(1 * u.h, 100 * u.s)`` are the same call.
 
 Count rates and the electron budget
 ------------------------------------
