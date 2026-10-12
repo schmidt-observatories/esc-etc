@@ -1,7 +1,7 @@
 """Pinned golden anchors. These catch uniform regressions that scaling-law
 tests (ratios/directions) would miss. Values measured 2026-06-01 against the
 editable esc_etc install, re-pinned 2026-09-12 for the single-aperture model
-(issue #10) and 2026-09-13 for the config_um_esc 3 m default (source rate x5.9 =
+(issue #10) and 2026-09-13 for the Lazuli 3 m default (source rate x5.9 =
 area 1.56 x throughput 3.52 x FPM 1.07), then again 2026-09-13 for the
 encircled-energy default (point-source rates x0.456, Airy EE in the resel). If one changes, investigate before editing it.
 """

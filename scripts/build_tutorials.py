@@ -24,7 +24,7 @@ def write(name, cells):
 write("01_getting_started.ipynb", [
 md(f"""# 01 Getting started with esc_etc
 
-`esc_etc` is the exposure-time calculator for the ESC, the coronagraphic camera on the Ultramarine 3 m. It answers two questions: what signal-to-noise ratio (SNR) a planet reaches in a given integration time, and how long it takes to reach a target SNR. This notebook goes from an empty session to both answers, then shows where the noise comes from.
+`esc_etc` is the exposure-time calculator for the ESC, the coronagraphic camera on Lazuli, a 3 m telescope. It answers two questions: what signal-to-noise ratio (SNR) a planet reaches in a given integration time, and how long it takes to reach a target SNR. This notebook goes from an empty session to both answers, then shows where the noise comes from.
 
 {REQ}"""),
 code("""import astropy.units as u

@@ -2,7 +2,7 @@
 """Telescope geometry for the ESC ETC.
 
 Holds aperture/collecting-area geometry. Throughput lives in Sensor (mirroring
-wcc-etc). Values are extracted from config_um (telescope) + config_um_esc
+wcc-etc). Values are extracted from the vendored Lazuli telescope + ESC
 (per-arm aperture), matching the original Observatory.make_STP logic.
 """
 
@@ -95,9 +95,9 @@ class Telescope(_MetaHolder_):
         from . import uasal_config
 
         return cls.from_config(
-            telescope_config=uasal_config.load_config_values("config_um"),
-            instrument_config=uasal_config.load_config_values("config_um_esc"),
-            telescope_support_path=uasal_config.get_data_path("config_um"),
+            telescope_config=uasal_config.load_config_values(uasal_config.TELESCOPE),
+            instrument_config=uasal_config.load_config_values(uasal_config.INSTRUMENT),
+            telescope_support_path=uasal_config.get_data_path(uasal_config.TELESCOPE),
             arm=arm,
             filter=filter,
         )

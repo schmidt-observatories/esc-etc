@@ -37,7 +37,7 @@ A calculation is built from four pieces, combined into a
 ---------------------------------------
 
 :meth:`Simulation.from_default <esc_etc.Simulation.from_default>` assembles
-all four components from the bundled configuration of the 3 m Ultramarine
+all four components from the bundled configuration of the Lazuli 3 m
 telescope and the ESC:
 
 .. code-block:: python

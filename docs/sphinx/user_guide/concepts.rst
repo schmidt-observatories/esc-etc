@@ -84,7 +84,7 @@ There are two convenience constructors:
 
    from esc_etc import Simulation
 
-   # All four components from the bundled UASAL config (3 m Ultramarine + ESC):
+   # All four components from the bundled Lazuli config (3 m telescope + ESC):
    sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20.0,
                                  contrast=1e-8, ppgain=10, separation=0.4,
                                  arm="arm_a")

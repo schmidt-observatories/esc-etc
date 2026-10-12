@@ -13,22 +13,22 @@ Paths are relative to `src/esc_etc/data/`. The build job
 
 Both sets are the bandpass used when a simulation is built with `filter=` and `lifetime="eol"` or `"bol"`. Without `filter=`, the bandpass is assembled from the UASAL configuration below (issue #31).
 
-## UASAL configuration snapshot (`uasal/`)
+## Lazuli configuration snapshot (`lazuli/`)
 
-A copy of the `configs/*.toml` and `support_data/` of two University of Arizona Space Astrophysics Lab packages, written by `scripts/sync_uasal_configs.py`. `uasal/SNAPSHOT.txt` records the package versions and the date of the copy. Files the ETC never opens (Zemax optical designs, the Hsiao supernova template) are not copied. The `README.md` files inside each `support_data/` directory are the upstream provenance notes and are kept verbatim.
+A copy of the `configs/*.toml` and `support_data/` of two University of Arizona Space Astrophysics Lab (UASAL) packages, `config_um` (copied to `lazuli/telescope/`) and `config_um_esc` (copied to `lazuli/esc/`), written by `scripts/sync_uasal_configs.py`. "UM" is the UA code name for Lazuli. `lazuli/SNAPSHOT.txt` records the package versions and the date of the copy. Files the ETC never opens (Zemax optical designs, the Hsiao supernova template) are not copied. The `README.md` files inside each `support_data/` directory are the upstream provenance notes and are kept verbatim.
 
 | Path | What | Source and citation |
 |---|---|---|
-| `uasal/config_um/configs/*.toml` | Ultramarine 3 m telescope (M1 to M4 geometry and coatings), observatory pointing and jitter, zodiacal-light defaults | [uasal/config_um](https://github.com/uasal/config_um). |
-| `uasal/config_um/support_data/astrophysics/zodiacal_model_001.fits` | Zodiacal-light spectral template | HST Exposure Time Calculator background model (STScI), based on Leinert et al. (1998), A&AS 127, 1. |
-| `uasal/config_um/support_data/coatings/NIST_1st_surface_Al.csv` | Specular reflectance of a first-surface aluminium mirror | NIST Standard Reference Material 2003 certificate, shared by the UA MtOPS coating team. |
-| `uasal/config_um/support_data/coatings/qe_ag_fss99_profile_mirror.fits` | Protected-silver (FSS99) mirror reflectance | Via `config_um`; the upstream source is not recorded. |
-| `uasal/config_um_esc/configs/*.toml` | The ESC optical train per arm (surfaces, coatings, pupil mask, dichroic), source and spectrum defaults, and an EXOSIMS parameter file | [uasal/config_um_esc](https://github.com/uasal/config_um_esc). |
-| `uasal/config_um_esc/support_data/coatings/*.csv` | Reflectance curves: Al+MgF2, BMC deformable-mirror Ag+MgF2 and Au, NIST first-surface Al, FSS99 silver | Via `config_um_esc`; the NIST curve as above, the others are not sourced upstream. |
-| `uasal/config_um_esc/support_data/sensors/ZWO_ASI294MM_Pro_*.csv` | Gain, read noise, well depth and dark current vs setting; QE curve (Sony IMX492). The default ESC detector. | Digitized by Justin Hom from the manufacturer plots on the [ZWO product page](https://www.zwoastro.com/product/asi294/). |
-| `uasal/config_um_esc/support_data/sensors/ZWO_ASI6200MM_Pro_*.{csv,fits}` | The same for the ASI6200MM (Sony IMX455) | Digitized by Aaron Goldtooth from the [ZWO product page](https://astronomy-imaging-camera.com/product/asi6200mm-pro-mono/); QE curve identical to the IMX571, verified by Patrick Ingraham, 2023-09-18. |
-| `uasal/config_um_esc/support_data/transmissive_optics/meadowlark_VIS_pol_transmit.csv` | Linear polarizer transmission | [Meadowlark Optics Precision Linear Polarizer data sheet](https://www.meadowlark.com/product/precision-linear-polarizer/), accessed 2024-08-26. |
-| `uasal/config_um_esc/support_data/transmissive_optics/vvc_throughput_vs_lamD.fits` | Vortex coronagraph off-axis throughput vs separation in λ/D | Ruane, G., Mawet, D., Mennesson, B., et al. (2018), JATIS 4, 015004, accessed 2024-08-26. Whether this is a total or an in-core throughput is open (issue #30). |
+| `lazuli/telescope/configs/*.toml` | Lazuli 3 m telescope (M1 to M4 geometry and coatings), observatory pointing and jitter, zodiacal-light defaults | [uasal/config_um](https://github.com/uasal/config_um). |
+| `lazuli/telescope/support_data/astrophysics/zodiacal_model_001.fits` | Zodiacal-light spectral template | HST Exposure Time Calculator background model (STScI), based on Leinert et al. (1998), A&AS 127, 1. |
+| `lazuli/telescope/support_data/coatings/NIST_1st_surface_Al.csv` | Specular reflectance of a first-surface aluminium mirror | NIST Standard Reference Material 2003 certificate, shared by the UA MtOPS coating team. |
+| `lazuli/telescope/support_data/coatings/qe_ag_fss99_profile_mirror.fits` | Protected-silver (FSS99) mirror reflectance | Via `config_um`; the upstream source is not recorded. |
+| `lazuli/esc/configs/*.toml` | The ESC optical train per arm (surfaces, coatings, pupil mask, dichroic), source and spectrum defaults, and an EXOSIMS parameter file | [uasal/config_um_esc](https://github.com/uasal/config_um_esc). |
+| `lazuli/esc/support_data/coatings/*.csv` | Reflectance curves: Al+MgF2, BMC deformable-mirror Ag+MgF2 and Au, NIST first-surface Al, FSS99 silver | Via `config_um_esc`; the NIST curve as above, the others are not sourced upstream. |
+| `lazuli/esc/support_data/sensors/ZWO_ASI294MM_Pro_*.csv` | Gain, read noise, well depth and dark current vs setting; QE curve (Sony IMX492). The default ESC detector. | Digitized by Justin Hom from the manufacturer plots on the [ZWO product page](https://www.zwoastro.com/product/asi294/). |
+| `lazuli/esc/support_data/sensors/ZWO_ASI6200MM_Pro_*.{csv,fits}` | The same for the ASI6200MM (Sony IMX455) | Digitized by Aaron Goldtooth from the [ZWO product page](https://astronomy-imaging-camera.com/product/asi6200mm-pro-mono/); QE curve identical to the IMX571, verified by Patrick Ingraham, 2023-09-18. |
+| `lazuli/esc/support_data/transmissive_optics/meadowlark_VIS_pol_transmit.csv` | Linear polarizer transmission | [Meadowlark Optics Precision Linear Polarizer data sheet](https://www.meadowlark.com/product/precision-linear-polarizer/), accessed 2024-08-26. |
+| `lazuli/esc/support_data/transmissive_optics/vvc_throughput_vs_lamD.fits` | Vortex coronagraph off-axis throughput vs separation in λ/D | Ruane, G., Mawet, D., Mennesson, B., et al. (2018), JATIS 4, 015004, accessed 2024-08-26. Whether this is a total or an in-core throughput is open (issue #30). |
 
 ## Plot style
 

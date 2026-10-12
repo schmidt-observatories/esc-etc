@@ -297,7 +297,7 @@ class Sensor(_MetaHolder_):
         def _interp(csv_key, names, x):
             f = isp / Path(cp["sensor"][csv_key])
             df = pd.read_csv(f.as_posix(), skiprows=1, names=names)
-            # ponytail: clamps to the table ends (config_um_esc's -20 C nominal
+            # ponytail: clamps to the table ends (the instrument config's -20 C nominal
             # sits just below the first dark-current row); extrapolate if the
             # detector tables are ever extended.
             return np.interp(x, df[names[0]], df[names[1]])
@@ -396,10 +396,10 @@ class Sensor(_MetaHolder_):
         from . import uasal_config
 
         return cls.from_config(
-            instrument_config=uasal_config.load_config_values("config_um_esc"),
-            instrument_support_path=uasal_config.get_data_path("config_um_esc"),
-            telescope_config=uasal_config.load_config_values("config_um"),
-            telescope_support_path=uasal_config.get_data_path("config_um"),
+            instrument_config=uasal_config.load_config_values(uasal_config.INSTRUMENT),
+            instrument_support_path=uasal_config.get_data_path(uasal_config.INSTRUMENT),
+            telescope_config=uasal_config.load_config_values(uasal_config.TELESCOPE),
+            telescope_support_path=uasal_config.get_data_path(uasal_config.TELESCOPE),
             telescope=telescope,
             arm=arm,
             filter=filter,
