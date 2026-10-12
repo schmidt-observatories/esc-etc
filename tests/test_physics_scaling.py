@@ -9,6 +9,7 @@ the telescope config in make_STP(), so aperture is not a free knob through the
 public API. The host-magnitude flux law below exercises the same
 F0*10^(-0.4*mag)*area*throughput physics via a knob the API controls.
 """
+
 import pytest
 
 

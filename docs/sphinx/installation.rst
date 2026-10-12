@@ -4,20 +4,16 @@ Installation
 Requirements
 ------------
 
-- **Python 3.11 or newer.**
-- The scientific stack pulled in automatically as dependencies: ``numpy``,
-  ``astropy``, ``synphot``, ``matplotlib``, ``pandas``, and ``scipy``.
-- The UASAL configuration files for ``config_um`` (UA Ultramarine 3 m telescope
-  concept) and ``config_um_esc`` (the ESC instrument) ship inside the package
-  under ``esc_etc/data/uasal/``, so no git packages are needed. Maintainers
-  refresh that snapshot with ``scripts/sync_uasal_configs.py``. See
-  :doc:`configuration`.
+Python 3.11 or newer. The scientific stack (``numpy``, ``scipy``, ``astropy``,
+``synphot``, ``matplotlib``, ``pandas``) is installed automatically, and the
+instrument configuration ships inside the package, so nothing else has to be
+downloaded.
 
-Install from source (recommended)
----------------------------------
+Install from source
+-------------------
 
-The package is developed on GitHub. Clone it and install in *editable* mode so
-local changes to ``src/`` are picked up immediately:
+The package is developed on GitHub. Clone it and install it in editable mode,
+so that changes to ``src/`` are picked up without reinstalling:
 
 .. code-block:: bash
 
@@ -27,20 +23,31 @@ local changes to ``src/`` are picked up immediately:
 
 .. important::
 
-   Use an **editable** install (``pip install -e .``). A plain ``pip install .``
-   copies the package into ``site-packages`` and can shadow the repository's
-   ``src/`` tree, reintroducing import/version surprises. For development always
-   prefer ``-e``.
+   Use the editable install (``pip install -e .``). A plain ``pip install .``
+   copies the package into ``site-packages``, where it can shadow the
+   repository's ``src/`` tree and cause import and version surprises.
 
-To additionally pull the optional development dependencies (``pytest``,
-``build``, ``twine``):
+The optional extras:
 
 .. code-block:: bash
 
-   pip install -e '.[dev]'
+   pip install -e ".[dev]"    # pytest, ruff, build, twine
+   pip install -e ".[docs]"   # Sphinx, the Read the Docs theme, nbsphinx
+
+Once the package is on PyPI, ``pip install esc_etc`` installs a release
+without cloning.
+
+Using a conda environment
+-------------------------
+
+.. code-block:: bash
+
+   conda create -n esc-etc python=3.11
+   conda activate esc-etc
+   pip install -e .
 
 Verify the installation
-------------------------
+-----------------------
 
 .. code-block:: python
 
@@ -48,44 +55,42 @@ Verify the installation
    print(esc_etc.__version__)
 
    from esc_etc import Simulation
-   import astropy.units as u
 
    sim = Simulation.from_default(separation=0.4, contrast=1e-8, ppgain=10)
-   print(sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)["snr"])
+   print(sim.get_snr(total_time=3600, frame_time=100)["snr"])   # about 9.87
 
-If that prints a version string and a signal-to-noise value, you are ready to
-go. Continue with :doc:`quickstart`.
+The last line is the signal-to-noise for the default scene, a host star of
+ESC-band magnitude -0.353 with a planet 20 magnitudes fainter at 0.4 arcsec,
+integrated for one hour in 100 s frames. Continue with :doc:`quickstart`.
 
 Running the test suite
 ----------------------
 
-The package ships with a ``pytest`` suite. From the repository root:
-
 .. code-block:: bash
 
-   pip install -e '.[dev]'    # editable install + pytest
+   pip install -e ".[dev]"
    pytest
 
-The same suite runs on every pull request (``.github/workflows/tests.yml``).
+Every pull request runs the same suite, ``ruff`` (undefined names, unused
+imports and formatting), and a build of the sdist and wheel that is then
+installed in a clean environment and smoke-tested
+(``.github/workflows/tests.yml``).
 
 Building the documentation locally
------------------------------------
+----------------------------------
 
-The documentation you are reading is built with `Sphinx
-<https://www.sphinx-doc.org>`_ and the *Read the Docs* theme. The tutorial
-pages are rendered from the Jupyter notebooks via `nbsphinx
-<https://nbsphinx.readthedocs.io>`_, which requires `pandoc
-<https://pandoc.org>`_ to be installed.
+The site is built with `Sphinx <https://www.sphinx-doc.org>`_ and the Read
+the Docs theme. The tutorial pages are rendered from the Jupyter notebooks by
+`nbsphinx <https://nbsphinx.readthedocs.io>`_, which needs a `pandoc
+<https://pandoc.org>`_ binary.
 
 .. code-block:: bash
 
-   # from the repository root
-   pip install -e .                              # so autodoc can import the package
-   pip install -r docs/sphinx/requirements.txt   # Sphinx + theme + nbsphinx
-   # plus a pandoc binary, e.g.  conda install pandoc   or   brew install pandoc
-
+   pip install -e ".[docs]"
+   brew install pandoc         # or: conda install pandoc / apt-get install pandoc
    cd docs/sphinx
    make html
 
-Open ``docs/sphinx/_build/html/index.html`` in a browser. To force a clean
-rebuild, run ``make clean html``.
+Open ``docs/sphinx/_build/html/index.html`` in a browser. ``make clean html``
+forces a full rebuild. The notebooks are rendered from their saved outputs, so
+the build itself executes no code.

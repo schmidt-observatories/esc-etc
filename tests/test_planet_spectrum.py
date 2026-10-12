@@ -1,4 +1,5 @@
 """The planet spectrum is used in the count-rate chain (issue #13)."""
+
 import astropy.units as u
 import pytest
 from synphot import SourceSpectrum
@@ -15,7 +16,9 @@ def test_default_is_host_scaled_by_deltamag():
     r = sim.count_rate_components()
     # host is the k-scaled full-PSF rate; the planet is also credited only the
     # encircled energy inside the noise aperture
-    assert r.source.value == pytest.approx((r.host * 10 ** (-0.4 * 20.0) * sim.sensor.ee_fraction).value, rel=1e-6)
+    assert r.source.value == pytest.approx(
+        (r.host * 10 ** (-0.4 * 20.0) * sim.sensor.ee_fraction).value, rel=1e-6
+    )
 
 
 def test_esc_band_reference_is_shape_independent():
@@ -23,7 +26,9 @@ def test_esc_band_reference_is_shape_independent():
     flat = sim.count_rate_components().source
     sim.update(scene__planet__spectrum=RED)
     # deltamag defined in the observing band pins the ESC count rate regardless of colour
-    assert sim.count_rate_components().source.value == pytest.approx(flat.value, rel=1e-6)
+    assert sim.count_rate_components().source.value == pytest.approx(
+        flat.value, rel=1e-6
+    )
 
 
 def test_v_band_reference_makes_planet_colour_matter():

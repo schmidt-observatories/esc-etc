@@ -1,5 +1,6 @@
 # tests/test_plotting_rates.py
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -18,8 +19,9 @@ class _Sensor:
 
 def _rates():
     e = u.electron / u.s
-    return CountRates(source=0.9 * e, zodi=2.3e-4 * e, exozodi=1e-4 * e,
-                      speckle=0.9 * e, host=9e7 * e)
+    return CountRates(
+        source=0.9 * e, zodi=2.3e-4 * e, exozodi=1e-4 * e, speckle=0.9 * e, host=9e7 * e
+    )
 
 
 def test_count_rates_raw_path_draws_five_bars():

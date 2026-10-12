@@ -6,6 +6,7 @@ Measured 2026-06-01:
     snr(3600)=21.026 -> ratio 2.0000 = sqrt(4).
   - floor-limited (contrast 1e-7, ppgain 1): snr pinned at 0.1000 = C_p/M.
 """
+
 import numpy as np
 import pytest
 

@@ -34,10 +34,10 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["pytest", "build", "twine"]
-# Sphinx toolchain for the docs site under docs/sphinx/. CI and Read the Docs use
-# `pip install -r docs/sphinx/requirements.txt && pip install -e .`.
-# nbsphinx also requires a `pandoc` binary on the build machine.
+dev = ["pytest", "build", "twine", "ruff"]
+# Sphinx toolchain for the docs site under docs/sphinx/; CI and Read the Docs
+# install it with `pip install -e ".[docs]"`. nbsphinx also needs a `pandoc`
+# binary on the build machine.
 docs = [
   "sphinx>=7",
   "sphinx-rtd-theme>=2.0",
@@ -73,3 +73,14 @@ omit=["src/esc_etc/_version.py"] # Modify the path where the _version.py lives
 
 [tool.setuptools.package-data]
 "esc_etc" = ["data/*.mplstyle", "data/esc_filters_eol/*.csv", "data/esc_filters_bol/*.csv", "data/uasal/**/*"]
+
+[tool.ruff]
+src = ["src"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Legacy STP tests (xfail/skip): dead assignments left as-is until the file goes.
+"tests/test_esc_etc_initialization.py" = ["F841"]

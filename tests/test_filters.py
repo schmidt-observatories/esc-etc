@@ -1,6 +1,7 @@
 """End-of-life ESC filter curves shipped in esc_etc/data/esc_filters_eol (Pearl PLSE
 budget v0.4 chain incl. QE, EOL contamination and reserves; vortex and Lyot factors
 excluded because Coronagraph and Telescope.surface apply them)."""
+
 import astropy.units as u
 import pytest
 
@@ -15,11 +16,17 @@ def test_twelve_filters_by_slot_and_designation():
 
 
 def test_filter_sets_central_wavelength():
-    assert Telescope.from_default(filter="R1").primary_filter.to_value(u.nm) == pytest.approx(620)
-    assert Telescope.from_default(filter="R5").primary_filter.to_value(u.nm) == pytest.approx(725.9)
+    assert Telescope.from_default(filter="R1").primary_filter.to_value(
+        u.nm
+    ) == pytest.approx(620)
+    assert Telescope.from_default(filter="R5").primary_filter.to_value(
+        u.nm
+    ) == pytest.approx(725.9)
     # resel follows lambda
-    assert (Telescope.from_default(filter="R1").resel
-            > Telescope.from_default(filter="B1").resel)
+    assert (
+        Telescope.from_default(filter="R1").resel
+        > Telescope.from_default(filter="B1").resel
+    )
 
 
 def test_filter_bandpass_is_the_csv_curve():

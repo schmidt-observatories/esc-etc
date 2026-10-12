@@ -1,6 +1,7 @@
 """The vendored UASAL config snapshot must load on its own and, when the
 upstream packages are installed, be byte-identical to them (run
 scripts/sync_uasal_configs.py if this drifts)."""
+
 import filecmp
 from pathlib import Path
 
@@ -32,4 +33,6 @@ def test_snapshot_matches_installed_package(name):
     for f in dst.rglob("*"):
         if f.is_file() and not filecmp.cmp(f, src / f.relative_to(dst), shallow=False):
             stale.append(str(f.relative_to(dst)))
-    assert not stale, f"vendored {name} differs from installed; rerun scripts/sync_uasal_configs.py: {stale}"
+    assert not stale, (
+        f"vendored {name} differs from installed; rerun scripts/sync_uasal_configs.py: {stale}"
+    )
