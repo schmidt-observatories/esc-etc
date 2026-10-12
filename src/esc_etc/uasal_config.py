@@ -4,6 +4,7 @@ Mirrors the two functions the ETC used from those packages so the defaults
 work from a plain PyPI install. Refresh the snapshot with
 scripts/sync_uasal_configs.py; provenance is in data/uasal/SNAPSHOT.txt.
 """
+
 import tomllib
 from pathlib import Path
 

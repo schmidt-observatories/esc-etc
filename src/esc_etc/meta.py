@@ -21,7 +21,9 @@ class _MetaHolder_:
             if "__" in key:
                 child_name, sub_key = key.split("__", 1)
                 child = getattr(self, child_name)
-                updated += [f"{child_name}__{k}" for k in child.update(**{sub_key: value})]
+                updated += [
+                    f"{child_name}__{k}" for k in child.update(**{sub_key: value})
+                ]
                 continue
             if key not in self._mutable_parameters:
                 raise KeyError(

@@ -18,6 +18,7 @@ zodi, exozodi, dark and read noise as on target) adds to the science variance.
 ``total_time`` is on-target science time; ``charged_time`` includes the
 reference. ``"none"`` reproduces the single-image budget.
 """
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -47,9 +48,11 @@ class CountRates:
 def _background_variance(rates, sensor, t, frame_time, star_scale=1.0):
     """Random variance (e-) of everything but the planet in a ``t`` exposure of a
     star ``star_scale`` times the host: speckle, zodi, exozodi, dark, read."""
-    return ((star_scale * rates.speckle + rates.zodi + rates.exozodi) * t
-            + sensor.dark_current * t * sensor.num_psf_pixels
-            + sensor.num_psf_pixels * sensor.read_noise ** 2 * n_reads(t, frame_time))
+    return (
+        (star_scale * rates.speckle + rates.zodi + rates.exozodi) * t
+        + sensor.dark_current * t * sensor.num_psf_pixels
+        + sensor.num_psf_pixels * sensor.read_noise**2 * n_reads(t, frame_time)
+    )
 
 
 def _reference_variance(rates, sensor, coronagraph, total_time, frame_time):
@@ -58,17 +61,20 @@ def _reference_variance(rates, sensor, coronagraph, total_time, frame_time):
         return 0 * u.electron
     beta, tau = coronagraph.ref_brightness_ratio, coronagraph.ref_time_ratio
     kappa = 1.0 / (beta * tau)
-    return kappa ** 2 * _background_variance(rates, sensor, tau * total_time,
-                                             frame_time, star_scale=beta)
+    return kappa**2 * _background_variance(
+        rates, sensor, tau * total_time, frame_time, star_scale=beta
+    )
 
 
 class AnalyticCoronagraphNoiseModel:
     def snr(self, rates, sensor, coronagraph, total_time, frame_time):
-        total_time = u.Quantity(total_time, u.s)   # plain numbers are seconds
+        total_time = u.Quantity(total_time, u.s)  # plain numbers are seconds
         frame_time = u.Quantity(frame_time, u.s)
         _require_positive(total_time=total_time, frame_time=frame_time)
         M = rates.speckle * coronagraph.noise_floor_factor()
-        var_ref = _reference_variance(rates, sensor, coronagraph, total_time, frame_time)
+        var_ref = _reference_variance(
+            rates, sensor, coronagraph, total_time, frame_time
+        )
         total_noise = np.sqrt(
             rates.source * total_time
             + _background_variance(rates, sensor, total_time, frame_time)
@@ -97,37 +103,51 @@ class AnalyticCoronagraphNoiseModel:
         the shortest realizable schedule that meets ``snr``. NaN when
         unreachable (systematic floor).
         """
-        frame_time = u.Quantity(frame_time, u.s)   # plain numbers are seconds
+        frame_time = u.Quantity(frame_time, u.s)  # plain numbers are seconds
         _require_positive(snr=snr, frame_time=frame_time)
         SNR = snr * u.ct
         M = rates.speckle * coronagraph.noise_floor_factor() / u.ct
         background_counts = (
             (sensor.dark_current * sensor.num_psf_pixels)
-            + rates.zodi + rates.exozodi + rates.speckle
-            + ((sensor.read_noise * sensor.read_noise) * sensor.num_psf_pixels
-               / frame_time)
+            + rates.zodi
+            + rates.exozodi
+            + rates.speckle
+            + (
+                (sensor.read_noise * sensor.read_noise)
+                * sensor.num_psf_pixels
+                / frame_time
+            )
         )
         # reference variance per second of science time (continuous reads)
         reference_rate = 0 * background_counts
         if coronagraph.subtraction == "rdi":
             beta, tau = coronagraph.ref_brightness_ratio, coronagraph.ref_time_ratio
             reference_rate = (
-                (beta * rates.speckle + rates.zodi + rates.exozodi
-                 + sensor.dark_current * sensor.num_psf_pixels
-                 + sensor.read_noise ** 2 * sensor.num_psf_pixels / frame_time)
-                / (beta ** 2 * tau))
+                beta * rates.speckle
+                + rates.zodi
+                + rates.exozodi
+                + sensor.dark_current * sensor.num_psf_pixels
+                + sensor.read_noise**2 * sensor.num_psf_pixels / frame_time
+            ) / (beta**2 * tau)
         numerator = rates.source + background_counts + reference_rate
-        denominator = (rates.source / SNR) ** 2 - M ** 2
+        denominator = (rates.source / SNR) ** 2 - M**2
         int_time = (numerator / denominator) / u.ct
         # legacy algebra leaves a spurious ct/electron on the time; value is seconds
         int_time = u.Quantity(np.atleast_1d(int_time).value, u.s)
         int_time[np.isinf(int_time) | (int_time.value < 0.0)] = np.nan
         scheduled = n_reads(int_time, frame_time) * u.Quantity(frame_time, u.s)
-        noise_terms = np.array([
-            (sensor.dark_current * sensor.num_psf_pixels).value,
-            ((sensor.read_noise ** 2) * sensor.num_psf_pixels / frame_time).value,
-            rates.zodi.value, rates.exozodi.value, rates.speckle.value,
-            u.Quantity(reference_rate).value,
-        ])
-        return {"int_time": scheduled, "int_time_continuous": int_time,
-                "noise_terms": noise_terms}
+        noise_terms = np.array(
+            [
+                (sensor.dark_current * sensor.num_psf_pixels).value,
+                ((sensor.read_noise**2) * sensor.num_psf_pixels / frame_time).value,
+                rates.zodi.value,
+                rates.exozodi.value,
+                rates.speckle.value,
+                u.Quantity(reference_rate).value,
+            ]
+        )
+        return {
+            "int_time": scheduled,
+            "int_time_continuous": int_time,
+            "noise_terms": noise_terms,
+        }

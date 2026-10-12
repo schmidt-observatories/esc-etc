@@ -20,6 +20,7 @@ and read noise are charged over ``num_psf_pixels``, and zodi/exozodi over
 ponytail: all fractions are for an unaberrated Airy PSF at the plate scale; set
 ``encircled_energy`` from the coronagraphic off-axis PSF when one exists.
 """
+
 import re
 from pathlib import Path
 
@@ -47,7 +48,9 @@ _DATA = Path(__file__).parent / "data"
 
 def _load_filters(lifetime):
     out = {}
-    for f in sorted((_DATA / f"esc_filters_{lifetime}").glob(f"ESC_*_{lifetime.upper()}.csv")):
+    for f in sorted(
+        (_DATA / f"esc_filters_{lifetime}").glob(f"ESC_*_{lifetime.upper()}.csv")
+    ):
         slot, name = f.stem.split("_")[2:4]
         out[slot] = out[name.replace("p", ".")] = f
     return out
@@ -59,11 +62,15 @@ FILTERS = _FILTERS["eol"]
 
 def _filter_path(name, lifetime="eol"):
     if lifetime not in _FILTERS:
-        raise ValueError(f"lifetime must be one of {sorted(_FILTERS)}, got {lifetime!r}")
+        raise ValueError(
+            f"lifetime must be one of {sorted(_FILTERS)}, got {lifetime!r}"
+        )
     try:
         return _FILTERS[lifetime][name]
     except KeyError:
-        raise ValueError(f"Unknown ESC filter {name!r}; choose from {sorted(FILTERS)}") from None
+        raise ValueError(
+            f"Unknown ESC filter {name!r}; choose from {sorted(FILTERS)}"
+        ) from None
 
 
 def filter_central_wavelength(name):
@@ -74,8 +81,11 @@ def filter_central_wavelength(name):
 
 def filter_bandpass(name, lifetime="eol"):
     df = pd.read_csv(_filter_path(name, lifetime), skiprows=1)
-    return SpectralElement(Empirical1D, points=df.iloc[:, 0].values * u.nm,
-                           lookup_table=df.iloc[:, 1].values)
+    return SpectralElement(
+        Empirical1D,
+        points=df.iloc[:, 0].values * u.nm,
+        lookup_table=df.iloc[:, 1].values,
+    )
 
 
 def _resample_spectral_element(S, w):
@@ -117,7 +127,7 @@ def aperture_geometry(aperture, pix_per_lamD, resel_pix):
     if aperture == "optimal":
         return np.pi * (0.7 * pix_per_lamD) ** 2, _ee_disk(0.7)
     if aperture == "box":
-        n = int(np.ceil(2 * 1.22 * pix_per_lamD))          # upstream calc_PSF('sq')
+        n = int(np.ceil(2 * 1.22 * pix_per_lamD))  # upstream calc_PSF('sq')
         x, I = _airy_fine(pix_per_lamD)
         inside = np.abs(x) < 0.5 * n / pix_per_lamD
         return float(n * n), float(I[np.ix_(inside, inside)].sum())
@@ -126,8 +136,10 @@ def aperture_geometry(aperture, pix_per_lamD, resel_pix):
         sub = round(len(x) / (2 * 6.0 * pix_per_lamD))
         m = (len(x) // sub) * sub
         P = I[:m, :m].reshape(m // sub, sub, m // sub, sub).sum(axis=(1, 3))
-        return float(1.0 / np.sum(P ** 2)), 1.0
-    raise ValueError(f"aperture must be one of resel, optimal, box, matched; got {aperture!r}")
+        return float(1.0 / np.sum(P**2)), 1.0
+    raise ValueError(
+        f"aperture must be one of resel, optimal, box, matched; got {aperture!r}"
+    )
 
 
 class Sensor(_MetaHolder_):
@@ -139,13 +151,34 @@ class Sensor(_MetaHolder_):
     ``encircled_energy`` (None = Airy value; otherwise in ``(0, 1]``).
     """
 
-    def __init__(self, bandpass, gain, dark_current, read_noise, well_depth,
-                 pixel_size, num_pixels, sensor_area, sensor_temp, plate_scale,
-                 telescope, peak_pixel_fraction=None, headroom=0.8,
-                 aperture="resel", encircled_energy=None):
-        self._mutable_parameters = ["read_noise", "dark_current", "gain", "well_depth",
-                                    "peak_pixel_fraction", "headroom", "aperture",
-                                    "encircled_energy"]
+    def __init__(
+        self,
+        bandpass,
+        gain,
+        dark_current,
+        read_noise,
+        well_depth,
+        pixel_size,
+        num_pixels,
+        sensor_area,
+        sensor_temp,
+        plate_scale,
+        telescope,
+        peak_pixel_fraction=None,
+        headroom=0.8,
+        aperture="resel",
+        encircled_energy=None,
+    ):
+        self._mutable_parameters = [
+            "read_noise",
+            "dark_current",
+            "gain",
+            "well_depth",
+            "peak_pixel_fraction",
+            "headroom",
+            "aperture",
+            "encircled_energy",
+        ]
         self.bandpass = bandpass
         self.pixel_size = pixel_size
         self.num_pixels = num_pixels
@@ -156,10 +189,16 @@ class Sensor(_MetaHolder_):
         self._auto_peak = peak_pixel_fraction is None
         # headroom: usable fraction of full well before saturation/nonlinearity.
         # 0.8 is a safety margin, not a measured linearity limit.
-        self._init_meta(gain=gain, dark_current=dark_current,
-                        read_noise=read_noise, well_depth=well_depth,
-                        peak_pixel_fraction=peak_pixel_fraction, headroom=headroom,
-                        aperture=aperture, encircled_energy=encircled_energy)
+        self._init_meta(
+            gain=gain,
+            dark_current=dark_current,
+            read_noise=read_noise,
+            well_depth=well_depth,
+            peak_pixel_fraction=peak_pixel_fraction,
+            headroom=headroom,
+            aperture=aperture,
+            encircled_energy=encircled_energy,
+        )
         self._on_update(["aperture"])
 
     def _on_update(self, updated_keys):
@@ -170,50 +209,74 @@ class Sensor(_MetaHolder_):
             raise ValueError(f"encircled_energy must be in (0, 1], got {ee_override}")
         t = self._telescope
         lam_d = (t.primary_filter / t.diameter_primary).to_value(
-            u.arcsec, equivalencies=u.dimensionless_angles())
+            u.arcsec, equivalencies=u.dimensionless_angles()
+        )
         ppl = lam_d / self.plate_scale
-        resel_pix = t.resel.to_value(u.arcsec ** 2) / self.plate_scale ** 2
+        resel_pix = t.resel.to_value(u.arcsec**2) / self.plate_scale**2
         npix, ee = aperture_geometry(self.aperture, ppl, resel_pix)
         self.pix_per_lamD = float(ppl)
         self.num_psf_pixels = npix * u.pix
-        self.aperture_solid_angle = npix * self.plate_scale ** 2 * u.arcsec ** 2
-        self.ee_fraction = float(ee if self.encircled_energy is None else self.encircled_energy)
+        self.aperture_solid_angle = npix * self.plate_scale**2 * u.arcsec**2
+        self.ee_fraction = float(
+            ee if self.encircled_energy is None else self.encircled_energy
+        )
         if self._auto_peak:
             # brightest pixel: pi/4 of the total per (lambda/D)^2, relative to the
             # in-aperture rate (ponytail: Airy, no Lyot broadening or pixel integration)
-            self.peak_pixel_fraction = float((np.pi / 4) / ppl ** 2 / self.ee_fraction)
+            self.peak_pixel_fraction = float((np.pi / 4) / ppl**2 / self.ee_fraction)
             # meta keeps None: it records what was set, so a restore re-enters auto mode
 
     def plot_bandpass(self, **kw):
         """See :func:`esc_etc.plotting.plot_bandpass`."""
         from . import plotting
+
         return plotting.plot_bandpass(self, **kw)
 
     def plot_aperture(self, **kw):
         """See :func:`esc_etc.plotting.plot_aperture`."""
         from . import plotting
+
         return plotting.plot_aperture(self, **kw)
 
     @classmethod
-    def from_config(cls, instrument_config, instrument_support_path, telescope_config,
-                    telescope_support_path, telescope, arm="arm_a", filter=None,
-                    lifetime="eol"):
+    def from_config(
+        cls,
+        instrument_config,
+        instrument_support_path,
+        telescope_config,
+        telescope_support_path,
+        telescope,
+        arm="arm_a",
+        filter=None,
+        lifetime="eol",
+    ):
         isp = Path(instrument_support_path)
         tsp = Path(telescope_support_path)
         cp = instrument_config["common_params"][arm]
         if lifetime not in _FILTERS:
-            raise ValueError(f"lifetime must be one of {sorted(_FILTERS)}, got {lifetime!r}")
+            raise ValueError(
+                f"lifetime must be one of {sorted(_FILTERS)}, got {lifetime!r}"
+            )
         if filter is None and lifetime != "eol":
-            raise ValueError(f"lifetime={lifetime!r} needs a named filter; the generic "
-                             "config bandpass has no BOL/EOL variants")
-        lam_c = (filter_central_wavelength(filter) if filter else
-                 u.Quantity(cp["optics"]["filter"]["lam_central"])).to(u.AA)
+            raise ValueError(
+                f"lifetime={lifetime!r} needs a named filter; the generic "
+                "config bandpass has no BOL/EOL variants"
+            )
+        lam_c = (
+            filter_central_wavelength(filter)
+            if filter
+            else u.Quantity(cp["optics"]["filter"]["lam_central"])
+        ).to(u.AA)
         if not u.isclose(lam_c, telescope.primary_filter):
             raise ValueError(
                 f"filter={filter!r} ({lam_c:.0f}) does not match the telescope built for "
-                f"{telescope.primary_filter:.0f}; pass the same filter= to Telescope")
-        bandpass = filter_bandpass(filter, lifetime) if filter else cls._config_bandpass(
-            cp, isp, telescope_config, tsp)
+                f"{telescope.primary_filter:.0f}; pass the same filter= to Telescope"
+            )
+        bandpass = (
+            filter_bandpass(filter, lifetime)
+            if filter
+            else cls._config_bandpass(cp, isp, telescope_config, tsp)
+        )
 
         # Detector
         pixel_size = (u.Quantity(cp["sensor"]["pixel_size"])).to(u.um) * (1.0 / u.pix)
@@ -229,20 +292,41 @@ class Sensor(_MetaHolder_):
             # detector tables are ever extended.
             return np.interp(x, df[names[0]], df[names[1]])
 
-        gain = _interp("gain_curve", ["gain_setting", "gain"], gain_setting) * (u.electron / u.ct)
-        dark_current = _interp("dark_current", ["sensor_temperature", "dark_current"],
-                               sensor_temp.value) * (u.electron / (u.s * u.pix))
-        read_noise = _interp("read_noise", ["gain_setting", "read_noise"], gain_setting) \
-            * np.sqrt(1.0 * u.electron / u.pix)
-        well_depth = _interp("well_depth", ["gain_setting", "well_depth"], gain_setting) \
-            * (u.electron / u.pix)
+        gain = _interp("gain_curve", ["gain_setting", "gain"], gain_setting) * (
+            u.electron / u.ct
+        )
+        dark_current = _interp(
+            "dark_current", ["sensor_temperature", "dark_current"], sensor_temp.value
+        ) * (u.electron / (u.s * u.pix))
+        read_noise = _interp(
+            "read_noise", ["gain_setting", "read_noise"], gain_setting
+        ) * np.sqrt(1.0 * u.electron / u.pix)
+        well_depth = _interp(
+            "well_depth", ["gain_setting", "well_depth"], gain_setting
+        ) * (u.electron / u.pix)
 
-        num_pixels = (sensor_area / (pixel_size ** 2)).to("pix2").value * u.pix
-        plate_scale = (pixel_size.value * 1e-6 / telescope.diameter_primary.value
-                       / telescope.f_num * 206265)
+        num_pixels = (sensor_area / (pixel_size**2)).to("pix2").value * u.pix
+        plate_scale = (
+            pixel_size.value
+            * 1e-6
+            / telescope.diameter_primary.value
+            / telescope.f_num
+            * 206265
+        )
 
-        return cls(bandpass, gain, dark_current, read_noise, well_depth, pixel_size,
-                   num_pixels, sensor_area, sensor_temp, plate_scale, telescope)
+        return cls(
+            bandpass,
+            gain,
+            dark_current,
+            read_noise,
+            well_depth,
+            pixel_size,
+            num_pixels,
+            sensor_area,
+            sensor_temp,
+            plate_scale,
+            telescope,
+        )
 
     @staticmethod
     def _config_bandpass(cp, isp, telescope_config, tsp):
@@ -250,7 +334,9 @@ class Sensor(_MetaHolder_):
         bandpass = SpectralElement(Box1D, amplitude=1, x_0=6000, width=7000)
         # Telescope mirrors
         for key in telescope_config["telescope"]["optics"].keys():
-            coating = tsp / Path(telescope_config["telescope"]["optics"][key]["coating_refl"])
+            coating = tsp / Path(
+                telescope_config["telescope"]["optics"][key]["coating_refl"]
+            )
             bandpass = bandpass * _mirror_bandpass(coating.as_posix())
         # ESC reflective optics
         for key in cp["optics"].keys():
@@ -261,35 +347,51 @@ class Sensor(_MetaHolder_):
         primary_filter = u.Quantity(cp["optics"]["filter"]["lam_central"]).to("AA")
         fbw = cp["optics"]["filter"]["bandwidth"]
         bandpass = bandpass * SpectralElement(
-            Box1D, amplitude=0.98, x_0=primary_filter, width=fbw * primary_filter)
+            Box1D, amplitude=0.98, x_0=primary_filter, width=fbw * primary_filter
+        )
         # Dichroic (flat), when the config has one
         if "dichroic" in cp["optics"]:
             bandpass = bandpass * SpectralElement(
-                Box1D, amplitude=cp["optics"]["dichroic"]["dichroic_throughput"], x_0=6000, width=7000)
+                Box1D,
+                amplitude=cp["optics"]["dichroic"]["dichroic_throughput"],
+                x_0=6000,
+                width=7000,
+            )
         # Polarizers / wave plates (NOT the FPM)
         for key in cp["optics"].keys():
             if "lp" in key or "qwp" in key:
                 coating_init = cp["optics"][key]["pol_throughput"]
                 if coating_init == "none":
-                    bandpass = bandpass * SpectralElement(Box1D, amplitude=0.99, x_0=6000, width=7000)
+                    bandpass = bandpass * SpectralElement(
+                        Box1D, amplitude=0.99, x_0=6000, width=7000
+                    )
                 else:
                     coating_ext = isp / Path(coating_init)
                     bandpass = bandpass * SpectralElement.from_file(
-                        coating_ext.as_posix(), wave_unit="nm")
+                        coating_ext.as_posix(), wave_unit="nm"
+                    )
                 if "lp1" in key:
-                    bandpass = bandpass * SpectralElement(Box1D, amplitude=0.5, x_0=6000, width=7000)
+                    bandpass = bandpass * SpectralElement(
+                        Box1D, amplitude=0.5, x_0=6000, width=7000
+                    )
 
         qe_path = isp / Path(cp["sensor"]["qe"])
-        bandpass = bandpass * SpectralElement.from_file(qe_path.as_posix(), wave_unit="nm")
+        bandpass = bandpass * SpectralElement.from_file(
+            qe_path.as_posix(), wave_unit="nm"
+        )
         return _resample_spectral_element(bandpass, WAVELENGTHS)
 
     @classmethod
     def from_default(cls, telescope, arm="arm_a", filter=None, lifetime="eol"):
         from . import uasal_config
+
         return cls.from_config(
             instrument_config=uasal_config.load_config_values("config_um_esc"),
             instrument_support_path=uasal_config.get_data_path("config_um_esc"),
             telescope_config=uasal_config.load_config_values("config_um"),
             telescope_support_path=uasal_config.get_data_path("config_um"),
-            telescope=telescope, arm=arm, filter=filter, lifetime=lifetime,
+            telescope=telescope,
+            arm=arm,
+            filter=filter,
+            lifetime=lifetime,
         )

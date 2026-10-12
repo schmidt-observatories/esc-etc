@@ -7,6 +7,7 @@ keywords, accepts ax=None, applies the lazuli style via a context manager, and
 returns (fig, ax). The style ships as data/lazuli.mplstyle (byte-identical to the
 canonical lazuli-transit copy).
 """
+
 import contextlib
 import importlib.resources
 
@@ -102,18 +103,24 @@ def plot_count_rates(sim=None, *, rates=None, sensor=None, ax=None, log=True):
     _require(rates, "rates", "sensor")
     _require(sensor, "sensor", "rates")
 
-    dark_total = (sensor.dark_current * sensor.num_psf_pixels)
+    dark_total = sensor.dark_current * sensor.num_psf_pixels
     labels = ["Source", "Zodi", "Exozodi", "Speckle", "Dark"]
-    values = np.array([
-        rates.source.value, rates.zodi.value, rates.exozodi.value,
-        rates.speckle.value, dark_total.value,
-    ], dtype=float)
+    values = np.array(
+        [
+            rates.source.value,
+            rates.zodi.value,
+            rates.exozodi.value,
+            rates.speckle.value,
+            dark_total.value,
+        ],
+        dtype=float,
+    )
     if log:
         values = np.clip(values, 1e-30, None)
 
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
-        ax.bar(labels, values, color=LAZULI_COLORS[:len(labels)])
+        ax.bar(labels, values, color=LAZULI_COLORS[: len(labels)])
         if log:
             ax.set_yscale("log")
         ax.set_ylabel(r"Count rate [e$^-$/s]")
@@ -127,10 +134,15 @@ def _snr_curve(sim, total_times, frame_time):
     """SNR at each of ``total_times`` with the count rates evaluated once.
     Intentionally bypasses sim.get_snr, which recomputes the rates per call."""
     rates = sim.count_rate_components()
-    return np.array([
-        sim.noise_model.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]
-        for t in total_times
-    ], dtype=float)
+    return np.array(
+        [
+            sim.noise_model.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)[
+                "snr"
+            ]
+            for t in total_times
+        ],
+        dtype=float,
+    )
 
 
 def _owner_and_attr(sim, key):
@@ -145,12 +157,20 @@ def _owner_and_attr(sim, key):
 def _fmt(value):
     try:
         return format(value, "g")
-    except (TypeError, ValueError):      # strings and other non-numbers
+    except (TypeError, ValueError):  # strings and other non-numbers
         return str(value)
 
 
-def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
-                     sweep=None, label=None, ax=None):
+def plot_snr_vs_time(
+    sim=None,
+    *,
+    total_times=None,
+    frame_time=None,
+    snrs=None,
+    sweep=None,
+    label=None,
+    ax=None,
+):
     """SNR vs total integration time (log-log).
 
     Pass a Simulation (sweeps `total_times`, default logspace from one frame to
@@ -171,14 +191,18 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
         total_times = np.logspace(t0, max(5, t0 + 1), 40) * u.s
     if sweep is not None:
         _require(sim, "sim", "sweep")
-        (key, values), = sweep.items()
+        ((key, values),) = sweep.items()
         owner, attr = _owner_and_attr(sim, key)
-        previous = owner.meta[attr]      # what was set, not a derived value (None = automatic)
+        previous = owner.meta[
+            attr
+        ]  # what was set, not a derived value (None = automatic)
         curves = []
         try:
             for v in values:
                 sim.update(**{key: v})
-                curves.append((f"{attr} = {_fmt(v)}", _snr_curve(sim, total_times, frame_time)))
+                curves.append(
+                    (f"{attr} = {_fmt(v)}", _snr_curve(sim, total_times, frame_time))
+                )
         finally:
             sim.update(**{key: previous})
     else:
@@ -191,7 +215,12 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
         for i, (lab, y) in enumerate(curves):
-            ax.loglog(t_s, y, color=None if label else LAZULI_COLORS[i % len(LAZULI_COLORS)], label=lab)
+            ax.loglog(
+                t_s,
+                y,
+                color=None if label else LAZULI_COLORS[i % len(LAZULI_COLORS)],
+                label=lab,
+            )
         if sweep is not None or label is not None:
             ax.legend()
         ax.set_xlabel("Integration time [s]")
@@ -200,8 +229,15 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
     return fig, ax
 
 
-def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=None,
-                            label=None, ax=None, mark_separation=True):
+def plot_offaxis_throughput(
+    coronagraph=None,
+    *,
+    separations=None,
+    throughputs=None,
+    label=None,
+    ax=None,
+    mark_separation=True,
+):
     """Coronagraph off-axis (FPM) throughput vs planet separation (arcsec).
 
     Pass a Coronagraph, a Simulation (uses .coronagraph), or explicit
@@ -214,16 +250,27 @@ def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=N
         _require(coronagraph, "throughputs", "separations")
         if separations is None:
             separations = np.linspace(0.05, 0.6, 60)
-        throughputs = np.array([coronagraph.off_axis_throughput(float(s))
-                                for s in separations], dtype=float)
+        throughputs = np.array(
+            [coronagraph.off_axis_throughput(float(s)) for s in separations],
+            dtype=float,
+        )
 
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
-        ax.plot(np.asarray(separations, dtype=float),
-                np.asarray(throughputs, dtype=float), color=None if label else TEAL, label=label)
+        ax.plot(
+            np.asarray(separations, dtype=float),
+            np.asarray(throughputs, dtype=float),
+            color=None if label else TEAL,
+            label=label,
+        )
         if mark_separation and coronagraph is not None:
-            ax.axvline(coronagraph.separation, color=RED, ls="--", lw=1.0,
-                       label=f"separation = {coronagraph.separation} arcsec")
+            ax.axvline(
+                coronagraph.separation,
+                color=RED,
+                ls="--",
+                lw=1.0,
+                label=f"separation = {coronagraph.separation} arcsec",
+            )
             ax.legend()
         ax.set_xlabel("Separation [arcsec]")
         ax.set_ylabel("Off-axis throughput")
@@ -231,7 +278,9 @@ def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=N
     return fig, ax
 
 
-def plot_bandpass(sensor=None, *, wavelength=None, throughput=None, label=None, ax=None):
+def plot_bandpass(
+    sensor=None, *, wavelength=None, throughput=None, label=None, ax=None
+):
     """Instrument bandpass throughput vs wavelength (nm).
 
     Pass a Sensor, a Simulation (uses .sensor), or explicit (wavelength, throughput).
@@ -248,13 +297,20 @@ def plot_bandpass(sensor=None, *, wavelength=None, throughput=None, label=None, 
         tput = bp(wave_q)
         throughput = np.asarray(getattr(tput, "value", tput), dtype=float)
     else:
-        wavelength = (u.Quantity(wavelength).to(u.nm).value
-                      if hasattr(wavelength, "unit") else np.asarray(wavelength, dtype=float))
+        wavelength = (
+            u.Quantity(wavelength).to(u.nm).value
+            if hasattr(wavelength, "unit")
+            else np.asarray(wavelength, dtype=float)
+        )
 
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
-        ax.plot(np.asarray(wavelength, dtype=float),
-                np.asarray(throughput, dtype=float), color=None if label else TEAL, label=label)
+        ax.plot(
+            np.asarray(wavelength, dtype=float),
+            np.asarray(throughput, dtype=float),
+            color=None if label else TEAL,
+            label=label,
+        )
         if label is not None:
             ax.legend()
         ax.set_xlabel("Wavelength [nm]")
@@ -293,10 +349,10 @@ def _pixelated_airy(pix_per_lamD, half_pix, sub=10):
     """Airy PSF integrated onto a (2*half_pix+1)^2 pixel grid centred on a pixel.
     Returns the fraction of the total flux in each pixel."""
     n = 2 * half_pix + 1
-    d = 1.0 / sub                                                  # pixel units
+    d = 1.0 / sub  # pixel units
     x = np.arange(n * sub) * d - n / 2 + d / 2
     X, Y = np.meshgrid(x, x)
-    R = np.hypot(X, Y) / pix_per_lamD                              # lambda/D
+    R = np.hypot(X, Y) / pix_per_lamD  # lambda/D
     with np.errstate(invalid="ignore", divide="ignore"):
         I = np.where(R == 0, 1.0, (2 * j1(np.pi * R) / (np.pi * R)) ** 2)
     I *= (np.pi / 4) * (d / pix_per_lamD) ** 2
@@ -323,9 +379,14 @@ def plot_aperture(sensor=None, *, ax=None, half_lamD=2.5):
 
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
-        im = ax.imshow(img, extent=ext, origin="lower", cmap="Greys",
-                       norm=LogNorm(vmin=img.max() * 1e-4, vmax=img.max()))
-        for k in np.arange(-half_pix - 0.5, half_pix + 1):          # pixel grid
+        im = ax.imshow(
+            img,
+            extent=ext,
+            origin="lower",
+            cmap="Greys",
+            norm=LogNorm(vmin=img.max() * 1e-4, vmax=img.max()),
+        )
+        for k in np.arange(-half_pix - 0.5, half_pix + 1):  # pixel grid
             ax.axhline(k, color="w", lw=0.3, alpha=0.5)
             ax.axvline(k, color="w", lw=0.3, alpha=0.5)
         if ap == "box":
@@ -333,17 +394,33 @@ def plot_aperture(sensor=None, *, ax=None, half_lamD=2.5):
             ax.add_patch(Rectangle((-n / 2, -n / 2), n, n, fill=False, ec=RED, lw=2))
         else:
             r = np.sqrt(npix / np.pi)
-            ax.add_patch(Circle((0, 0), r, fill=False, ec=RED, lw=2,
-                                ls="--" if ap == "matched" else "-"))
+            ax.add_patch(
+                Circle(
+                    (0, 0),
+                    r,
+                    fill=False,
+                    ec=RED,
+                    lw=2,
+                    ls="--" if ap == "matched" else "-",
+                )
+            )
         ax.add_patch(Circle((0, 0), 1.22 * ppl, fill=False, ec=TEAL, lw=1, ls=":"))
-        ax.set_xlim(ext[0], ext[1]); ax.set_ylim(ext[2], ext[3])
+        ax.set_xlim(ext[0], ext[1])
+        ax.set_ylim(ext[2], ext[3])
         ax.set_aspect("equal")
-        ax.set_xlabel("pixels"); ax.set_ylabel("pixels")
-        ax.set_title(f"aperture = {ap!r}: {npix:.1f} px, EE = {sensor.ee_fraction:.2f}\n"
-                     f"{ppl:.2f} px per $\\lambda/D$ at {sensor._telescope.primary_filter.to(u.nm):.0f}"
-                     f"  (dotted: first Airy dark ring)", fontsize=10)
-        ax.grid(False); ax.minorticks_off()
-        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.02, label="fraction of PSF flux per pixel")
+        ax.set_xlabel("pixels")
+        ax.set_ylabel("pixels")
+        ax.set_title(
+            f"aperture = {ap!r}: {npix:.1f} px, EE = {sensor.ee_fraction:.2f}\n"
+            f"{ppl:.2f} px per $\\lambda/D$ at {sensor._telescope.primary_filter.to(u.nm):.0f}"
+            f"  (dotted: first Airy dark ring)",
+            fontsize=10,
+        )
+        ax.grid(False)
+        ax.minorticks_off()
+        fig.colorbar(
+            im, ax=ax, fraction=0.046, pad=0.02, label="fraction of PSF flux per pixel"
+        )
     return fig, ax
 
 

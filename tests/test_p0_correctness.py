@@ -1,4 +1,5 @@
 """Regression tests for the six P0 correctness bugs in issue #27."""
+
 import astropy.units as u
 import pytest
 
@@ -21,9 +22,12 @@ def test_snr_independent_of_time_unit(sim):
 
 def test_snr_accepts_plain_floats_as_seconds(sim):
     assert sim.get_snr(3600, 100)["snr"] == pytest.approx(
-        sim.get_snr(3600 * u.s, 100 * u.s)["snr"])
-    assert sim.get_int_time_for_snr(5, 100)["int_time"] == sim.get_int_time_for_snr(
-        5, 100 * u.s)["int_time"]
+        sim.get_snr(3600 * u.s, 100 * u.s)["snr"]
+    )
+    assert (
+        sim.get_int_time_for_snr(5, 100)["int_time"]
+        == sim.get_int_time_for_snr(5, 100 * u.s)["int_time"]
+    )
 
 
 # 2. lifetime is validated, and never silently ignored.
@@ -76,7 +80,7 @@ def test_encircled_energy_out_of_range_is_rejected(bad):
     before = sim.sensor.ee_fraction
     with pytest.raises(ValueError, match="encircled_energy"):
         sim.update(sensor__encircled_energy=bad)
-    assert sim.sensor.ee_fraction == before          # rejected update leaves no trace
+    assert sim.sensor.ee_fraction == before  # rejected update leaves no trace
 
 
 def test_encircled_energy_in_range_is_accepted():
@@ -87,9 +91,9 @@ def test_encircled_energy_in_range_is_accepted():
 
 # 6. Component API: the sensor bandpass and the telescope geometry must agree.
 def test_component_api_rejects_filter_geometry_mismatch():
-    t = Telescope.from_default()                     # 630 nm config default
+    t = Telescope.from_default()  # 630 nm config default
     with pytest.raises(ValueError, match="filter"):
-        Sensor.from_default(t, filter="B1")          # 400 nm bandpass
+        Sensor.from_default(t, filter="B1")  # 400 nm bandpass
     with pytest.raises(ValueError, match="filter"):
         Sensor.from_default(Telescope.from_default(filter="B1"))  # generic 630 nm chain
 

@@ -9,8 +9,9 @@ from esc_etc.scene import Scene, SceneElement, get_scene
 
 def test_get_scene_elements():
     t = Telescope.from_default()
-    scene = get_scene(t, hoststarmag=-0.353, planetdeltamag=20.0,
-                      bg_flux=22.5, exobg_flux=21.0)
+    scene = get_scene(
+        t, hoststarmag=-0.353, planetdeltamag=20.0, bg_flux=22.5, exobg_flux=21.0
+    )
     assert isinstance(scene.star, SceneElement)
     assert scene.star.mag == pytest.approx(-0.353)
     assert scene.planet.deltamag == pytest.approx(20.0)

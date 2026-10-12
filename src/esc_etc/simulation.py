@@ -20,6 +20,7 @@ k on the diffuse terms stands in for the diffuse-background transmission.
 ponytail: assumed equal to the point-source core throughput; split it out when
 the FPM data records total transmission separately.
 """
+
 import warnings
 
 import numpy as np
@@ -62,10 +63,21 @@ class Simulation(_MetaHolder_):
         return cls(telescope, sensor, scene, coronagraph, noise_model)
 
     @classmethod
-    def from_default(cls, hoststarmag=-0.353, planetdeltamag=20.0, contrast=1e-8,
-                     ppgain=10, separation=0.4, bg_flux=22.5, exobg_flux=21.0,
-                     arm="arm_a", mag_system="vega", hoststar_band=None, filter=None,
-                     lifetime="eol"):
+    def from_default(
+        cls,
+        hoststarmag=-0.353,
+        planetdeltamag=20.0,
+        contrast=1e-8,
+        ppgain=10,
+        separation=0.4,
+        bg_flux=22.5,
+        exobg_flux=21.0,
+        arm="arm_a",
+        mag_system="vega",
+        hoststar_band=None,
+        filter=None,
+        lifetime="eol",
+    ):
         """See ``get_scene`` for what band each magnitude is quoted in.
 
         ``filter`` (None = the generic config box filter, or a key of
@@ -76,22 +88,34 @@ class Simulation(_MetaHolder_):
         named filter, and anything else raises ``ValueError``.
         """
         telescope = Telescope.from_default(arm=arm, filter=filter)
-        sensor = Sensor.from_default(telescope, arm=arm, filter=filter, lifetime=lifetime)
-        scene = get_scene(telescope, hoststarmag=hoststarmag,
-                          planetdeltamag=planetdeltamag, bg_flux=bg_flux,
-                          exobg_flux=exobg_flux, mag_system=mag_system,
-                          hoststar_band=hoststar_band)
+        sensor = Sensor.from_default(
+            telescope, arm=arm, filter=filter, lifetime=lifetime
+        )
+        scene = get_scene(
+            telescope,
+            hoststarmag=hoststarmag,
+            planetdeltamag=planetdeltamag,
+            bg_flux=bg_flux,
+            exobg_flux=exobg_flux,
+            mag_system=mag_system,
+            hoststar_band=hoststar_band,
+        )
         coronagraph = Coronagraph.from_default(
-            telescope, raw_dh_contrast=contrast, ppgain=ppgain, separation=separation,
-            arm=arm)
+            telescope,
+            raw_dh_contrast=contrast,
+            ppgain=ppgain,
+            separation=separation,
+            arm=arm,
+        )
         return cls(telescope, sensor, scene, coronagraph)
 
     def _normalize(self, element, mag, band):
         """Scale ``element.spectrum`` to ``mag`` in ``band`` (Vega/AB per element)."""
         units = mag_units(element.mag_system)
         vegaspec = self._vega if units is su.VEGAMAG else None
-        return element.spectrum.normalize(mag * units, self._band(band),
-                                          vegaspec=vegaspec, force=FORCE)
+        return element.spectrum.normalize(
+            mag * units, self._band(band), vegaspec=vegaspec, force=FORCE
+        )
 
     def _band(self, band):
         """None -> ESC bandpass; str -> synphot filter (cached); else as given."""
@@ -109,12 +133,16 @@ class Simulation(_MetaHolder_):
         vega = self._vega
         bp = self.sensor.bandpass
         area = self.telescope.surface
-        omega = self.sensor.aperture_solid_angle      # noise aperture on the sky
-        ee = self.sensor.ee_fraction                  # point-source light inside it
+        omega = self.sensor.aperture_solid_angle  # noise aperture on the sky
+        ee = self.sensor.ee_fraction  # point-source light inside it
         k = self.coronagraph.off_axis_throughput(self.coronagraph.separation)
 
         def countrate(sp):
-            return Observation(sp, bp, force=FORCE).countrate(area=area) * u.electron / u.ct
+            return (
+                Observation(sp, bp, force=FORCE).countrate(area=area)
+                * u.electron
+                / u.ct
+            )
 
         star = self.scene.star
         host_sp = self._normalize(star, star.mag, star.band)
@@ -123,31 +151,52 @@ class Simulation(_MetaHolder_):
         # Planet: its own spectral shape, deltamag fainter than the host in the
         # reference band (default: the ESC band itself), observed through bp.
         planet = self.scene.planet
-        host_ref_mag = Observation(host_sp, self._band(planet.deltamag_band), force=FORCE
-                                   ).effstim(mag_units(star.mag_system), vegaspec=vega).value
-        planet_sp = self._normalize(planet, host_ref_mag + planet.deltamag, planet.deltamag_band)
+        host_ref_mag = (
+            Observation(host_sp, self._band(planet.deltamag_band), force=FORCE)
+            .effstim(mag_units(star.mag_system), vegaspec=vega)
+            .value
+        )
+        planet_sp = self._normalize(
+            planet, host_ref_mag + planet.deltamag, planet.deltamag_band
+        )
         source = countrate(planet_sp) * k * ee
         speckle = host_countrate * self.coronagraph.speckle_scale() * k * ee
 
         zodi_el = self.scene.zodi
-        zodi = countrate(self._normalize(zodi_el, zodi_el.mag, zodi_el.band)) \
-            * omega / u.arcsec ** 2 * k
+        zodi = (
+            countrate(self._normalize(zodi_el, zodi_el.mag, zodi_el.band))
+            * omega
+            / u.arcsec**2
+            * k
+        )
 
         exo_el = self.scene.exozodi
-        exozodi = countrate(self._normalize(exo_el, exo_el.mag, exo_el.band)) \
-            * omega / u.arcsec ** 2 * k
+        exozodi = (
+            countrate(self._normalize(exo_el, exo_el.mag, exo_el.band))
+            * omega
+            / u.arcsec**2
+            * k
+        )
 
         # host is the POST-FPM (k-scaled) host count rate, NOT the unattenuated
         # stellar flux. Consumers (e.g. contrast estimation) must account for the
         # applied FPM throughput k if they need the raw stellar rate.
-        return CountRates(source=source, zodi=zodi, exozodi=exozodi,
-                          speckle=speckle, host=host_countrate * k)
+        return CountRates(
+            source=source,
+            zodi=zodi,
+            exozodi=exozodi,
+            speckle=speckle,
+            host=host_countrate * k,
+        )
 
     def _warn_if_saturated(self, frame_time, rates):
         t_sat = self._saturation_time(rates)
         if np.any(u.Quantity(frame_time, u.s) > t_sat):
-            warnings.warn(f"frame_time {frame_time} exceeds saturation_time {t_sat:.3g}; "
-                          "the brightest dark-hole pixel saturates", stacklevel=3)
+            warnings.warn(
+                f"frame_time {frame_time} exceeds saturation_time {t_sat:.3g}; "
+                "the brightest dark-hole pixel saturates",
+                stacklevel=3,
+            )
 
     def get_snr(self, total_time, frame_time):
         """SNR after ``total_time`` on target in frames of ``frame_time``.
@@ -159,8 +208,9 @@ class Simulation(_MetaHolder_):
         """
         rates = self.count_rate_components()
         self._warn_if_saturated(frame_time, rates)
-        return self.noise_model.snr(rates, self.sensor, self.coronagraph,
-                                    total_time, frame_time)
+        return self.noise_model.snr(
+            rates, self.sensor, self.coronagraph, total_time, frame_time
+        )
 
     def get_int_time_for_snr(self, snr, frame_time):
         """Integration time to reach ``snr`` with frames of ``frame_time``
@@ -172,8 +222,9 @@ class Simulation(_MetaHolder_):
         """
         rates = self.count_rate_components()
         self._warn_if_saturated(frame_time, rates)
-        return self.noise_model.int_time_for_snr(snr, rates, self.sensor,
-                                                 self.coronagraph, frame_time)
+        return self.noise_model.int_time_for_snr(
+            snr, rates, self.sensor, self.coronagraph, frame_time
+        )
 
     def saturation_time(self):
         """Frame time at which the brightest dark-hole pixel reaches
@@ -189,8 +240,10 @@ class Simulation(_MetaHolder_):
 
     def _saturation_time(self, r):
         s = self.sensor
-        peak = ((r.source + r.speckle) * s.peak_pixel_fraction
-                + (r.zodi + r.exozodi) / s.num_psf_pixels.value) / u.pix + s.dark_current
+        peak = (
+            (r.source + r.speckle) * s.peak_pixel_fraction
+            + (r.zodi + r.exozodi) / s.num_psf_pixels.value
+        ) / u.pix + s.dark_current
         return (s.headroom * s.well_depth / peak).to(u.s)
 
     def is_saturated(self, frame_time):

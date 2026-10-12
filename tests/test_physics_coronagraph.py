@@ -4,6 +4,7 @@ Measured 2026-06-01: speckle_counts is linear in contrast (1e-9/1e-8/1e-7 ->
 0.0916/0.9158/9.158); noise floor M = speckle_counts * (1/ppgain_input), and
 esc.ppgain == 1/ppgain_input (input 10 -> 0.1).
 """
+
 import pytest
 
 

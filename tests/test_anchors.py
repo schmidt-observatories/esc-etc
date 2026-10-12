@@ -5,6 +5,7 @@ editable esc_etc install, re-pinned 2026-09-12 for the single-aperture model
 area 1.56 x throughput 3.52 x FPM 1.07), then again 2026-09-13 for the
 encircled-energy default (point-source rates x0.456, Airy EE in the resel). If one changes, investigate before editing it.
 """
+
 import astropy.units as u
 import pytest
 
