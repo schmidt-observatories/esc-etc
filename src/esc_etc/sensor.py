@@ -175,6 +175,16 @@ class Sensor(_MetaHolder_):
             self.peak_pixel_fraction = float((np.pi / 4) / ppl ** 2 / self.ee_fraction)
             self.meta["peak_pixel_fraction"] = self.peak_pixel_fraction
 
+    def plot_bandpass(self, **kw):
+        """See :func:`esc_etc.plotting.plot_bandpass`."""
+        from . import plotting
+        return plotting.plot_bandpass(self, **kw)
+
+    def plot_aperture(self, **kw):
+        """See :func:`esc_etc.plotting.plot_aperture`."""
+        from . import plotting
+        return plotting.plot_aperture(self, **kw)
+
     @classmethod
     def from_config(cls, instrument_config, instrument_support_path, telescope_config,
                     telescope_support_path, telescope, arm="arm_a", filter=None,

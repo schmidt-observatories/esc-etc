@@ -29,6 +29,7 @@ from .sensor import Sensor
 from .scene import Scene, get_scene, mag_units
 from .coronagraph import Coronagraph
 from .noise import CountRates, AnalyticCoronagraphNoiseModel
+from . import plotting
 
 FORCE = None
 
@@ -166,4 +167,34 @@ class Simulation(_MetaHolder_):
         return (s.headroom * s.well_depth / peak).to(u.s)
 
     def is_saturated(self, frame_time):
-        return frame_time > self.saturation_time()
+        return u.Quantity(frame_time, u.s) > self.saturation_time()
+
+    # Plots: thin delegates to esc_etc.plotting, which documents the keywords.
+    # Every one accepts ax= and returns (fig, ax); plot() returns (fig, axes).
+    def plot(self, **kw):
+        """2 x 3 overview; see :func:`esc_etc.plotting.plot_overview`."""
+        return plotting.plot_overview(self, **kw)
+
+    def plot_count_rates(self, **kw):
+        """See :func:`esc_etc.plotting.plot_count_rates`."""
+        return plotting.plot_count_rates(self, **kw)
+
+    def plot_snr_vs_time(self, **kw):
+        """See :func:`esc_etc.plotting.plot_snr_vs_time` (supports ``sweep=``)."""
+        return plotting.plot_snr_vs_time(self, **kw)
+
+    def plot_bandpass(self, **kw):
+        """See :func:`esc_etc.plotting.plot_bandpass`."""
+        return plotting.plot_bandpass(self.sensor, **kw)
+
+    def plot_spectra(self, **kw):
+        """See :func:`esc_etc.plotting.plot_spectra`."""
+        return plotting.plot_spectra(self.scene, **kw)
+
+    def plot_offaxis_throughput(self, **kw):
+        """See :func:`esc_etc.plotting.plot_offaxis_throughput`."""
+        return plotting.plot_offaxis_throughput(self.coronagraph, **kw)
+
+    def plot_aperture(self, **kw):
+        """See :func:`esc_etc.plotting.plot_aperture`."""
+        return plotting.plot_aperture(self.sensor, **kw)

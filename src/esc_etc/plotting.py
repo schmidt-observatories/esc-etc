@@ -7,7 +7,6 @@ keywords, accepts ax=None, applies the lazuli style via a context manager, and
 returns (fig, ax). The style ships as data/lazuli.mplstyle (byte-identical to the
 canonical lazuli-transit copy).
 """
-import dataclasses
 import importlib.resources
 
 import numpy as np
@@ -107,33 +106,66 @@ def plot_count_rates(sim=None, *, rates=None, sensor=None, ax=None, log=True):
     return fig, ax
 
 
-def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None, ax=None):
+def _snr_curve(sim, total_times, frame_time):
+    """SNR at each of ``total_times`` with the count rates evaluated once.
+    Intentionally bypasses sim.get_snr, which recomputes the rates per call."""
+    rates = sim.count_rate_components()
+    return np.array([
+        sim.noise_model.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]
+        for t in total_times
+    ], dtype=float)
+
+
+def _get_nested(obj, key):
+    """Value of an ``update``-style key such as ``"coronagraph__ppgain"``."""
+    for part in key.split("__"):
+        obj = getattr(obj, part)
+    return obj
+
+
+def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
+                     sweep=None, ax=None):
     """SNR vs total integration time (log-log).
 
     Pass a Simulation (sweeps `total_times`, default logspace from one frame to
     1e5 s, computing SNR per point via the engine's noise_model with a single
     count-rate evaluation), or explicit `(total_times, snrs)`. `frame_time`
-    defaults to 100 s. Returns (fig, ax).
+    defaults to 100 s.
+
+    ``sweep={"coronagraph__raw_dh_contrast": [1e-7, 1e-8, 1e-9]}`` draws one
+    curve per value of one ``update``-style parameter (any nesting, e.g.
+    ``"scene__zodi__mag"``) and puts the original value back afterwards.
+    Returns (fig, ax).
     """
     if frame_time is None:
         frame_time = 100 * u.s
     if total_times is None and sim is not None:
         t0 = np.log10(u.Quantity(frame_time, u.s).value)
         total_times = np.logspace(t0, max(5, t0 + 1), 40) * u.s
-    if snrs is None:
-        _require(sim, "snrs", "total_times")
-        # Intentionally bypasses sim.get_snr (which recomputes count rates each call):
-        # evaluate count rates ONCE, then vary only the time in the noise model.
-        rates = sim.count_rate_components()
-        snrs = np.array([
-            sim.noise_model.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]
-            for t in total_times
-        ], dtype=float)
+    if sweep is not None:
+        _require(sim, "sim", "sweep")
+        (key, values), = sweep.items()
+        previous = _get_nested(sim, key)
+        curves = []
+        try:
+            for v in values:
+                sim.update(**{key: v})
+                curves.append((f"{key.rsplit('__', 1)[-1]} = {v:g}", _snr_curve(sim, total_times, frame_time)))
+        finally:
+            sim.update(**{key: previous})
+    else:
+        if snrs is None:
+            _require(sim, "snrs", "total_times")
+            snrs = _snr_curve(sim, total_times, frame_time)
+        curves = [(None, np.asarray(snrs, dtype=float))]
 
     t_s = u.Quantity(total_times, u.s).value
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
-        ax.loglog(t_s, np.asarray(snrs, dtype=float), color=TEAL)
+        for i, (label, y) in enumerate(curves):
+            ax.loglog(t_s, y, color=LAZULI_COLORS[i % len(LAZULI_COLORS)], label=label)
+        if sweep is not None:
+            ax.legend()
         ax.set_xlabel("Integration time [s]")
         ax.set_ylabel("SNR")
         _apply_axis_cosmetics(ax)
@@ -285,55 +317,23 @@ def plot_aperture(sensor=None, *, ax=None, half_lamD=2.5):
     return fig, ax
 
 
-def plot_snr_vs_zodi(sim=None, *, factors=(0, 3, 10, 100, 1000, 10000), which="zodi",
-                     frame_time=None, total_times=None, snr_target=5.0, axes=None):
-    """SNR vs time (left) and time-to-``snr_target`` (right) as the ``which``
-    background ("zodi" or "exozodi") is scaled by each of ``factors``.
+def plot_overview(sim=None, *, frame_time=None, axes=None):
+    """2 x 3 overview of a Simulation: count rates, SNR vs time, bandpass;
+    off-axis throughput, aperture footprint, scene spectra.
 
-    Factor 1 is the scene as built (``bg_flux`` for zodi, ``hoststarmag +
-    exobg_flux`` for exozodi); 0 removes that background entirely. Count rates
-    are evaluated once and only the chosen background rate is rescaled, so the
-    sweep is cheap. Returns (fig, (ax_snr, ax_time)).
+    ``axes`` may be an existing 2 x 3 array of axes. Returns (fig, axes).
     """
     _require(sim, "sim", "nothing else")
-    if frame_time is None:
-        frame_time = 100 * u.s
-    if total_times is None:
-        t0 = np.log10(u.Quantity(frame_time, u.s).value)
-        total_times = np.logspace(t0, max(5, t0 + 1), 40) * u.s
-    base = sim.count_rate_components()
-    el = getattr(sim.scene, which)
-    nm = sim.noise_model
-    curves, t_snr = [], []
-    for f in factors:
-        rates = dataclasses.replace(base, **{which: getattr(base, which) * f})
-        curves.append([nm.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]
-                       for t in total_times])
-        r = nm.int_time_for_snr(snr_target, rates, sim.sensor, sim.coronagraph, frame_time)
-        t_snr.append(float(np.atleast_1d(r["int_time_continuous"].to_value(u.s))[0]))
-    t_s = u.Quantity(total_times, u.s).value
-    cmap = plt.get_cmap("viridis")
-
-    with lazuli_style():
-        if axes is None:
-            fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
-        else:
-            fig = axes[0].figure
-        ax1, ax2 = axes
-        for k, (f, c) in enumerate(zip(factors, curves)):
-            ax1.loglog(t_s, np.asarray(c, dtype=float), color=cmap(k / max(1, len(factors) - 1)),
-                       label=f"{f:g}x")
-        ax1.axhline(snr_target, color="0.5", ls="--", lw=1)
-        ax1.set_xlabel("Integration time [s]"); ax1.set_ylabel("SNR")
-        ax1.legend(title=f"{which} scale", fontsize=8)
-        x = np.arange(len(factors))
-        ax2.plot(x, np.asarray(t_snr) / 3600, "o-", color=TEAL)
-        ax2.set_yscale("log")
-        ax2.set_xticks(x); ax2.set_xticklabels([f"{f:g}" for f in factors])
-        ax2.set_xlabel(f"{which} scale factor"); ax2.set_ylabel(f"time to SNR = {snr_target:g} [hr]")
-        ref = f"{el.mag:.1f} mag/arcsec$^2$" + (" (V)" if which == "zodi" else " (ESC band)")
-        fig.suptitle(f"1x = scene {which} at {ref}; frame {u.Quantity(frame_time, u.s).value:g} s",
-                     fontsize=10)
-        for ax in axes:
-            _apply_axis_cosmetics(ax)
+    if axes is None:
+        with lazuli_style():
+            fig, axes = plt.subplots(2, 3, figsize=(14, 8), layout="constrained")
+    else:
+        fig = np.asarray(axes).flat[0].figure
+    a = np.asarray(axes)
+    plot_count_rates(sim, ax=a[0, 0])
+    plot_snr_vs_time(sim, frame_time=frame_time, ax=a[0, 1])
+    plot_bandpass(sim, ax=a[0, 2])
+    plot_offaxis_throughput(sim, ax=a[1, 0])
+    plot_aperture(sim, ax=a[1, 1])
+    plot_spectra(sim, ax=a[1, 2])
     return fig, axes

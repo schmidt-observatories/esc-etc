@@ -106,6 +106,11 @@ class Coronagraph(_MetaHolder_):
         idx = np.absolute(self._lamD - lamD_separation).argmin()
         return float(self._throughput[idx])
 
+    def plot_offaxis_throughput(self, **kw):
+        """See :func:`esc_etc.plotting.plot_offaxis_throughput`."""
+        from . import plotting
+        return plotting.plot_offaxis_throughput(self, **kw)
+
     def speckle_scale(self):
         """Stellar-leakage rate in the extraction aperture per unit host rate."""
         return self.raw_dh_contrast
