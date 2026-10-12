@@ -18,3 +18,65 @@ jobs:
           python-version: '3.11'
       - run: python -m pip install --upgrade pip && pip install -e ".[dev]"
       - run: python -m pytest -q
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install ruff
+
+      # Gated on F (undefined names, unused imports) and on formatting.
+      # E, I and UP are reported but not gated yet.
+      - name: ruff check (F)
+        run: ruff check src tests --select F
+      - name: ruff format
+        run: ruff format --check src tests
+      - name: ruff check (E, I, UP), advisory
+        continue-on-error: true
+        run: ruff check src --select E,I,UP
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # setuptools-scm needs the tags for the version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build sdist and wheel
+        run: |
+          pip install build twine
+          python -m build
+          twine check dist/*
+
+      - name: Audit artifact contents
+        run: python .github/scripts/audit_artifacts.py
+
+      # Import the installed wheel from outside the source tree, so a data file
+      # missing from the wheel fails here rather than on a user's machine.
+      - name: Smoke-test the installed wheel
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install --upgrade pip
+          /tmp/smoke/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/smoke/bin/python - <<'EOF'
+          # The README Quick Start, verbatim.
+          import matplotlib
+          matplotlib.use("Agg")
+          from esc_etc import Simulation
+
+          sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20,
+                                        contrast=1e-8, ppgain=10, separation=0.4)
+          snr = sim.get_snr(total_time=3600, frame_time=100)["snr"]
+          assert 9 < snr < 11, snr
+          print("installed-wheel SNR:", snr)
+          sim.plot()                                                    # packaged lazuli.mplstyle
+          Simulation.from_default(filter="F630N", lifetime="eol").get_snr(3600, 100)  # bundled EOL curves
+          Simulation.from_default(filter="F630N", lifetime="bol").get_snr(3600, 100)  # bundled BOL curves
+          EOF

@@ -26,7 +26,7 @@ pip install -e .
 
 With optional extras:
 ```sh
-pip install -e ".[dev]"    # development tools (pytest, build, twine)
+pip install -e ".[dev]"    # development tools (pytest, ruff, build, twine)
 pip install -e ".[docs]"   # documentation build (Sphinx, nbsphinx, etc.)
 ```
 
@@ -105,11 +105,13 @@ pip install -r scripts/requirements-uasal.txt
 python scripts/sync_uasal_configs.py
 ```
 
+What ships in the wheel and where each file comes from is listed in [`DATA_SOURCES.md`](DATA_SOURCES.md).
+
 Your own configuration can be supplied through the `from_config` class methods, as long as it follows the same organizational structure as the UASAL repositories.
 
 ## Tests
 
-`pip install -e ".[dev]"` then `pytest`. The same suite runs on every pull request through `.github/workflows/tests.yml`.
+`pip install -e ".[dev]"` then `pytest`. On every pull request `.github/workflows/tests.yml` runs the suite, `ruff check --select F` and `ruff format --check` on `src` and `tests`, and builds the sdist and wheel, checks them with `twine`, audits their contents and smoke-tests the installed wheel with the Quick Start above.
 
 ## Documentation
 

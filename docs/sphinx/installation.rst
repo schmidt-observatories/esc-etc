@@ -63,7 +63,7 @@ The package ships with a ``pytest`` suite. From the repository root:
 
 .. code-block:: bash
 
-   pip install -e '.[dev]'    # editable install + pytest
+   pip install -e '.[dev]'    # editable install + pytest, ruff, build, twine
    pytest
 
 The same suite runs on every pull request (``.github/workflows/tests.yml``).

@@ -1,0 +1,12 @@
+# What the sdist carries. setuptools-scm seeds the file list with every
+# git-tracked file, so untracked scratch never gets in; this trims the tracked
+# parts a PyPI consumer does not need (docs, notebooks, maintainer scripts, CI).
+# The wheel's data files are listed in [tool.setuptools.package-data] and the
+# build job audits both artifacts (.github/scripts/audit_artifacts.py).
+include README.md LICENSE COPYRIGHT DATA_SOURCES.md pyproject.toml
+prune docs
+prune notebooks
+prune scripts
+prune .github
+exclude .gitignore .readthedocs.yaml
+global-exclude .DS_Store *.swp *.swo *~ *.pyc __pycache__ *.prof
