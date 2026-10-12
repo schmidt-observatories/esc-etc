@@ -1,0 +1,109 @@
+name: Publish
+
+# Tag-driven release. Push v0.2.0rc1 -> TestPyPI; push v0.2.0 -> PyPI.
+# workflow_dispatch builds and audits without publishing (a dry run).
+#
+# The version comes from setuptools-scm, so the tag IS the version: tag the
+# release commit on main as vX.Y.Z and the wheel is X.Y.Z. The "check the tag"
+# step fails if the built wheel's version differs from the tag (a tag on a
+# commit with uncommitted or untagged history gives X.Y.Z.postN+g...).
+#
+# Publishing uses PyPI trusted publishing: no API tokens in secrets. One-time
+# setup: on pypi.org (and test.pypi.org) add a "pending publisher" for
+# owner schmidt-observatories, repository esc-etc, workflow publish.yml,
+# environment "pypi" ("testpypi"), and create those two environments under
+# Settings > Environments in this repository.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # setuptools-scm needs the tags for the version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build sdist and wheel
+        run: |
+          pip install build twine
+          python -m build
+          twine check dist/*
+
+      - name: Check the tag matches the built version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          built=$(ls dist/*.whl | sed -E 's#.*/esc_etc-([^-]+)-.*#\1#')
+          echo "tag=$tag built=$built"
+          test "$tag" = "$built" || { echo "::error::tag v$tag does not match wheel version $built (tag a clean commit on main)"; exit 1; }
+
+      - name: Audit artifact contents
+        run: python .github/scripts/audit_artifacts.py
+
+      # Same smoke test as tests.yml: import the installed wheel from outside
+      # the source tree and run the README Quick Start.
+      - name: Smoke-test the installed wheel
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install --upgrade pip
+          /tmp/smoke/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/smoke/bin/python - <<'PY'
+          import matplotlib
+          matplotlib.use("Agg")
+          from esc_etc import Simulation
+
+          sim = Simulation.from_default(hoststarmag=-0.353, planetdeltamag=20,
+                                        contrast=1e-8, ppgain=10, separation=0.4)
+          snr = sim.get_snr(total_time=3600, frame_time=100)["snr"]
+          assert 9 < snr < 11, snr
+          print("installed-wheel SNR:", snr)
+          sim.plot()
+          Simulation.from_default(filter="F630N", lifetime="eol").get_snr(3600, 100)
+          Simulation.from_default(filter="F630N", lifetime="bol").get_snr(3600, 100)
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  testpypi:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref_name, 'rc')
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  pypi:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, 'rc')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
