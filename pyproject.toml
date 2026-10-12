@@ -13,11 +13,11 @@ authors = [
   {name = "Gudmundur Stefansson", email = "gstefansson@schmidtsciences.org"}
 ]
 maintainers = [
-  {name = "Justin Hom", email = "jrhom@arizona.edu"}
+  {name = "Gudmundur Stefansson", email = "gstefansson@schmidtsciences.org"}
 ]
-description = "Exposure time calculator for the ExtraSolar Camera (ESC) on the UA Ultramarine 3 m"
+description = "Exposure time calculator for the ExtraSolar Camera (ESC) on Lazuli"
 readme = "README.md"
-license = "GPL-3.0-or-later"
+license = "BSD-3-Clause"
 license-files = ["LICENSE", "COPYRIGHT"]
 requires-python = ">=3.11"
 # The UASAL config_um / config_um_esc files are vendored under

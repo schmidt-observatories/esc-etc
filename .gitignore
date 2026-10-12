@@ -219,3 +219,8 @@ report/
 review/
 manual/
 memo/
+
+# esc-etc: internal planning docs and local scratch (not part of the package)
+docs/superpowers/
+notebook_scrap/
+src/esc_etc/data/esc_filters_eol_old/

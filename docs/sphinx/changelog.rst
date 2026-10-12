@@ -1,13 +1,17 @@
 Changelog
 =========
 
-This page summarizes notable changes. The authoritative history is the git log
-and the design specs under ``docs/superpowers/``. A detailed list of the changes
+This page summarizes notable changes. The authoritative history is the git
+log. A detailed list of the changes
 made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 
 Unreleased
 ----------
 
+- **License.** The package is released under the BSD 3-Clause license (it
+  was GPL-3.0-or-later), matching wcc-etc. Gudmundur Stefansson is the
+  maintainer. The legacy demo notebook, ``etc_esc_requirements.py`` and the
+  internal planning documents are no longer tracked.
 - **Sensor units.** ``sim.update(sensor__read_noise=5)`` and the same for
   ``dark_current``, ``well_depth`` and ``gain`` now read a plain number in the
   sensor's own unit; before, the next ``get_snr`` raised ``UnitConversionError``.
@@ -21,7 +25,7 @@ Unreleased
   ``config_um_esc``) is vendored as a snapshot under ``esc_etc/data/uasal/``
   and read by ``esc_etc.uasal_config``; the git dependencies are gone, so the
   package installs from a wheel. ``scipy`` is declared, Python 3.11 or newer is
-  required, the license is SPDX ``GPL-3.0-or-later``, and
+  required, and
   :func:`esc_etc.get_data_path` returns the real ``data/`` directory.
   ``scripts/sync_uasal_configs.py`` refreshes the snapshot.
 - **Correctness fixes** (issue #27). SNR no longer depends on the unit
