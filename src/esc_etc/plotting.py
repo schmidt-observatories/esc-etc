@@ -7,11 +7,15 @@ keywords, accepts ax=None, applies the lazuli style via a context manager, and
 returns (fig, ax). The style ships as data/lazuli.mplstyle (byte-identical to the
 canonical lazuli-transit copy).
 """
+import dataclasses
 import importlib.resources
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+from matplotlib.patches import Circle, Rectangle
 import astropy.units as u
+from scipy.special import j1
 
 # Lazuli qualitative palette (hex), in prop_cycle order.
 TEAL = "#00798c"
@@ -221,3 +225,115 @@ def plot_spectra(scene=None, *, which=("star", "planet", "zodi"), ax=None):
         ax.legend()
         _apply_axis_cosmetics(ax)
     return fig, ax
+
+
+def _pixelated_airy(pix_per_lamD, half_pix, sub=10):
+    """Airy PSF integrated onto a (2*half_pix+1)^2 pixel grid centred on a pixel.
+    Returns the fraction of the total flux in each pixel."""
+    n = 2 * half_pix + 1
+    d = 1.0 / sub                                                  # pixel units
+    x = np.arange(n * sub) * d - n / 2 + d / 2
+    X, Y = np.meshgrid(x, x)
+    R = np.hypot(X, Y) / pix_per_lamD                              # lambda/D
+    with np.errstate(invalid="ignore", divide="ignore"):
+        I = np.where(R == 0, 1.0, (2 * j1(np.pi * R) / (np.pi * R)) ** 2)
+    I *= (np.pi / 4) * (d / pix_per_lamD) ** 2
+    return I.reshape(n, sub, n, sub).sum(axis=(1, 3))
+
+
+def plot_aperture(sensor=None, *, ax=None, half_lamD=2.5):
+    """The noise/extraction aperture drawn over a pixel-integrated Airy PSF.
+
+    Pass a Sensor or a Simulation (uses .sensor). Shows the footprint that the
+    SNR terms use: a disk for "resel"/"optimal", the n x n square for "box", and
+    for "matched" a dashed circle of the equivalent area N_eff (there is no hard
+    edge; every pixel is weighted). Axes are in detector pixels. Returns (fig, ax).
+    """
+    if sensor is not None and hasattr(sensor, "sensor"):
+        sensor = sensor.sensor
+    _require(sensor, "sensor", "nothing else")
+    ppl = sensor.pix_per_lamD
+    npix = float(sensor.num_psf_pixels.value)
+    ap = sensor.aperture
+    half_pix = int(np.ceil(half_lamD * ppl))
+    img = _pixelated_airy(ppl, half_pix)
+    ext = (-half_pix - 0.5, half_pix + 0.5, -half_pix - 0.5, half_pix + 0.5)
+
+    with lazuli_style():
+        fig, ax = _prepare_ax(ax)
+        im = ax.imshow(img, extent=ext, origin="lower", cmap="Greys",
+                       norm=LogNorm(vmin=img.max() * 1e-4, vmax=img.max()))
+        for k in np.arange(-half_pix - 0.5, half_pix + 1):          # pixel grid
+            ax.axhline(k, color="w", lw=0.3, alpha=0.5)
+            ax.axvline(k, color="w", lw=0.3, alpha=0.5)
+        if ap == "box":
+            n = int(round(np.sqrt(npix)))
+            ax.add_patch(Rectangle((-n / 2, -n / 2), n, n, fill=False, ec=RED, lw=2))
+        else:
+            r = np.sqrt(npix / np.pi)
+            ax.add_patch(Circle((0, 0), r, fill=False, ec=RED, lw=2,
+                                ls="--" if ap == "matched" else "-"))
+        ax.add_patch(Circle((0, 0), 1.22 * ppl, fill=False, ec=TEAL, lw=1, ls=":"))
+        ax.set_xlim(ext[0], ext[1]); ax.set_ylim(ext[2], ext[3])
+        ax.set_aspect("equal")
+        ax.set_xlabel("pixels"); ax.set_ylabel("pixels")
+        ax.set_title(f"aperture = {ap!r}: {npix:.1f} px, EE = {sensor.ee_fraction:.2f}\n"
+                     f"{ppl:.2f} px per $\\lambda/D$ at {sensor._telescope.primary_filter.to(u.nm):.0f}"
+                     f"  (dotted: first Airy dark ring)", fontsize=10)
+        ax.grid(False); ax.minorticks_off()
+        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.02, label="fraction of PSF flux per pixel")
+    return fig, ax
+
+
+def plot_snr_vs_zodi(sim=None, *, factors=(0, 3, 10, 100, 1000, 10000), which="zodi",
+                     frame_time=None, total_times=None, snr_target=5.0, axes=None):
+    """SNR vs time (left) and time-to-``snr_target`` (right) as the ``which``
+    background ("zodi" or "exozodi") is scaled by each of ``factors``.
+
+    Factor 1 is the scene as built (``bg_flux`` for zodi, ``hoststarmag +
+    exobg_flux`` for exozodi); 0 removes that background entirely. Count rates
+    are evaluated once and only the chosen background rate is rescaled, so the
+    sweep is cheap. Returns (fig, (ax_snr, ax_time)).
+    """
+    _require(sim, "sim", "nothing else")
+    if frame_time is None:
+        frame_time = 100 * u.s
+    if total_times is None:
+        t0 = np.log10(u.Quantity(frame_time, u.s).value)
+        total_times = np.logspace(t0, max(5, t0 + 1), 40) * u.s
+    base = sim.count_rate_components()
+    el = getattr(sim.scene, which)
+    nm = sim.noise_model
+    curves, t_snr = [], []
+    for f in factors:
+        rates = dataclasses.replace(base, **{which: getattr(base, which) * f})
+        curves.append([nm.snr(rates, sim.sensor, sim.coronagraph, t, frame_time)["snr"]
+                       for t in total_times])
+        r = nm.int_time_for_snr(snr_target, rates, sim.sensor, sim.coronagraph, frame_time)
+        t_snr.append(float(np.atleast_1d(r["int_time_continuous"].to_value(u.s))[0]))
+    t_s = u.Quantity(total_times, u.s).value
+    cmap = plt.get_cmap("viridis")
+
+    with lazuli_style():
+        if axes is None:
+            fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+        else:
+            fig = axes[0].figure
+        ax1, ax2 = axes
+        for k, (f, c) in enumerate(zip(factors, curves)):
+            ax1.loglog(t_s, np.asarray(c, dtype=float), color=cmap(k / max(1, len(factors) - 1)),
+                       label=f"{f:g}x")
+        ax1.axhline(snr_target, color="0.5", ls="--", lw=1)
+        ax1.set_xlabel("Integration time [s]"); ax1.set_ylabel("SNR")
+        ax1.legend(title=f"{which} scale", fontsize=8)
+        x = np.arange(len(factors))
+        ax2.plot(x, np.asarray(t_snr) / 3600, "o-", color=TEAL)
+        ax2.set_yscale("log")
+        ax2.set_xticks(x); ax2.set_xticklabels([f"{f:g}" for f in factors])
+        ax2.set_xlabel(f"{which} scale factor"); ax2.set_ylabel(f"time to SNR = {snr_target:g} [hr]")
+        ref = f"{el.mag:.1f} mag/arcsec$^2$" + (" (V)" if which == "zodi" else " (ESC band)")
+        fig.suptitle(f"1x = scene {which} at {ref}; frame {u.Quantity(frame_time, u.s).value:g} s",
+                     fontsize=10)
+        for ax in axes:
+            _apply_axis_cosmetics(ax)
+    return fig, axes

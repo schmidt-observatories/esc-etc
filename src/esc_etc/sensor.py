@@ -165,6 +165,7 @@ class Sensor(_MetaHolder_):
         ppl = lam_d / self.plate_scale
         resel_pix = t.resel.to_value(u.arcsec ** 2) / self.plate_scale ** 2
         npix, ee = aperture_geometry(self.aperture, ppl, resel_pix)
+        self.pix_per_lamD = float(ppl)
         self.num_psf_pixels = npix * u.pix
         self.aperture_solid_angle = npix * self.plate_scale ** 2 * u.arcsec ** 2
         self.ee_fraction = float(ee if self.encircled_energy is None else self.encircled_energy)
