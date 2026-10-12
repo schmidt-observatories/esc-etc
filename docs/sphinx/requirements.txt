@@ -1,21 +1,5 @@
-# Documentation build requirements for the Sphinx site.
-# Build with:  pip install -r docs/sphinx/requirements.txt && pip install -e .
-#
-# Sphinx toolchain
-sphinx>=7
-sphinx-rtd-theme>=2.0
-nbsphinx>=0.9
-ipykernel
-# Optional: enables authoring pages in Markdown in addition to reStructuredText
-myst-parser
-# nbsphinx also needs a `pandoc` binary on the build machine
-# (conda install pandoc  /  apt-get install pandoc  /  brew install pandoc)
-#
-# esc_etc's runtime deps, so autodoc can import the package. Keep in sync with
-# pyproject.toml.
-numpy
-astropy
-synphot
-matplotlib
-pandas
-scipy
+# The documentation toolchain is declared in pyproject.toml as the [docs] extra.
+# Build with:
+#   pip install -e ".[docs]"     # esc_etc + Sphinx + theme + nbsphinx
+#   brew install pandoc          # or conda / apt-get; nbsphinx needs the binary
+#   cd docs/sphinx && make html

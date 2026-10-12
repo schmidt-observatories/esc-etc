@@ -1,5 +1,5 @@
-Legacy API (deprecated)
-=======================
+Legacy API (``esc_etc.ExposureTimeSNRCalculatorESC``, deprecated)
+=================================================================
 
 .. note::
 

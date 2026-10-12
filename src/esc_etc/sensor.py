@@ -201,7 +201,17 @@ class Sensor(_MetaHolder_):
         )
         self._on_update(["aperture"])
 
+    _UNITS = {
+        "read_noise": u.electron**0.5 / u.pix**0.5,
+        "dark_current": u.electron / (u.s * u.pix),
+        "well_depth": u.electron / u.pix,
+        "gain": u.electron / u.ct,
+    }
+
     def _on_update(self, updated_keys):
+        for key, unit in self._UNITS.items():
+            # a bare number means "in the sensor's own unit"; a Quantity is converted
+            setattr(self, key, u.Quantity(getattr(self, key), unit))
         if "peak_pixel_fraction" in updated_keys:
             self._auto_peak = self.peak_pixel_fraction is None
         ee_override = self.encircled_energy
