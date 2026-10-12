@@ -8,6 +8,9 @@ made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 Unreleased
 ----------
 
+- **Docs hosting.** Read the Docs is the only publisher; the GitHub Pages
+  workflow is removed and the Read the Docs build fails on warnings, as a
+  local ``sphinx-build -W`` does.
 - **License.** The package is released under the BSD 3-Clause license (it
   was GPL-3.0-or-later), matching wcc-etc. Gudmundur Stefansson is the
   maintainer. The legacy demo notebook, ``etc_esc_requirements.py`` and the

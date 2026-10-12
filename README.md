@@ -127,4 +127,4 @@ cd docs/sphinx
 make html                  # output in _build/html/index.html
 ```
 
-The tutorial notebooks render from their saved outputs, so nothing is executed at build time. The site is built and published by the `Docs` workflow (`.github/workflows/deploy-docs.yml`) on every push to `main`, and a `.readthedocs.yaml` is included so it also builds on Read the Docs once the repository is connected there.
+The tutorial notebooks render from their saved outputs, so nothing is executed at build time. Read the Docs builds and publishes the site from `.readthedocs.yaml` on every push to `main` and as a preview on every pull request, with warnings treated as errors.
