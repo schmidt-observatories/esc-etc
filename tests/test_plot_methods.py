@@ -88,3 +88,20 @@ def test_single_curve_plots_accept_label(sim, name):
     labels = [l.get_label() for l in ax.get_lines()]
     assert "first" in labels and "second" in labels
     plt.close(ax.figure)
+
+
+def test_snr_vs_time_sweep_accepts_string_valued_parameters(sim):
+    fig, ax = sim.plot_snr_vs_time(sweep={"coronagraph__subtraction": ["none", "rdi"]})
+    assert [l.get_label() for l in ax.get_lines()] == ["subtraction = none", "subtraction = rdi"]
+    assert sim.coronagraph.subtraction == "none"
+    plt.close(fig)
+
+
+def test_snr_vs_time_sweep_over_peak_pixel_fraction_keeps_auto_model():
+    sim = Simulation.from_default()
+    fig, ax = sim.plot_snr_vs_time(sweep={"sensor__peak_pixel_fraction": [0.1, 0.2]})
+    plt.close(fig)
+    sim.update(sensor__aperture="box")
+    fresh = Simulation.from_default(); fresh.update(sensor__aperture="box")
+    assert sim.sensor.peak_pixel_fraction == pytest.approx(fresh.sensor.peak_pixel_fraction)
+    assert sim.saturation_time() == fresh.saturation_time()

@@ -173,7 +173,7 @@ class Sensor(_MetaHolder_):
             # brightest pixel: pi/4 of the total per (lambda/D)^2, relative to the
             # in-aperture rate (ponytail: Airy, no Lyot broadening or pixel integration)
             self.peak_pixel_fraction = float((np.pi / 4) / ppl ** 2 / self.ee_fraction)
-            self.meta["peak_pixel_fraction"] = self.peak_pixel_fraction
+            # meta keeps None: it records what was set, so a restore re-enters auto mode
 
     def plot_bandpass(self, **kw):
         """See :func:`esc_etc.plotting.plot_bandpass`."""

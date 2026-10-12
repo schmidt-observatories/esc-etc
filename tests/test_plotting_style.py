@@ -1,4 +1,5 @@
 # tests/test_plotting_style.py
+import pytest
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -57,6 +58,20 @@ def test_lazuli_style_keeps_interactive_state_switched_on_inside_the_context():
         matplotlib.interactive(False)
         with lazuli_style():
             matplotlib.interactive(True)
+        assert matplotlib.is_interactive()
+    finally:
+        matplotlib.interactive(before)
+
+
+def test_lazuli_style_keeps_interactive_state_when_the_body_raises():
+    import matplotlib
+    before = matplotlib.is_interactive()
+    try:
+        matplotlib.interactive(False)
+        with pytest.raises(RuntimeError):
+            with lazuli_style():
+                matplotlib.interactive(True)      # the inline backend activating
+                raise RuntimeError("plot failed")
         assert matplotlib.is_interactive()
     finally:
         matplotlib.interactive(before)

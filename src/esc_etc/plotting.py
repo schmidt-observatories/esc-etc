@@ -35,17 +35,25 @@ def _style_path():
 
 @contextlib.contextmanager
 def lazuli_style():
-    """Context manager applying the lazuli style without touching global rcParams.
+    """Context manager applying the lazuli style without touching global rcParams,
+    except that interactive mode switched on inside the block (Jupyter's inline
+    backend does this on the first figure) stays on.
 
     Usage: ``with lazuli_style(): ...``. Every helper wraps its drawing in this.
     """
-    with plt.style.context(str(_style_path())):
-        yield
-        # Jupyter's inline backend switches interactive mode on when the first
-        # figure is created, i.e. inside this block; style.context would restore
-        # the old value on exit and every later figure would go undisplayed.
-        interactive = matplotlib.is_interactive()
-    matplotlib.interactive(interactive)
+    # Jupyter's inline backend switches interactive mode on when the first
+    # figure is created, i.e. inside this block; style.context would restore
+    # the old value on exit and every later figure would go undisplayed. Keep
+    # the flag as it stood at the end of the block, even if the block raised.
+    interactive = matplotlib.is_interactive()
+    try:
+        with plt.style.context(str(_style_path())):
+            try:
+                yield
+            finally:
+                interactive = matplotlib.is_interactive()
+    finally:
+        matplotlib.interactive(interactive)
 
 
 def use_lazuli_style():
@@ -125,11 +133,20 @@ def _snr_curve(sim, total_times, frame_time):
     ], dtype=float)
 
 
-def _get_nested(obj, key):
-    """Value of an ``update``-style key such as ``"coronagraph__ppgain"``."""
-    for part in key.split("__"):
-        obj = getattr(obj, part)
-    return obj
+def _owner_and_attr(sim, key):
+    """(component, attribute) for an ``update``-style key such as ``"coronagraph__ppgain"``."""
+    *path, attr = key.split("__")
+    owner = sim
+    for part in path:
+        owner = getattr(owner, part)
+    return owner, attr
+
+
+def _fmt(value):
+    try:
+        return format(value, "g")
+    except (TypeError, ValueError):      # strings and other non-numbers
+        return str(value)
 
 
 def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
@@ -155,12 +172,13 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
     if sweep is not None:
         _require(sim, "sim", "sweep")
         (key, values), = sweep.items()
-        previous = _get_nested(sim, key)
+        owner, attr = _owner_and_attr(sim, key)
+        previous = owner.meta[attr]      # what was set, not a derived value (None = automatic)
         curves = []
         try:
             for v in values:
                 sim.update(**{key: v})
-                curves.append((f"{key.rsplit('__', 1)[-1]} = {v:g}", _snr_curve(sim, total_times, frame_time)))
+                curves.append((f"{attr} = {_fmt(v)}", _snr_curve(sim, total_times, frame_time)))
         finally:
             sim.update(**{key: previous})
     else:
