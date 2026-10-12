@@ -133,7 +133,7 @@ def _get_nested(obj, key):
 
 
 def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
-                     sweep=None, ax=None):
+                     sweep=None, label=None, ax=None):
     """SNR vs total integration time (log-log).
 
     Pass a Simulation (sweeps `total_times`, default logspace from one frame to
@@ -144,7 +144,8 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
     ``sweep={"coronagraph__raw_dh_contrast": [1e-7, 1e-8, 1e-9]}`` draws one
     curve per value of one ``update``-style parameter (any nesting, e.g.
     ``"scene__zodi__mag"``) and puts the original value back afterwards.
-    Returns (fig, ax).
+    ``label`` names the single curve (for a legend when drawing several onto
+    one ``ax``). Returns (fig, ax).
     """
     if frame_time is None:
         frame_time = 100 * u.s
@@ -166,14 +167,14 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
         if snrs is None:
             _require(sim, "snrs", "total_times")
             snrs = _snr_curve(sim, total_times, frame_time)
-        curves = [(None, np.asarray(snrs, dtype=float))]
+        curves = [(label, np.asarray(snrs, dtype=float))]
 
     t_s = u.Quantity(total_times, u.s).value
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
-        for i, (label, y) in enumerate(curves):
-            ax.loglog(t_s, y, color=LAZULI_COLORS[i % len(LAZULI_COLORS)], label=label)
-        if sweep is not None:
+        for i, (lab, y) in enumerate(curves):
+            ax.loglog(t_s, y, color=None if label else LAZULI_COLORS[i % len(LAZULI_COLORS)], label=lab)
+        if sweep is not None or label is not None:
             ax.legend()
         ax.set_xlabel("Integration time [s]")
         ax.set_ylabel("SNR")
@@ -182,7 +183,7 @@ def plot_snr_vs_time(sim=None, *, total_times=None, frame_time=None, snrs=None,
 
 
 def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=None,
-                            ax=None, mark_separation=True):
+                            label=None, ax=None, mark_separation=True):
     """Coronagraph off-axis (FPM) throughput vs planet separation (arcsec).
 
     Pass a Coronagraph, a Simulation (uses .coronagraph), or explicit
@@ -201,7 +202,7 @@ def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=N
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
         ax.plot(np.asarray(separations, dtype=float),
-                np.asarray(throughputs, dtype=float), color=TEAL)
+                np.asarray(throughputs, dtype=float), color=None if label else TEAL, label=label)
         if mark_separation and coronagraph is not None:
             ax.axvline(coronagraph.separation, color=RED, ls="--", lw=1.0,
                        label=f"separation = {coronagraph.separation} arcsec")
@@ -212,7 +213,7 @@ def plot_offaxis_throughput(coronagraph=None, *, separations=None, throughputs=N
     return fig, ax
 
 
-def plot_bandpass(sensor=None, *, wavelength=None, throughput=None, ax=None):
+def plot_bandpass(sensor=None, *, wavelength=None, throughput=None, label=None, ax=None):
     """Instrument bandpass throughput vs wavelength (nm).
 
     Pass a Sensor, a Simulation (uses .sensor), or explicit (wavelength, throughput).
@@ -235,7 +236,9 @@ def plot_bandpass(sensor=None, *, wavelength=None, throughput=None, ax=None):
     with lazuli_style():
         fig, ax = _prepare_ax(ax)
         ax.plot(np.asarray(wavelength, dtype=float),
-                np.asarray(throughput, dtype=float), color=TEAL)
+                np.asarray(throughput, dtype=float), color=None if label else TEAL, label=label)
+        if label is not None:
+            ax.legend()
         ax.set_xlabel("Wavelength [nm]")
         ax.set_ylabel("Throughput")
         _apply_axis_cosmetics(ax)

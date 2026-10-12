@@ -78,3 +78,13 @@ def test_plot_snr_vs_zodi_is_gone():
 def test_is_saturated_accepts_plain_float_seconds(sim):
     assert sim.is_saturated(100.0) == sim.is_saturated(100 * u.s)
     assert bool(sim.is_saturated(1e9)) is True
+
+
+@pytest.mark.parametrize("name", ["plot_snr_vs_time", "plot_bandpass", "plot_offaxis_throughput"])
+def test_single_curve_plots_accept_label(sim, name):
+    _, ax = plt.subplots()
+    getattr(sim, name)(ax=ax, label="first")
+    getattr(sim, name)(ax=ax, label="second")
+    labels = [l.get_label() for l in ax.get_lines()]
+    assert "first" in labels and "second" in labels
+    plt.close(ax.figure)
