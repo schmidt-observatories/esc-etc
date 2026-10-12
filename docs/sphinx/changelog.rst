@@ -8,6 +8,13 @@ made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 Unreleased
 ----------
 
+- **Release hygiene** (issue #27). ``esc_calc_snr(plot=True)`` draws the
+  overview instead of ignoring the argument. ``Sensor.from_config`` computes
+  the plate scale with units (a 2 ppm change from the exact arcsec-per-radian
+  factor), and the instrument numbers that are not in the
+  configuration files are named module constants in ``esc_etc.sensor``. The
+  legacy STP 6.5 m test module, which could only run with University of
+  Arizona packages that are not public, is removed with its test data.
 - **Docs hosting.** Read the Docs is the only publisher; the GitHub Pages
   workflow is removed and the Read the Docs build fails on warnings, as a
   local ``sphinx-build -W`` does.

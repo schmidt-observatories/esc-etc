@@ -1,6 +1,12 @@
 # tests/test_api_equivalence.py
-"""The new OO engine must reproduce the frozen legacy grid, and the fluent
-Simulation API must agree with the esc_calc_snr shim."""
+"""Regression grid for esc_calc_snr, and the fluent Simulation API must agree
+with that shim.
+
+test_data/legacy_snr_grid.json is a snapshot of the shim's own output, taken
+by generate_legacy_grid.py and regenerated after each deliberate physics change
+(see its docstring for the dates and ratios). It guards against accidental
+changes, not against the pre-refactor engine, whose numbers it no longer
+reproduces."""
 
 import json
 import os
@@ -24,7 +30,8 @@ def test_new_engine_matches_legacy_grid(record):
     assert float(snr) == pytest.approx(record["snr"], rel=2e-3)
     assert esc.source_counts.value == pytest.approx(record["source_counts"], rel=2e-3)
     assert esc.speckle_counts.value == pytest.approx(record["speckle_counts"], rel=2e-3)
-    assert esc.num_psf_pixels.value == pytest.approx(record["num_psf_pixels"])
+    # 1e-4: the fixture predates the exact arcsec-per-radian plate scale (2 ppm)
+    assert esc.num_psf_pixels.value == pytest.approx(record["num_psf_pixels"], rel=1e-4)
 
 
 def test_fluent_api_matches_shim():

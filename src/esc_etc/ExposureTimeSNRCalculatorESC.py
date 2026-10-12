@@ -72,6 +72,7 @@ def esc_calc_snr(
     Historical time mapping (plan physics-fact #5): total integration time is
     this function's `exp_time`; per-frame time is `int_time`.
 
+    ``plot=True`` draws the :meth:`~esc_etc.Simulation.plot` overview.
     ``lifetime`` picks the ``"eol"`` (default) or ``"bol"`` filter curve set;
     ``aperture`` the noise aperture (``"resel"`` default, ``"optimal"``,
     ``"box"``, ``"matched"``) - see :class:`esc_etc.sensor.Sensor`.
@@ -96,4 +97,6 @@ def esc_calc_snr(
     )
     sim.sensor.update(aperture=aperture)
     out = sim.get_snr(total_time=exp_time * u.s, frame_time=int_time * u.s)
+    if plot:
+        sim.plot()
     return out["snr"], Observatory(sim)
