@@ -64,6 +64,8 @@ def _reference_variance(rates, sensor, coronagraph, total_time, frame_time):
 
 class AnalyticCoronagraphNoiseModel:
     def snr(self, rates, sensor, coronagraph, total_time, frame_time):
+        total_time = u.Quantity(total_time, u.s)   # plain numbers are seconds
+        frame_time = u.Quantity(frame_time, u.s)
         _require_positive(total_time=total_time, frame_time=frame_time)
         M = rates.speckle * coronagraph.noise_floor_factor()
         var_ref = _reference_variance(rates, sensor, coronagraph, total_time, frame_time)
@@ -76,6 +78,8 @@ class AnalyticCoronagraphNoiseModel:
         snr = rates.source * total_time / total_noise
         tau = coronagraph.ref_time_ratio if coronagraph.subtraction == "rdi" else 0.0
         return {
+            # legacy algebra leaves a spurious electron^(1/2) on the ratio; with
+            # the times in seconds the value is the dimensionless SNR
             "snr": snr.value,
             "signal_e": (rates.source * total_time).value,
             "noise_e": total_noise.value,
@@ -93,6 +97,7 @@ class AnalyticCoronagraphNoiseModel:
         the shortest realizable schedule that meets ``snr``. NaN when
         unreachable (systematic floor).
         """
+        frame_time = u.Quantity(frame_time, u.s)   # plain numbers are seconds
         _require_positive(snr=snr, frame_time=frame_time)
         SNR = snr * u.ct
         M = rates.speckle * coronagraph.noise_floor_factor() / u.ct
