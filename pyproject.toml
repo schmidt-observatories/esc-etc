@@ -35,9 +35,9 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = ["pytest", "build", "twine", "ruff"]
-# Sphinx toolchain for the docs site under docs/sphinx/. CI and Read the Docs use
-# `pip install -r docs/sphinx/requirements.txt && pip install -e .`.
-# nbsphinx also requires a `pandoc` binary on the build machine.
+# Sphinx toolchain for the docs site under docs/sphinx/; CI and Read the Docs
+# install it with `pip install -e ".[docs]"`. nbsphinx also needs a `pandoc`
+# binary on the build machine.
 docs = [
   "sphinx>=7",
   "sphinx-rtd-theme>=2.0",
