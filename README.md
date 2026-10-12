@@ -7,7 +7,7 @@ Exposure Time Calculator (ETC) for the ExtraSolar Camera (ESC), the coronagraphi
 
 A web-based ETC is available here: https://simulators.schmidtobservatorysystem.org/esc/
 
-Derived from the exposure time calculator developed by Aaron Goldtooth, with updates from Justin Hom and contributions from Sanchit Sabhlok and Jess Johnson.
+Adapted and extended from the exposure time calculator developed by Aaron Goldtooth at the University of Arizona ([uasal/stp_etc_esc](https://github.com/uasal/stp_etc_esc)), with updates from Justin Hom and contributions from Sanchit Sabhlok and Jess Johnson.
 
 # Installation
 
@@ -99,7 +99,7 @@ Also on the documentation site, with the issue links. In short:
 - Not yet validated against as-measured detector, vortex or on-sky data (#34).
 
 # Notes
-Instrument and telescope properties (mirrors, coatings, filters, detector tables) come from configuration files for the Lazuli 3 m telescope and the ESC instrument, bundled under `src/esc_etc/data/lazuli/` (`telescope/` and `esc/`), so a plain `pip install` needs no git access. They are snapshots of the UASAL repositories [config_um](https://github.com/uasal/config_um) and [config_um_esc](https://github.com/uasal/config_um_esc) ("UM" is the UA code name for Lazuli); `SNAPSHOT.txt` records which revision each came from. Maintainers refresh the snapshot with:
+Instrument and telescope properties (mirrors, coatings, filters, detector tables) come from configuration files for the Lazuli 3 m telescope and the ESC instrument, bundled under `src/esc_etc/data/lazuli/` (`telescope/` and `esc/`), so a plain `pip install` needs no git access. They are snapshots of the UASAL repositories [config_um](https://github.com/uasal/config_um) and [config_um_esc](https://github.com/uasal/config_um_esc) ("UM" is the UA code name for Lazuli), linked here for reference: those repositories are maintained by UASAL and are not edited in this package. `scripts/sync_uasal_configs.py` pulls them into the snapshot, and `SNAPSHOT.txt` records which revision each came from. Maintainers refresh the snapshot with:
 
 ```sh
 pip install -r scripts/requirements-uasal.txt
