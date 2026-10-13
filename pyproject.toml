@@ -18,7 +18,7 @@ maintainers = [
 description = "Exposure time calculator for the ExtraSolar Camera (ESC) on Lazuli"
 readme = "README.md"
 license = "BSD-3-Clause"
-license-files = ["LICENSE", "COPYRIGHT"]
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 # The Lazuli telescope and ESC configuration (UASAL config_um / config_um_esc)
 # is vendored under src/esc_etc/data/lazuli (scripts/sync_uasal_configs.py), so no git

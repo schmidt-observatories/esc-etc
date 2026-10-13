@@ -3,7 +3,7 @@
 # parts a PyPI consumer does not need (docs, notebooks, maintainer scripts, CI).
 # The wheel's data files are listed in [tool.setuptools.package-data] and the
 # build job audits both artifacts (.github/scripts/audit_artifacts.py).
-include README.md LICENSE COPYRIGHT DATA_SOURCES.md pyproject.toml
+include README.md LICENSE DATA_SOURCES.md pyproject.toml
 prune docs
 prune notebooks
 prune scripts
