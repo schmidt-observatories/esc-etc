@@ -11,5 +11,5 @@ def test_snr():
     snr, _esc = esc_etc.ExposureTimeSNRCalculatorESC.esc_calc_snr(
         600, 10, verbose=False, plot=False
     )
-    val = 8.11414044996051
+    val = 7.316562091622433  # F630N EOL default bandpass, 0.2 arcsec
     assert np.abs(float(snr) - val) < 1e-4, f"Expected {val}, but got {snr}"

@@ -7,12 +7,12 @@
       "contrast": 1e-08,
       "ppgain": 10
     },
-    "snr": 9.874243623318177,
-    "source_counts": 2.4792424803413255,
-    "sky_counts": 0.0008646151233760717,
-    "speckle_counts": 2.479242480341329,
-    "exozodi_counts": 0.0031900982709167037,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 9.822895455353404,
+    "source_counts": 1.8250234735023378,
+    "sky_counts": 0.0006361818907908775,
+    "speckle_counts": 1.8250234735023412,
+    "exozodi_counts": 0.002348302835850239,
+    "num_psf_pixels": 19.595181216030333
   },
   {
     "params": {
@@ -22,12 +22,12 @@
       "contrast": 1e-08,
       "ppgain": 10
     },
-    "snr": 8.11414044996051,
-    "source_counts": 1.8157321305236238,
-    "sky_counts": 0.0006332214265038109,
-    "speckle_counts": 1.8157321305236265,
-    "exozodi_counts": 0.002336344256748078,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 7.316562091622433,
+    "source_counts": 1.3365992984041677,
+    "sky_counts": 0.0004659229216688946,
+    "speckle_counts": 1.3365992984041701,
+    "exozodi_counts": 0.0017198353711114205,
+    "num_psf_pixels": 19.595181216030333
   },
   {
     "params": {
@@ -37,12 +37,12 @@
       "contrast": 1e-09,
       "ppgain": 10
     },
-    "snr": 62.561036288423196,
-    "source_counts": 2.4792424803413255,
-    "sky_counts": 0.0008646151233760717,
-    "speckle_counts": 0.24792424803413296,
-    "exozodi_counts": 0.0031900982709167037,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 55.3118340675604,
+    "source_counts": 1.8250234735023378,
+    "sky_counts": 0.0006361818907908775,
+    "speckle_counts": 0.1825023473502341,
+    "exozodi_counts": 0.002348302835850239,
+    "num_psf_pixels": 19.595181216030333
   },
   {
     "params": {
@@ -52,12 +52,12 @@
       "contrast": 1e-08,
       "ppgain": 100
     },
-    "snr": 52.97475371901486,
-    "source_counts": 2.4792424803413255,
-    "sky_counts": 0.0008646151233760717,
-    "speckle_counts": 2.479242480341329,
-    "exozodi_counts": 0.0031900982709167037,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 46.431534227322636,
+    "source_counts": 1.8250234735023378,
+    "sky_counts": 0.0006361818907908775,
+    "speckle_counts": 1.8250234735023412,
+    "exozodi_counts": 0.002348302835850239,
+    "num_psf_pixels": 19.595181216030333
   },
   {
     "params": {
@@ -68,12 +68,12 @@
       "ppgain": 10,
       "planetdeltamag": 22
     },
-    "snr": 1.5531113770712095,
-    "source_counts": 0.35593696959726284,
-    "sky_counts": 0.0007832076514936537,
-    "speckle_counts": 2.2458104513941604,
-    "exozodi_counts": 0.0028897359151464773,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 1.5376986855407526,
+    "source_counts": 0.2620128243820915,
+    "sky_counts": 0.0005762824534731064,
+    "speckle_counts": 1.653189158918796,
+    "exozodi_counts": 0.0021271993738446013,
+    "num_psf_pixels": 19.595181216030333
   },
   {
     "params": {
@@ -84,12 +84,12 @@
       "ppgain": 10,
       "hoststarmag": 2.0
     },
-    "snr": 8.331104063236532,
-    "source_counts": 0.28386967769802435,
-    "sky_counts": 0.0008646151233760717,
-    "speckle_counts": 0.28386967769802474,
-    "exozodi_counts": 0.00036526163744398033,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 7.629570223005687,
+    "source_counts": 0.208962547763022,
+    "sky_counts": 0.0006361818907908775,
+    "speckle_counts": 0.2089625477630224,
+    "exozodi_counts": 0.00026887727781204696,
+    "num_psf_pixels": 19.595181216030333
   },
   {
     "params": {
@@ -100,11 +100,11 @@
       "ppgain": 10,
       "bg_flux": 21.0
     },
-    "snr": 9.874187553059482,
-    "source_counts": 2.4792424803413255,
-    "sky_counts": 0.003442094803850108,
-    "speckle_counts": 2.479242480341329,
-    "exozodi_counts": 0.0031900982709167037,
-    "num_psf_pixels": 19.59514440298425
+    "snr": 9.822820500818457,
+    "source_counts": 1.8250234735023378,
+    "sky_counts": 0.0025326857250013023,
+    "speckle_counts": 1.8250234735023412,
+    "exozodi_counts": 0.002348302835850239,
+    "num_psf_pixels": 19.595181216030333
   }
 ]

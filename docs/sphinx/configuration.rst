@@ -27,13 +27,15 @@ train and filter wheel; the default is ``"arm_a"``.
    sim = Simulation.from_default(arm="arm_a")
    sim = Simulation.from_default(filter="F630N", lifetime="eol")
 
-``filter`` replaces the generic configuration bandpass with that filter's
-measured end-to-end throughput curve and moves the telescope's design
-wavelength to match. ``lifetime`` selects the ``"eol"`` curve set (end of
-life, the default) or ``"bol"`` (beginning of life); it needs a named filter,
-and any other value raises ``ValueError``. Without ``filter`` you get the
-generic chain assembled from the configuration files, which is wider and a
-little more transmissive than any real filter.
+``filter`` picks the ESC filter whose measured end-to-end throughput curve
+is the sensor bandpass; the telescope's design wavelength follows it. The
+default is :data:`esc_etc.DEFAULT_FILTER` (``"F630N"``, slot R2), so the two
+calls above build the same simulation. ``lifetime`` selects the ``"eol"``
+curve set (end of life, the default) or ``"bol"`` (beginning of life); any
+other value raises ``ValueError``. ``filter=None`` is the legacy option: the
+generic box-filter chain assembled from the configuration files, which is
+wider and a little more transmissive than any real filter and has no
+``lifetime`` variants.
 
 The ESC filters
 ---------------

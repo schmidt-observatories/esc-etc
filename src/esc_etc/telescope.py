@@ -12,7 +12,7 @@ import numpy as np
 from astropy import units as u
 
 from .meta import _MetaHolder_
-from .sensor import filter_central_wavelength
+from .sensor import DEFAULT_FILTER, filter_central_wavelength
 
 
 class Telescope(_MetaHolder_):
@@ -91,7 +91,7 @@ class Telescope(_MetaHolder_):
         )
 
     @classmethod
-    def from_default(cls, arm="arm_a", filter=None):
+    def from_default(cls, arm="arm_a", filter=DEFAULT_FILTER):
         from . import uasal_config
 
         return cls.from_config(

@@ -3,7 +3,8 @@
 tests/test_api_equivalence.py. First run with the pre-refactor engine, then
 regenerated 2026-09-12 after the single-aperture change (issue #10) and
 2026-09-13 for the Lazuli 3 m default, and again for the encircled-energy
-aperture default (point-source rates x0.456)."""
+aperture default (point-source rates x0.456), and 2026-10-12 for the F630N
+end-of-life default bandpass (issue #31)."""
 
 import json
 import os

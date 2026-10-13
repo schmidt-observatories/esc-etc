@@ -38,7 +38,7 @@ from .meta import _MetaHolder_
 WAVELENGTHS = np.arange(2000, 10000, 0.2) * u.AA
 
 # Instrument numbers that are not in the configuration files. They only enter
-# the generic (filter=None) bandpass chain and the legacy ``num_pixels``
+# the generic (filter=None, not the default) bandpass chain and the legacy ``num_pixels``
 # attribute; the EOL/BOL filter curves below carry their own optics.
 GENERIC_FILTER_PEAK = 0.98  # peak transmission of the generic box filter
 POLARIZER_FALLBACK = 0.99  # polarizer / wave plate with no curve in the config
@@ -68,6 +68,7 @@ def _load_filters(lifetime):
 
 _FILTERS = {"eol": _load_filters("eol"), "bol": _load_filters("bol")}
 FILTERS = _FILTERS["eol"]
+DEFAULT_FILTER = "F630N"  # R2; what from_default() and esc_calc_snr() use (issue #31)
 
 
 def _filter_path(name, lifetime="eol"):
@@ -400,7 +401,9 @@ class Sensor(_MetaHolder_):
         return _resample_spectral_element(bandpass, WAVELENGTHS)
 
     @classmethod
-    def from_default(cls, telescope, arm="arm_a", filter=None, lifetime="eol"):
+    def from_default(
+        cls, telescope, arm="arm_a", filter=DEFAULT_FILTER, lifetime="eol"
+    ):
         from . import uasal_config
 
         return cls.from_config(

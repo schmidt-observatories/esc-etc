@@ -9,6 +9,7 @@ import warnings
 
 from astropy import units as u
 
+from .sensor import DEFAULT_FILTER
 from .simulation import Simulation
 from synphot import SourceSpectrum, SpectralElement
 from synphot.models import Empirical1D
@@ -63,7 +64,7 @@ def esc_calc_snr(
     ppgain=10,
     verbose=True,
     plot=False,
-    filter=None,
+    filter=DEFAULT_FILTER,
     lifetime="eol",
     aperture="resel",
 ):
@@ -73,7 +74,8 @@ def esc_calc_snr(
     this function's `exp_time`; per-frame time is `int_time`.
 
     ``plot=True`` draws the :meth:`~esc_etc.Simulation.plot` overview.
-    ``lifetime`` picks the ``"eol"`` (default) or ``"bol"`` filter curve set;
+    ``filter`` defaults to :data:`esc_etc.DEFAULT_FILTER`; ``None`` is the legacy
+    generic config chain. ``lifetime`` picks the ``"eol"`` (default) or ``"bol"`` curve set;
     ``aperture`` the noise aperture (``"resel"`` default, ``"optimal"``,
     ``"box"``, ``"matched"``) - see :class:`esc_etc.sensor.Sensor`.
     """

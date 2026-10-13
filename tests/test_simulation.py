@@ -17,11 +17,11 @@ def test_baseline_snr_and_counts_match_anchor():
         exobg_flux=21.0,
     )
     rates = sim.count_rate_components()
-    assert rates.source.value == pytest.approx(2.479242, rel=1e-3)
-    assert rates.zodi.value == pytest.approx(8.646151e-04, rel=1e-3)
-    assert rates.speckle.value == pytest.approx(2.479242, rel=1e-3)
+    assert rates.source.value == pytest.approx(1.825023, rel=1e-3)
+    assert rates.zodi.value == pytest.approx(6.361819e-04, rel=1e-3)
+    assert rates.speckle.value == pytest.approx(1.825023, rel=1e-3)
     out = sim.get_snr(total_time=3600 * u.s, frame_time=100 * u.s)
-    assert out["snr"] == pytest.approx(9.87424, rel=2e-3)
+    assert out["snr"] == pytest.approx(9.82290, rel=2e-3)
 
 
 def test_noise_model_seam_is_used():

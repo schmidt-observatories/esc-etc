@@ -41,7 +41,7 @@ def test_lifetime_is_validated():
 def test_lifetime_without_filter_is_rejected():
     # the generic config chain has no BOL/EOL variants; bol would be a no-op
     with pytest.raises(ValueError, match="lifetime"):
-        Simulation.from_default(lifetime="bol")
+        Simulation.from_default(filter=None, lifetime="bol")
 
 
 # 3. Simulation.reset() restores nested components.

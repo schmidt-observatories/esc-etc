@@ -100,7 +100,7 @@ class Coronagraph(_MetaHolder_):
         telescope,
         raw_dh_contrast=1e-8,
         ppgain=10,
-        separation=0.4,
+        separation=0.2,
         arm="arm_a",
     ):
         isp = Path(instrument_support_path)
@@ -129,7 +129,7 @@ class Coronagraph(_MetaHolder_):
 
     @classmethod
     def from_default(
-        cls, telescope, raw_dh_contrast=1e-8, ppgain=10, separation=0.4, arm="arm_a"
+        cls, telescope, raw_dh_contrast=1e-8, ppgain=10, separation=0.2, arm="arm_a"
     ):
         from . import uasal_config
 

@@ -10,7 +10,7 @@ def get_data_path():
 
 
 from .telescope import Telescope
-from .sensor import Sensor, FILTERS
+from .sensor import Sensor, FILTERS, DEFAULT_FILTER
 from .scene import Scene, SceneElement, get_scene
 from .coronagraph import Coronagraph
 from .noise import AnalyticCoronagraphNoiseModel, CountRates
@@ -42,6 +42,7 @@ __all__ = [
     "Telescope",
     "Sensor",
     "FILTERS",
+    "DEFAULT_FILTER",
     "Scene",
     "SceneElement",
     "Coronagraph",
