@@ -37,7 +37,8 @@ that led up to it.
   workflow is removed and the Read the Docs build fails on warnings, as a
   local ``sphinx-build -W`` does.
 - **License.** The package is released under the BSD 3-Clause license (it
-  was GPL-3.0-or-later), matching wcc-etc. Gudmundur Stefansson is the
+  was GPL-3.0-or-later), matching wcc-etc; ``LICENSE`` is the only license
+  file, the separate ``COPYRIGHT`` is gone. Gudmundur Stefansson is the
   maintainer. The legacy demo notebook, ``etc_esc_requirements.py`` and the
   internal planning documents are no longer tracked.
 - **Sensor units.** ``sim.update(sensor__read_noise=5)`` and the same for
