@@ -112,8 +112,8 @@ filters 10%.
      - 656.0 nm
      - 2%
 
-The curves are the Lazuli throughput budget (v0.4, frozen for the Mission
-PDR): telescope plus ESC, including detector quantum efficiency and a
+The curves are the Lazuli throughput budget of 2026-03-25: telescope plus
+ESC, including detector quantum efficiency and a
 polarization factor of 0.5, and at end of life also contamination and the
 budget reserves. They exclude the vortex off-axis throughput and the Lyot stop
 area, which ``esc_etc`` applies itself. ``DATA_SOURCES.md`` in the repository

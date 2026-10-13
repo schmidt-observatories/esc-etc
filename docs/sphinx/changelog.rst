@@ -11,6 +11,10 @@ made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 First public release on PyPI. The sections after this one record the work
 that led up to it.
 
+- **Filter curve provenance** (issue #29). The 24 bundled throughput
+  curves, ``DATA_SOURCES.md`` and the docs cite the Lazuli throughput
+  budget by date only; the internal budget document, review milestone
+  and margin numbers are no longer quoted. The curve data is unchanged.
 - **Release hygiene** (issue #27). ``esc_calc_snr(plot=True)`` draws the
   overview instead of ignoring the argument. ``Sensor.from_config`` computes
   the plate scale with units (a 2 ppm change from the exact arcsec-per-radian
@@ -123,7 +127,7 @@ Physics
   magnitude. Invalid magnitude systems raise ``ValueError`` immediately, and the
   deprecated ``flux_units`` argument is now honored instead of ignored.
 - **End-of-life ESC filter curves**. Twelve telescope + ESC throughput curves
-  (EOL, 5% telescope and 10% ESC reserve, detector QE and EOL contamination
+  (EOL, budget reserves, detector QE and EOL contamination
   included, vortex and Lyot factors excluded) ship in ``esc_etc/data/esc_filters_eol`` and are listed in
   :data:`esc_etc.FILTERS` by wheel slot (``"R1"``) and designation
   (``"F620N"``). ``filter=`` on :meth:`Simulation.from_default
@@ -131,7 +135,7 @@ Physics
   ``Sensor.from_default`` uses the curve as the whole sensor bandpass and the
   design wavelength as the telescope's central wavelength (resel, lambda/D).
   Default (``None``) keeps the generic config box filter. The curves come
-  from the Pearl PLSE throughput budget v0.4 (Zandbergen, frozen for MPDR),
+  from the Lazuli throughput budget of 2026-03-25,
   whose optics chain matches ``config_um_esc``, on a 0.1 nm grid; the vortex
   off-axis factor and the Lyot area are deliberately left out because
   ``Coronagraph.off_axis_throughput`` and ``Telescope.surface`` apply them per
@@ -171,7 +175,7 @@ Physics
   numbers; ``aperture="box"`` with ``encircled_energy=1.0`` reproduces the UA
   convention. ``filter=`` gains ``lifetime="eol"`` (default: EOL contamination
   and reserves) or ``"bol"`` (instrument delivery, no reserves); both curve sets
-  come from the Pearl PLSE budget v0.4 without the vortex and Lyot factors.
+  come from the Lazuli throughput budget without the vortex and Lyot factors.
 
 Object-oriented API
 -------------------

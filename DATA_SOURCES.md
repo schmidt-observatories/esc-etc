@@ -8,7 +8,7 @@ Paths are relative to `src/esc_etc/data/`. The build job
 
 | Path | What | Source and citation |
 |---|---|---|
-| `esc_filters_eol/ESC_*_EOL.csv` | 12 end-of-life telescope + ESC throughput curves, one per filter-wheel slot (B1 to B6, R1 to R6), 300 to 1100 nm. Include detector QE (ZWO ASI294MM), a polarization factor of 0.5, end-of-life contamination, and 5% telescope + 10% ESC reserves. Exclude the vortex off-axis throughput and the Lyot stop area, which `esc_etc` applies separately. | Lazuli / Project Pearl throughput budget v0.4, 2026-03-25 (frozen for the Mission PDR). Internal product of the Schmidt Observatory System. Each file header records the budget version and what is folded in. |
+| `esc_filters_eol/ESC_*_EOL.csv` | 12 end-of-life telescope + ESC throughput curves, one per filter-wheel slot (B1 to B6, R1 to R6), 300 to 1100 nm. Include detector QE (ZWO ASI294MM), a polarization factor of 0.5, end-of-life contamination and the budget reserves. Exclude the vortex off-axis throughput and the Lyot stop area, which `esc_etc` applies separately. | Lazuli throughput budget, 2026-03-25. Each file header records the budget date and what is folded in. |
 | `esc_filters_bol/ESC_*_BOL.csv` | The same 12 curves at instrument delivery (beginning of life), no contamination, no reserves. | Same budget. |
 
 Both sets are the bandpass used when a simulation is built with `filter=` and `lifetime="eol"` or `"bol"`. Without `filter=`, the bandpass is assembled from the UASAL configuration below (issue #31).
@@ -44,4 +44,4 @@ A copy of the `configs/*.toml` and `support_data/` of two University of Arizona 
 
 ## Not bundled
 
-The ASI294MM detector parameters are datasheet values digitized by hand; nothing here has been checked against measured detector, vortex or on-sky data yet (issue #34). Pearl-derived throughput data is subject to the export review in issue #29.
+The ASI294MM detector parameters are datasheet values digitized by hand; nothing here has been checked against measured detector, vortex or on-sky data yet (issue #34). The bundled throughput curves are subject to the export review in issue #29.
