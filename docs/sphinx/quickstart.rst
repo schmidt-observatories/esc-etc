@@ -129,14 +129,14 @@ original values.
 
    sim.reset()                               # back to the initial configuration
 
-To use one of the ESC filters instead of the generic configuration bandpass,
-build the simulation with ``filter=`` (a key of :data:`esc_etc.FILTERS`) and
-``lifetime="eol"`` for the end-of-life throughput or ``"bol"`` for beginning
-of life:
+The bandpass is the end-of-life throughput curve of the ``F630N`` filter
+unless you say otherwise. Pick another filter with ``filter=`` (a key of
+:data:`esc_etc.FILTERS`), and ``lifetime="bol"`` for the beginning-of-life
+curve:
 
 .. code-block:: python
 
-   sim = Simulation.from_default(filter="F630N", lifetime="eol")
+   sim = Simulation.from_default(filter="F620N", lifetime="bol")
 
 6. Plot the results
 -------------------

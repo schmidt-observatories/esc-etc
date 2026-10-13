@@ -29,7 +29,7 @@ from synphot import Observation, SourceSpectrum, SpectralElement, units as su
 
 from .meta import _MetaHolder_
 from .telescope import Telescope
-from .sensor import Sensor
+from .sensor import DEFAULT_FILTER, Sensor
 from .scene import get_scene, mag_units
 from .coronagraph import Coronagraph
 from .noise import CountRates, AnalyticCoronagraphNoiseModel
@@ -69,23 +69,24 @@ class Simulation(_MetaHolder_):
         planetdeltamag=20.0,
         contrast=1e-8,
         ppgain=10,
-        separation=0.4,
+        separation=0.2,
         bg_flux=22.5,
         exobg_flux=21.0,
         arm="arm_a",
         mag_system="vega",
         hoststar_band=None,
-        filter=None,
+        filter=DEFAULT_FILTER,
         lifetime="eol",
     ):
         """See ``get_scene`` for what band each magnitude is quoted in.
 
-        ``filter`` (None = the generic config box filter, or a key of
-        :data:`esc_etc.FILTERS` such as ``"R1"`` / ``"F620N"``) uses that ESC
+        ``filter`` (a key of :data:`esc_etc.FILTERS` such as ``"R1"`` /
+        ``"F620N"``, default :data:`esc_etc.DEFAULT_FILTER`) uses that ESC
         filter's measured curve as the full sensor bandpass and its design
         wavelength as the telescope's central wavelength. ``lifetime`` picks the
-        ``"eol"`` (end of life, default) or ``"bol"`` curve set; it needs a
-        named filter, and anything else raises ``ValueError``.
+        ``"eol"`` (end of life, default) or ``"bol"`` curve set. ``filter=None``
+        is the legacy option: the generic box-filter chain assembled from the
+        configuration files, which has no BOL/EOL variants.
         """
         telescope = Telescope.from_default(arm=arm, filter=filter)
         sensor = Sensor.from_default(

@@ -11,12 +11,6 @@ number. Each links to the GitHub issue that tracks it.
   the focal-plane mask throughput table is a total or an in-core throughput
   is also still open.
   `#30 <https://github.com/schmidt-observatories/esc-etc/issues/30>`_
-- **The default bandpass is not the flight baseline.** Without ``filter=``,
-  the bandpass is the generic chain from the configuration files, which is
-  wider and more transmissive than the end-of-life curves of the real
-  filters. Pass ``filter=`` and ``lifetime="eol"`` for a flight-like
-  estimate.
-  `#31 <https://github.com/schmidt-observatories/esc-etc/issues/31>`_
 - **The raw contrast is one number.** It does not vary with separation,
   wavelength or bandwidth, no inner or outer working angle is enforced, and
   the off-axis throughput is read from the table with the nearest point

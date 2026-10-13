@@ -107,7 +107,7 @@ curve is flat beyond one hour:
    from esc_etc import Simulation, lazuli_style
 
    sim = Simulation.from_default(separation=0.4, contrast=1e-8, ppgain=10)
-   frame_times = np.logspace(0, 4.7, 80)                      # 1 s to 50 000 s
+   frame_times = np.logspace(0, 4.6, 80)                      # 1 s to 40 000 s
    snr = [sim.get_snr(total_time=3600, frame_time=ft)["snr"] for ft in frame_times]
 
    with lazuli_style():

@@ -35,10 +35,10 @@ use_lazuli_style()      # house plotting style for the whole session
 print('esc_etc', esc_etc.__version__)"""),
 md("""## 1. A default simulation
 
-`Simulation.from_default()` builds the four pieces of the calculator (telescope, sensor, scene, coronagraph) from the packaged configuration. The arguments below are the defaults, written out so you can see what a scene is: a host star of Vega magnitude -0.353, a planet 20 magnitudes fainter at 0.4 arcsec, a raw dark-hole contrast of 1e-8, and a post-processing gain of 10. Magnitudes are quoted in the ESC band unless you say otherwise (notebook 02)."""),
+`Simulation.from_default()` builds the four pieces of the calculator (telescope, sensor, scene, coronagraph) from the packaged configuration. The arguments below are the defaults, written out so you can see what a scene is: a host star of Vega magnitude -0.353, a planet 20 magnitudes fainter at 0.2 arcsec, a raw dark-hole contrast of 1e-8, and a post-processing gain of 10. The bandpass is the end-of-life curve of the `F630N` filter (notebook 02 shows the alternatives). Magnitudes are quoted in the ESC band unless you say otherwise (notebook 02)."""),
 code("""sim = Simulation.from_default(
     hoststarmag=-0.353, planetdeltamag=20,
-    contrast=1e-8, ppgain=10, separation=0.4,
+    contrast=1e-8, ppgain=10, separation=0.2,
 )
 sim"""),
 md("""## 2. SNR for a given integration time
@@ -52,7 +52,7 @@ print('noise  [e-]  :', round(out['noise_e'], 1))
 # plain floats are seconds; hours work too
 assert sim.get_snr(3600, 100)['snr'] == out['snr']
 assert sim.get_snr(1 * u.h, 100)['snr'] == out['snr']
-assert abs(out['snr'] - 9.87) < 0.05, out['snr']"""),
+assert abs(out['snr'] - 9.75) < 0.05, out['snr']"""),
 md("""## 3. Integration time for a target SNR
 
 `get_int_time_for_snr` is the inverse. `int_time` is rounded up to whole frames; `int_time_continuous` is the exact solution. The 3600 s above round-trips. SNR 5 is reached in about 30 s because it is only half of this scene's plateau of 10; the last factor of two toward the plateau takes most of the hour (notebook 03 explains the plateau)."""),
@@ -121,13 +121,13 @@ assert np.isclose(s.num_psf_pixels.value * s.plate_scale**2, t.resel.value)
 fig, ax = s.plot_aperture()"""),
 md("""## 3. Filters
 
-`FILTERS` lists the ESC filter set. Passing `filter=` to `Simulation.from_default` uses that filter's measured curve as the whole bandpass and moves the telescope's design wavelength to match; `lifetime="eol"` (the default) or `"bol"` selects the end-of-life or beginning-of-life curve. Without a filter you get the generic configuration chain, which is wider and a little more transmissive than any real filter.
+`FILTERS` lists the ESC filter set. Passing `filter=` to `Simulation.from_default` uses that filter's measured curve as the whole bandpass and moves the telescope's design wavelength to match; `lifetime="eol"` (the default) or `"bol"` selects the end-of-life or beginning-of-life curve. The default is `DEFAULT_FILTER` (`F630N`, end of life). `filter=None` is the legacy option: the generic configuration chain, which is wider and a little more transmissive than any real filter.
 
 When you build the components yourself, the telescope and the sensor must be built for the same filter. Mixing them raises a `ValueError`, because the pixel geometry would be computed at one wavelength and the throughput at another."""),
 code("""print(sorted(FILTERS))
 
 fig, ax = plt.subplots()
-Simulation.from_default().plot_bandpass(ax=ax, label='generic chain')
+Simulation.from_default(filter=None).plot_bandpass(ax=ax, label='generic chain (filter=None)')
 Simulation.from_default(filter='F630N', lifetime='eol').plot_bandpass(ax=ax, label='F630N end of life')
 Simulation.from_default(filter='F630N', lifetime='bol').plot_bandpass(ax=ax, label='F630N beginning of life')
 ax.set_xlim(610, 650);
@@ -140,7 +140,7 @@ md("""## 4. Scene and coronagraph
 
 `get_scene` builds the star, planet, zodi and exozodi elements. The star and planet magnitudes are Vega magnitudes in the ESC band by default; `hoststar_band=` and `mag_system=` change that. The coronagraph carries the raw dark-hole contrast, the post-processing gain and the planet separation."""),
 code("""scene = get_scene(t, hoststarmag=-0.353, planetdeltamag=20, bg_flux=22.5, exobg_flux=21)
-c = Coronagraph.from_default(t, raw_dh_contrast=1e-8, ppgain=10, separation=0.4)
+c = Coronagraph.from_default(t, raw_dh_contrast=1e-8, ppgain=10, separation=0.2)
 print('star mag    :', scene.star.mag, scene.star.mag_system)
 print('planet dmag :', scene.planet.deltamag)
 print('contrast    :', c.raw_dh_contrast, '| ppgain', c.ppgain, '| separation', c.separation, 'arcsec')
@@ -157,14 +157,14 @@ md("""## 6. Change parameters
 
 `update()` changes a parameter in place and the next calculation sees it. From the simulation, nested parameters are addressed with double underscores, so `sim.update(coronagraph__ppgain=100)` is the same as `sim.coronagraph.update(ppgain=100)`. An invalid value is refused and leaves the object unchanged. `sim.reset()` puts every component back to its initial state.
 
-Two changes below, one at a time. A fainter host means a fainter planet, because the planet is defined relative to the host, so the SNR drops and the curve is no longer near its plateau. Raising `ppgain` then lifts the plateau from 10 to 100, and at one hour the SNR ends up above the default scene's, because the photon-limited part of the curve has not yet bent over."""),
+Two changes below, one at a time. A fainter host means a fainter planet, because the planet is defined relative to the host, so the SNR drops and the curve is no longer near its plateau. Raising `ppgain` then lifts the plateau from 10 to 100 and the SNR climbs back most of the way, but not above the default scene's: the fainter planet is photon-limited rather than speckle-limited, so a higher plateau helps less than it would for the bright host."""),
 code("""sim.update(scene__star__mag=2.0)
 faint = sim.get_snr(3600, 100)['snr']
 print('host 2.35 mag fainter        :', round(faint, 3))
 sim.update(coronagraph__ppgain=100)
 faint_pp = sim.get_snr(3600, 100)['snr']
 print('... and post-processing gain 100:', round(faint_pp, 3))
-assert faint < base < faint_pp
+assert faint < faint_pp < base
 
 try:
     sim.update(sensor__encircled_energy=1.7)

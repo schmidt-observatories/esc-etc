@@ -72,8 +72,7 @@ The off-axis throughput
 :meth:`~esc_etc.Coronagraph.off_axis_throughput` converts a separation in
 arcsec to :math:`\lambda/D` (using the filter wavelength and the primary
 diameter) and looks up the focal-plane mask transmission in the curve loaded
-from the instrument configuration. At the default 0.4 arcsec the throughput
-is 0.58:
+from the instrument configuration. At 0.4 arcsec the throughput is 0.58:
 
 .. plot::
    :context: reset

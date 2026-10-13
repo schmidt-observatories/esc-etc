@@ -33,7 +33,7 @@ def test_dichroic_throughput_is_applied():
         uasal_config.get_data_path(uasal_config.TELESCOPE),
         t,
     )
-    full = Sensor.from_default(t)
+    full = Sensor.from_default(t, filter=None)  # the generic config chain
     assert float(half.bandpass(630 * u.nm)) == pytest.approx(
         0.5 / 0.9 * float(full.bandpass(630 * u.nm)), rel=1e-6
     )
@@ -43,3 +43,28 @@ def test_default_simulation_geometry():
     sim = Simulation.from_default()
     assert sim.sensor.num_psf_pixels.value == pytest.approx(19.595, rel=1e-3)
     assert sim.telescope.primary_filter.to_value(u.nm) == pytest.approx(630.0)
+
+
+def test_default_bandpass_is_the_eol_f630n_curve():
+    # issue #31: the default must be the flight baseline, not the generic chain
+    sim = Simulation.from_default()
+    assert float(sim.sensor.bandpass(630 * u.nm)) == pytest.approx(0.0916449, rel=1e-6)
+    generic = Simulation.from_default(filter=None)
+    assert float(generic.sensor.bandpass(630 * u.nm)) > 0.1
+
+
+def test_legacy_shim_shares_the_default_filter_and_separation():
+    import inspect
+
+    from esc_etc import Coronagraph
+    from esc_etc.ExposureTimeSNRCalculatorESC import esc_calc_snr
+
+    _, esc = esc_calc_snr(600, 10, verbose=False, plot=False)
+    assert float(esc._sim.sensor.bandpass(630 * u.nm)) == pytest.approx(
+        0.0916449, rel=1e-6
+    )
+    defaults = {
+        f.__qualname__: inspect.signature(f).parameters["separation"].default
+        for f in (esc_calc_snr, Simulation.from_default, Coronagraph.from_default)
+    }
+    assert len(set(defaults.values())) == 1, defaults

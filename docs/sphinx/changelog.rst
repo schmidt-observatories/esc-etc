@@ -11,6 +11,14 @@ made since the original fork is kept in ``docs/ETC_Changelog.rst``.
 First public release on PyPI. The sections after this one record the work
 that led up to it.
 
+- **Default bandpass is the flight baseline** (issue #31). ``Simulation.from_default``,
+  ``Telescope.from_default``, ``Sensor.from_default`` and ``esc_calc_snr`` now
+  default to ``filter="F630N"`` (:data:`esc_etc.DEFAULT_FILTER`) with the
+  end-of-life curve, where they used the generic box-filter chain from the
+  configuration files. ``filter=None`` keeps that chain as the legacy option.
+  Default point-source and zodi rates fall x0.736 and the anchors are
+  re-pinned. The default separation is 0.2 arcsec everywhere (it was 0.4 in
+  the object API and 0.2 in ``esc_calc_snr``).
 - **Filter curve provenance** (issue #29). The 24 bundled throughput
   curves, ``DATA_SOURCES.md`` and the docs cite the Lazuli throughput
   budget by date only; the internal budget document, review milestone
