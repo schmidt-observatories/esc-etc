@@ -1,4 +1,4 @@
-# ESC B6 F425W blue 425.0nm 10%: telescope + ESC throughput, EOL, budget v0.4 (2026-03-25, frozen MPDR), 5% tel + 10% ESC reserve; EXCLUDES vortex off-axis throughput (0.446175 @5 lam/D) and Lyot area (0.81): esc_etc applies both; incl. QE (ASI294MM), polarization 0.5, EOL contamination
+# ESC B6 F425W blue 425.0nm 10%: telescope + ESC throughput, end of life (contamination and reserves included), Lazuli throughput budget, 2026-03-25; excludes vortex off-axis throughput and Lyot stop area (esc_etc applies both); includes QE (ASI294MM), polarization 0.5
 wavelength_nm,throughput_EOL_TelESC_noVVW_noLyot
 300,0
 300.1,0

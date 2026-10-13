@@ -1,4 +1,4 @@
-# ESC B1 F400N blue 400.0nm 2%: telescope + ESC throughput, INSTRUMENT DELIVERY (ID/BOL contamination), NO reserves, budget v0.4 (2026-03-25, frozen MPDR); EXCLUDES vortex off-axis throughput (0.446175 @5 lam/D) and Lyot area (0.81): esc_etc applies both; incl. QE (ASI294MM), polarization 0.5
+# ESC B1 F400N blue 400.0nm 2%: telescope + ESC throughput, instrument delivery (beginning of life, no reserves), Lazuli throughput budget, 2026-03-25; excludes vortex off-axis throughput and Lyot stop area (esc_etc applies both); includes QE (ASI294MM), polarization 0.5
 wavelength_nm,throughput_ID_noreserve_TelESC_noVVW_noLyot
 300,0
 300.1,0

@@ -47,10 +47,10 @@ LEGACY_SENSOR_AREA = (
     962.56 * u.um * 962.56 * u.um
 )  # from the original ETC; sets num_pixels, which nothing uses
 
-# Telescope + ESC throughput curves from the Pearl PLSE budget v0.4 (optics, QE,
+# Telescope + ESC throughput curves from the Lazuli throughput budget of 2026-03-25 (optics, QE,
 # polarization 0.5 included; vortex off-axis factor and Lyot area EXCLUDED because
 # Coronagraph and Telescope.surface apply them). Two lifetimes:
-#   "eol": end of life, EOL contamination, 5% telescope + 10% ESC reserves
+#   "eol": end of life, EOL contamination, budget reserves
 #   "bol": instrument delivery / beginning of life, ID contamination, no reserves
 # Keyed by wheel slot ("R1") and by designation ("F620N").
 _DATA = Path(__file__).parent / "data"

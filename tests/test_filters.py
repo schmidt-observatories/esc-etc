@@ -1,5 +1,5 @@
-"""End-of-life ESC filter curves shipped in esc_etc/data/esc_filters_eol (Pearl PLSE
-budget v0.4 chain incl. QE, EOL contamination and reserves; vortex and Lyot factors
+"""End-of-life ESC filter curves shipped in esc_etc/data/esc_filters_eol (Lazuli throughput
+budget chain incl. QE, EOL contamination and reserves; vortex and Lyot factors
 excluded because Coronagraph and Telescope.surface apply them)."""
 
 import astropy.units as u
@@ -49,3 +49,22 @@ def test_simulation_filter_changes_rates():
     b1 = Simulation.from_default(filter="B1").count_rate_components().host.value
     assert r1 != pytest.approx(default, rel=1e-3)
     assert b1 < r1
+
+
+def test_filter_headers_cite_the_budget_by_date_only():
+    """The shipped curves name the Lazuli budget and its date, not the internal
+    budget document, review milestone or margin numbers (issue #29)."""
+    from esc_etc.sensor import _DATA
+
+    files = [
+        f
+        for life in ("eol", "bol")
+        for f in sorted(_DATA.glob(f"esc_filters_{life}/ESC_*.csv"))
+    ]
+    assert len(files) == 24
+    for f in files:
+        header = f.open().readline()
+        assert header.startswith("# ESC ")
+        assert "Lazuli throughput budget, 2026-03-25" in header
+        for word in ("Pearl", "PLSE", "MPDR", "v0.4", "%", "0.446", "0.81"):
+            assert word not in header.split(":", 1)[1], (f.name, word)
